@@ -84,7 +84,6 @@
             activity: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
             cpu: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>,
             shield: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>,
-            sparkles: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>,
             mic: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
           };
           return icons[name] || null;
@@ -103,7 +102,7 @@
         };
 
         function App() {
-          const [view, setView] = React.useState('home');
+          const [view, setViewState] = React.useState('home');
           const [tracks, setTracks] = React.useState(INITIAL_TRACKS);
           const [currentTrack, setCurrentTrack] = React.useState(null);
           const [isPlaying, setIsPlaying] = React.useState(false);
@@ -127,6 +126,12 @@
           const [audioFile, setAudioFile] = React.useState(null);
 
           const audioRef = React.useRef(new Audio());
+
+          // NAVIGATION SECURISEE DANS LE SITE (REMONTE TOUJOURS EN HAUT)
+          const setView = (newView) => {
+            setViewState(newView);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
 
           React.useEffect(() => {
             const savedUser = localStorage.getItem('yanrecords_user');
@@ -152,7 +157,6 @@
               setShowAuthModal(true);
             } else {
               setView('upload');
-              window.scrollTo(0, 0);
             }
           };
 
@@ -223,7 +227,7 @@
             <div className="relative">
               {/* ===== NAVBAR ===== */}
               <nav className="glass fixed top-0 w-full z-50 px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-4 cursor-pointer" onClick={() => { setView('home'); window.scrollTo(0,0); }}>
+                <div className="flex items-center gap-4 cursor-pointer" onClick={() => setView('home')}>
                   <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent shadow-lg">
                     Y
                   </div>
@@ -231,10 +235,10 @@
                 </div>
 
                 <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
-                  <button onClick={() => { setView('home'); window.scrollTo(0,0); }} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'home' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>Accueil</button>
-                  <button onClick={() => { setView('vsts'); window.scrollTo(0,0); }} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'vsts' ? 'bg-cyanNeon text-black' : 'text-gray-400 hover:text-white'}`}>Plugins VST</button>
-                  <button onClick={() => { setView('beats'); window.scrollTo(0,0); }} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'beats' ? 'bg-goldAccent text-black' : 'text-gray-400 hover:text-white'}`}>Beatstore</button>
-                  <button onClick={() => { setView('dashboard'); window.scrollTo(0,0); }} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'dashboard' ? 'bg-pinkNeon text-white' : 'text-gray-400 hover:text-white'}`}>Dashboard Vendeur</button>
+                  <button onClick={() => setView('home')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'home' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>Accueil</button>
+                  <button onClick={() => setView('vsts')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'vsts' ? 'bg-cyanNeon text-black' : 'text-gray-400 hover:text-white'}`}>Plugins VST</button>
+                  <button onClick={() => setView('beats')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'beats' ? 'bg-goldAccent text-black' : 'text-gray-400 hover:text-white'}`}>Beatstore</button>
+                  <button onClick={() => setView('dashboard')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'dashboard' ? 'bg-pinkNeon text-white' : 'text-gray-400 hover:text-white'}`}>Dashboard Vendeur</button>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -273,7 +277,7 @@
                   </button>
                 )}
 
-                {/* ===== VIEW: HOME (VITRINE & CIBLAGE MOTIVANT) ===== */}
+                {/* ===== VIEW: HOME ===== */}
                 {view === 'home' && (
                   <div className="space-y-24">
                     
@@ -294,10 +298,10 @@
                           Propulsez votre carrière musicale. Accédez à des VSTs exclusifs codés en C++ natif et à des instrumentales uniques réservables en direct avec contrats de licences officiels.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                          <button onClick={() => { setView('vsts'); window.scrollTo(0,0); }} className="w-full sm:w-auto bg-cyanNeon text-black font-black px-8 py-4 rounded-xl text-lg hover:scale-105 transition cyan-glow">
+                          <button onClick={() => setView('vsts')} className="w-full sm:w-auto bg-cyanNeon text-black font-black px-8 py-4 rounded-xl text-lg hover:scale-105 transition cyan-glow">
                             DÉCOUVRIR LES VSTS
                           </button>
-                          <button onClick={() => { setView('beats'); window.scrollTo(0,0); }} className="w-full sm:w-auto bg-transparent border-2 border-goldAccent text-goldAccent font-black px-8 py-4 rounded-xl text-lg hover:bg-goldAccent/10 transition">
+                          <button onClick={() => setView('beats')} className="w-full sm:w-auto bg-transparent border-2 border-goldAccent text-goldAccent font-black px-8 py-4 rounded-xl text-lg hover:bg-goldAccent/10 transition">
                             ÉCOUTER LE BEATSTORE
                           </button>
                         </div>
@@ -308,7 +312,7 @@
                       </div>
                     </div>
 
-                    {/* SECTION CIBLE 1 : VOUS ÊTES BEATMAKER / PRODUCTEUR ? */}
+                    {/* SECTION CIBLE 1 : BEATMAKER / PRODUCTEUR */}
                     <div className="glass-card p-8 md:p-12 rounded-3xl border-goldAccent/50 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
                       <div className="space-y-4 max-w-2xl text-center md:text-left z-10">
                         <span className="bg-goldAccent/20 text-goldAccent text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider inline-flex items-center gap-2">
@@ -324,7 +328,7 @@
                       </button>
                     </div>
 
-                    {/* SECTION CIBLE 2 : TU ES UN(E) ARTISTE / RAPPEUR(SE) ? */}
+                    {/* SECTION CIBLE 2 : ARTISTE / RAPPEUR */}
                     <div className="glass-card p-8 md:p-12 rounded-3xl border-cyanNeon/50 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
                       <div className="space-y-4 max-w-2xl text-center md:text-left z-10">
                         <span className="bg-cyanNeon/20 text-cyanNeon text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider inline-flex items-center gap-2">
@@ -332,10 +336,10 @@
                         </span>
                         <h3 className="text-3xl md:text-4xl font-black text-white">DÉNICHE DES PÉPITES POUR TES PROJETS</h3>
                         <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                          Rode sur le Beatstore et trouve la prod qui va faire exploser ton prochain single. Réserves des licences exclusives (le beat est verrouillé et retiré du site) ou télécharge nos VST3 pour un enregistrement et mastering studio.
+                          Rode sur le Beatstore et trouve la prod qui va faire exploser ton prochain single. Réserve des licences exclusives (le beat est verrouillé et retiré du site) ou télécharge nos VST3 pour un enregistrement et mastering studio.
                         </p>
                       </div>
-                      <button onClick={() => { setView('beats'); window.scrollTo(0,0); }} className="bg-cyanNeon text-black font-black px-8 py-5 rounded-2xl text-base hover:scale-105 transition cyan-glow whitespace-nowrap z-10">
+                      <button onClick={() => setView('beats')} className="bg-cyanNeon text-black font-black px-8 py-5 rounded-2xl text-base hover:scale-105 transition cyan-glow whitespace-nowrap z-10">
                         DÉNICHER DES PÉPITES
                       </button>
                     </div>
@@ -526,7 +530,7 @@
 
                 {/* ===== VIEW: FORMULAIRE UPLOAD ===== */}
                 {view === 'upload' && (
-                  <div className="max-w-2xl mx-auto glass-card p-8 rounded-2xl border-goldAccent/40">
+                  <div className="max-w-2xl mx-auto glass-card p-8 rounded-2xl border-goldAccent/40 animate-fade-in">
                     <button onClick={() => setView('dashboard')} className="mb-4 flex items-center gap-2 text-gray-400 hover:text-white text-xs font-bold">
                       <Icon name="arrowLeft" className="w-4 h-4" />
                       <span>Retour au Dashboard</span>
@@ -598,8 +602,8 @@
                         <input type="file" onChange={(e) => setAudioFile(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-goldAccent file:text-black" />
                       </div>
 
-                      <button type="submit" disabled={isUploading} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gold-glow hover:opacity-90 transition mt-4">
-                        {isUploading ? "Upload en cours..." : "PUBLIER EN DIRECT SUR YANRECORDS"}
+                      <button type="submit" className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gold-glow hover:opacity-90 transition mt-4">
+                        PUBLIER EN DIRECT SUR YANRECORDS
                       </button>
                     </form>
                   </div>
@@ -686,4 +690,4 @@
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
-</html>
+</html>s
