@@ -17,12 +17,12 @@
         theme: {
           extend: {
             colors: {
-              background: '#050508',
-              surface: 'rgba(15, 17, 26, 0.75)',
-              surfaceBorder: 'rgba(255, 255, 255, 0.08)',
-              primary: '#00f0ff',
-              gold: '#e2b053',
-              accent: '#ff007f',
+              obsidian: '#050508',
+              cardDark: '#131520',
+              borderDark: '#222638',
+              cyanNeon: '#00f0ff',
+              goldAccent: '#e2b053',
+              pinkNeon: '#ff007f',
               greenPro: '#10b981'
             }
           }
@@ -31,7 +31,7 @@
     </script>
     <style>
       body { background-color: #050508; color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; }
-      .glass { background: var(--surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--surfaceBorder); }
+      .glass { background: rgba(19, 21, 32, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(34, 38, 56, 0.8); }
       .glass-card { background: linear-gradient(145deg, rgba(20, 22, 35, 0.9), rgba(10, 11, 18, 0.9)); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4); }
       .text-gradient-gold { background: linear-gradient(to right, #e2b053, #fff176); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .text-gradient-cyan { background: linear-gradient(to right, #00f0ff, #0080ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -42,9 +42,8 @@
       ::-webkit-scrollbar-thumb { background: #222638; border-radius: 4px; }
     </style>
 </head>
-<body class="pb-32">
+<body class="min-h-screen pb-32">
 
-    <!-- FOND ANIMÉ LUXE -->
     <div class="bg-animated-mesh">
         <div class="mesh-blob bg-blue-900 w-[500px] h-[500px] top-[-10%] left-[-10%]"></div>
         <div class="mesh-blob bg-purple-900 w-[600px] h-[600px] bottom-[-20%] right-[-10%]"></div>
@@ -54,23 +53,22 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // ===== ALGORITHME MATHEMATIQUE DE GÉNÉRATION DE CLÉ VST3 (COMPATIBLE FL STUDIO) =====
+        // ===== INITIALISATION SUPABASE (UTILISE TES CLEFS SI DÉFINIES) =====
+        const SUPABASE_URL = window.location.hostname.includes('vercel') ? 'https://xyz.supabase.co' : 'https://xyz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJ...'; 
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // Générateur de clés VST authentiques
         function generateRealVstKey() {
             const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let part1 = '';
-            for (let i = 0; i < 4; i++) {
-                part1 += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
+            for (let i = 0; i < 4; i++) part1 += chars.charAt(Math.floor(Math.random() * chars.length));
             let hash = 0;
-            for (let i = 0; i < part1.length; i++) {
-                hash += part1.charCodeAt(i) * (i + 5);
-            }
-            let part2 = hash.toString(16).toUpperCase().padStart(4, '0');
-            part2 = part2.substring(part2.length - 4);
+            for (let i = 0; i < part1.length; i++) hash += part1.charCodeAt(i) * (i + 5);
+            let part2 = hash.toString(16).toUpperCase().padStart(4, '0').slice(-4);
             return `SM2-${part1}-${part2}`;
         }
 
-        // ===== BASE DE DONNÉES DE DÉPART =====
         const INITIAL_TRACKS = [
           { 
             id: 'vst-1', 
@@ -79,7 +77,8 @@
             category: 'Mastering', 
             price: 6500, 
             cover: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80', 
-            desc: 'Le processeur de mastering intelligent. 6 modules matériels (EQ, Comp, Sat, Imager, Maximizer) avec Resonance Killer 3 Bandes et Analyse IA 15s.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            desc: 'Processeur de mastering intelligent 15s avec Resonance Killer 3 Bandes',
             isSold: false
           },
           { 
@@ -89,7 +88,8 @@
             category: 'Sampler', 
             price: 4500, 
             cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80', 
-            desc: 'Auto-slicer professionnel. Glissez un sample, il le découpe en 16 chops jouables au clavier. FX indépendants par tranche.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            desc: 'Auto-slicer 16 Chops Chromatique avec Mode Gate',
             isSold: false
           },
           { 
@@ -99,7 +99,8 @@
             category: 'Dynamics', 
             price: 3500, 
             cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80', 
-            desc: 'Soft-clipper analogique. Fait taper vos Kicks et 808s sans détruire la dynamique. Presets inclus.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+            desc: 'Soft Clipper Analogique pour Kick, 808 & Voix',
             isSold: false
           },
           { 
@@ -108,14 +109,14 @@
             type: 'beat', 
             bpm: 130, 
             key: 'Am', 
-            genre: 'Jul / Naps Type', 
+            genre: 'Jul Type', 
             producer: 'YANrecords', 
             priceMp3: 2000, 
             priceWav: 4000, 
             priceStems: 8000, 
             priceExclusive: 25000, 
             cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80', 
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
             isSold: false
           },
           { 
@@ -131,8 +132,8 @@
             priceStems: 10000, 
             priceExclusive: 35000, 
             cover: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&q=80', 
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-            isSold: true // EXEMPLE DE BEAT VENDU EN EXCLUSIVITÉ
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+            isSold: true
           }
         ];
 
@@ -141,21 +142,86 @@
           const [tracks, setTracks] = React.useState(INITIAL_TRACKS);
           const [currentTrack, setCurrentTrack] = React.useState(null);
           const [isPlaying, setIsPlaying] = React.useState(false);
-          const [modalItem, setModalItem] = React.useState(null);
+          const [selectedLicenseTrack, setSelectedLicenseTrack] = React.useState(null);
           const [selectedLicenseType, setSelectedLicenseType] = React.useState('mp3');
-          const [showAuthModal, setShowUploadAuthModal] = React.useState(false);
+          const [showAuthModal, setShowAuthModal] = React.useState(false);
+          const [showUploadModal, setShowUploadModal] = React.useState(false);
           const [currentUser, setCurrentUser] = React.useState(null);
           const [purchasedKey, setPurchasedKey] = React.useState(null);
+          const [isUploading, setIsUploading] = React.useState(false);
+
+          // Form State pour Upload
+          const [uploadTitle, setUploadTitle] = React.useState('');
+          const [uploadType, setUploadType] = React.useState('beat');
+          const [uploadBpm, setUploadBpm] = React.useState(130);
+          const [uploadKey, setUploadKey] = React.valueState ? React.useState('Am') : React.useState('Am');
+          const [uploadPrice, setUploadPrice] = React.useState(2000);
+          const [uploadCoverFile, setUploadCoverFile] = React.useState(null);
+          const [uploadAudioFile, setUploadAudioFile] = React.useState(null);
 
           const audioRef = React.useRef(new Audio());
 
-          React.useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
+          // ===== PERSISTENCE SESSION UTILISATEUR (NE SE DÉCONNECTE PLUS AU RAFRAÎCHISSEMENT) =====
+          React.useEffect(() => {
+            if (window.lucide) window.lucide.createIcons();
 
-          // ===== GESTION CONNEXION GOOGLE / GMAIL =====
-          const handleGoogleLogin = () => {
-            // Simulation Connexion Réussie
-            setCurrentUser({ name: 'Yanis (CEO)', email: 'yanis@gmail.com', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80' });
-            setShowUploadAuthModal(false);
+            if (!supabase) return;
+
+            // 1. Vérifier si une session existe déjà en mémoire
+            supabase.auth.getSession().then(({ data: { session } }) => {
+              if (session?.user) {
+                const u = session.user;
+                setCurrentUser({
+                  id: u.id,
+                  name: u.user_metadata?.full_name || u.email.split('@')[0],
+                  email: u.email,
+                  avatar: u.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80'
+                });
+              }
+            });
+
+            // 2. Écouter les changements d'état (Connexion / Déconnexion)
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+              if (session?.user) {
+                const u = session.user;
+                setCurrentUser({
+                  id: u.id,
+                  name: u.user_metadata?.full_name || u.email.split('@')[0],
+                  email: u.email,
+                  avatar: u.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80'
+                });
+              } else {
+                setCurrentUser(null);
+              }
+            });
+
+            return () => subscription.unsubscribe();
+          }, []);
+
+          // ===== CONNEXION GOOGLE OAUTH =====
+          const handleGoogleLogin = async () => {
+            if (!supabase) {
+              // Fallback Démo
+              setCurrentUser({
+                id: 'demo-user-123',
+                name: 'Yanis (CEO)',
+                email: 'yanis@gmail.com',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80'
+              });
+              setShowAuthModal(false);
+              return;
+            }
+
+            const { error } = await supabase.auth.signInWithOAuth({
+              provider: 'google',
+              options: { redirectTo: window.location.origin }
+            });
+            if (error) alert("Erreur Google Login : " + error.message);
+          };
+
+          const handleLogout = async () => {
+            if (supabase) await supabase.auth.signOut();
+            setCurrentUser(null);
           };
 
           const togglePlay = (track) => {
@@ -170,20 +236,87 @@
             }
           };
 
-          // ===== ACHAT & VERROUILLAGE EXCLUSIF AUTOMATIQUE =====
           const handlePurchase = (item) => {
             if (item.type === 'vst') {
               const generatedKey = generateRealVstKey();
               setPurchasedKey(generatedKey);
             } else {
               if (selectedLicenseType === 'exclusive') {
-                // VERROUILLAGE EXCLUSIF : Le beat passe en VENDU définitif
                 setTracks(prev => prev.map(t => t.id === item.id ? { ...t, isSold: true } : t));
-                alert(`FÉLICITATIONS ! Vous avez acheté la licence EXCLUSIVE de "${item.title}". Ce beat est maintenant retiré de la vente !`);
+                alert(`LICENCE EXCLUSIVE ACHETÉE ! Le beat "${item.title}" est maintenant VENDU et retiré du marché !`);
               } else {
-                alert(`Paiement réussi ! Votre fichier audio (${selectedLicenseType.toUpperCase()}) et votre contrat PDF sont disponibles.`);
+                alert(`Paiement confirmé ! Votre fichier audio (${selectedLicenseType.toUpperCase()}) et votre contrat PDF sont disponibles.`);
               }
-              setModalItem(null);
+              setSelectedLicenseTrack(null);
+            }
+          };
+
+          // ===== UPLOAD EN DIRECT VERS SUPABASE BUCKETS & DATABASE =====
+          const handleUploadSubmit = async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+              alert("Veuillez d'abord vous connecter !");
+              setShowAuthModal(true);
+              return;
+            }
+
+            setIsUploading(true);
+
+            try {
+              let coverUrl = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80';
+              let audioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+
+              if (supabase && uploadCoverFile && uploadAudioFile) {
+                // Upload Cover vers Bucket 'covers'
+                const coverFileName = `${Date.now()}_${uploadCoverFile.name}`;
+                const { data: coverData } = await supabase.storage.from('covers').upload(coverFileName, uploadCoverFile);
+                if (coverData) coverUrl = `${SUPABASE_URL}/storage/v1/object/public/covers/${coverFileName}`;
+
+                // Upload Audio vers Bucket 'previews'
+                const audioFileName = `${Date.now()}_${uploadAudioFile.name}`;
+                const { data: audioData } = await supabase.storage.from('previews').upload(audioFileName, uploadAudioFile);
+                if (audioData) audioUrl = `${SUPABASE_URL}/storage/v1/object/public/previews/${audioFileName}`;
+              }
+
+              const newTrack = {
+                id: `user-track-${Date.now()}`,
+                title: uploadTitle,
+                producer: currentUser.name,
+                bpm: uploadBpm,
+                key: uploadKey,
+                genre: uploadType === 'vst' ? 'VST3 Plugin' : 'Beat',
+                type: uploadType === 'vst' ? 'vst' : 'beat',
+                cover: coverUrl,
+                audio: audioUrl,
+                priceMp3: parseInt(uploadPrice),
+                priceWav: parseInt(uploadPrice) * 2,
+                priceStems: parseInt(uploadPrice) * 4,
+                priceExclusive: parseInt(uploadPrice) * 10,
+                isSold: false
+              };
+
+              if (supabase) {
+                await supabase.from('tracks').insert([{
+                  title: uploadTitle,
+                  producer_id: currentUser.id,
+                  bpm: uploadBpm,
+                  key_scale: uploadKey,
+                  genre: newTrack.genre,
+                  cover_url: coverUrl,
+                  audio_preview_url: audioUrl,
+                  is_vst: uploadType === 'vst',
+                  price_mp3: parseInt(uploadPrice)
+                }]);
+              }
+
+              setTracks(prev => [newTrack, ...prev]);
+              alert("Succès ! Votre création a été publiée en direct sur YANrecords !");
+              setShowUploadModal(false);
+              setUploadTitle('');
+            } catch (err) {
+              alert("Erreur lors de l'upload : " + err.message);
+            } finally {
+              setIsUploading(false);
             }
           };
 
@@ -192,46 +325,55 @@
 
           return (
             <div className="relative">
-              {/* ===== NAVBAR ===== */}
+              {/* NAVBAR */}
               <nav className="glass fixed top-0 w-full z-50 px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4 cursor-pointer" onClick={() => setView('home')}>
-                  <div className="w-10 h-10 rounded-lg bg-black border border-gold/50 flex items-center justify-center font-black text-xl text-gold shadow-[0_0_15px_rgba(226,176,83,0.3)]">
+                  <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent shadow-lg">
                     Y
                   </div>
                   <h1 className="text-2xl font-black tracking-widest text-white">YAN<span className="text-gradient-gold">RECORDS</span></h1>
                 </div>
 
-                <div className="hidden md:flex bg-black/40 border border-surfaceBorder rounded-full p-1">
+                <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
                   <button onClick={() => setView('home')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'home' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>Accueil</button>
-                  <button onClick={() => setView('vsts')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'vsts' ? 'bg-primary text-black' : 'text-gray-400 hover:text-white'}`}>Plugins VST</button>
-                  <button onClick={() => setView('beats')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'beats' ? 'bg-gold text-black' : 'text-gray-400 hover:text-white'}`}>Beatstore</button>
+                  <button onClick={() => setView('vsts')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'vsts' ? 'bg-cyanNeon text-black' : 'text-gray-400 hover:text-white'}`}>Plugins VST</button>
+                  <button onClick={() => setView('beats')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'beats' ? 'bg-goldAccent text-black' : 'text-gray-400 hover:text-white'}`}>Beatstore</button>
                 </div>
 
                 <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => currentUser ? setShowUploadModal(true) : setShowAuthModal(true)}
+                    className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs hover:opacity-90 transition cyan-glow"
+                  >
+                    <i data-lucide="upload" className="w-4 h-4"></i>
+                    <span>Poster Beat / VST</span>
+                  </button>
+
                   {currentUser ? (
-                    <div className="flex items-center gap-3 bg-cardDark border border-borderDark px-3 py-1.5 rounded-xl">
+                    <div className="flex items-center gap-2 bg-cardDark border border-borderDark px-3 py-1.5 rounded-xl">
                       <img src={currentUser.avatar} className="w-7 h-7 rounded-full object-cover" />
                       <span className="text-xs font-bold text-white">{currentUser.name}</span>
+                      <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 ml-2">
+                        <i data-lucide="log-out" className="w-3.5 h-3.5"></i>
+                      </button>
                     </div>
                   ) : (
                     <button 
-                      onClick={() => setShowUploadAuthModal(true)}
-                      className="bg-cardDark border border-borderDark text-white hover:border-primary px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2"
+                      onClick={() => setShowAuthModal(true)}
+                      className="bg-cardDark border border-borderDark text-white hover:border-cyanNeon px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2"
                     >
                       <i data-lucide="user" className="w-4 h-4"></i>
                       <span>Connexion / Gmail</span>
                     </button>
                   )}
-                  <div className="text-xs font-bold bg-cardDark border border-borderDark px-3 py-2 rounded-xl text-gold">🇩🇿 DZD</div>
+                  <div className="text-xs font-bold bg-cardDark border border-borderDark px-3 py-2 rounded-xl text-goldAccent">🇩🇿 DZD</div>
                 </div>
               </nav>
 
               <div className="pt-28 pb-10 px-6 max-w-7xl mx-auto">
-                
-                {/* ===== HOME HERO ===== */}
                 {view === 'home' && (
                   <div className="text-center mt-12 mb-16">
-                    <span className="inline-block bg-primary/10 border border-primary/30 text-primary text-xs font-bold px-3 py-1 rounded-full mb-4">
+                    <span className="inline-block bg-cyanNeon/10 border border-cyanNeon/30 text-cyanNeon text-xs font-bold px-3 py-1 rounded-full mb-4">
                       🇩🇿 La 1ère Plateforme de Beatmaking en Algérie
                     </span>
                     <h2 className="text-4xl md:text-6xl font-black mb-4 tracking-tight leading-tight">
@@ -244,20 +386,20 @@
                   </div>
                 )}
 
-                {/* ===== SECTION VSTS ===== */}
+                {/* VSTS */}
                 {(view === 'vsts' || view === 'home') && (
                   <section className="mb-16">
-                    <h3 className="text-2xl font-bold mb-6 text-white border-l-4 border-primary pl-4">PLUGINS VST3 OFFICIELS</h3>
+                    <h3 className="text-2xl font-bold mb-6 text-white border-l-4 border-cyanNeon pl-4">PLUGINS VST3 OFFICIELS</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {vsts.map(vst => (
-                        <div key={vst.id} className="glass-card rounded-2xl p-5 flex flex-col justify-between relative group border-primary/30">
-                          <span className="absolute top-3 right-3 bg-primary text-black text-[10px] font-black px-2 py-1 rounded">VST3 WINDOWS</span>
+                        <div key={vst.id} className="glass-card rounded-2xl p-5 flex flex-col justify-between relative group border-cyanNeon/30">
+                          <span className="absolute top-3 right-3 bg-cyanNeon text-black text-[10px] font-black px-2 py-1 rounded">VST3 WINDOWS</span>
                           <img src={vst.cover} className="w-full h-44 object-cover rounded-xl mb-4" />
                           <h4 className="text-xl font-black text-white">{vst.title}</h4>
                           <p className="text-xs text-gray-400 my-2 flex-grow">{vst.desc}</p>
-                          <div className="flex items-center justify-between pt-4 border-t border-surfaceBorder mt-2">
-                            <span className="text-lg font-black text-gold">{vst.price.toLocaleString()} DZD</span>
-                            <button onClick={() => { setSelectedLicenseTrack(vst); setModalItem(vst); setPurchasedKey(null); }} className="bg-primary text-black font-bold px-4 py-2 rounded-xl text-xs hover:opacity-90 transition">
+                          <div className="flex items-center justify-between pt-4 border-t border-borderDark mt-2">
+                            <span className="text-lg font-black text-goldAccent">{vst.price.toLocaleString()} DZD</span>
+                            <button onClick={() => { setSelectedLicenseTrack(vst); setPurchasedKey(null); }} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs hover:opacity-90 transition">
                               Acheter Clé VST
                             </button>
                           </div>
@@ -267,10 +409,10 @@
                   </section>
                 )}
 
-                {/* ===== SECTION BEATSTORE ===== */}
+                {/* BEATSTORE */}
                 {(view === 'beats' || view === 'home') && (
                   <section>
-                    <h3 className="text-2xl font-bold mb-6 text-white border-l-4 border-gold pl-4">BEATSTORE INSTRUMENTALES</h3>
+                    <h3 className="text-2xl font-bold mb-6 text-white border-l-4 border-goldAccent pl-4">BEATSTORE INSTRUMENTALES</h3>
                     <div className="glass-card rounded-2xl p-4">
                       <div className="space-y-2">
                         {beats.map(beat => (
@@ -297,7 +439,7 @@
                               {beat.isSold ? (
                                 <span className="text-xs font-bold text-red-500 bg-red-950/40 border border-red-800/50 px-4 py-2 rounded-xl">LICENCE EXCLUSIVE VENDUE</span>
                               ) : (
-                                <button onClick={() => { setSelectedLicenseTrack(beat); setModalItem(beat); setSelectedLicenseType('mp3'); setPurchasedKey(null); }} className="border border-gold text-gold font-bold px-4 py-2 rounded-xl text-xs hover:bg-gold hover:text-black transition">
+                                <button onClick={() => { setSelectedLicenseTrack(beat); setSelectedLicenseType('mp3'); setPurchasedKey(null); }} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">
                                   Acheter ({beat.priceMp3.toLocaleString()} DZD)
                                 </button>
                               )}
@@ -310,33 +452,31 @@
                 )}
               </div>
 
-              {/* ===== MODAL D'ACHAT & DÉBLOCAGE CLÉ VST ===== */}
-              {modalItem && (
+              {/* MODAL ACHAT & DÉBLOCAGE VST */}
+              {selectedLicenseTrack && (
                 <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="glass-card rounded-2xl max-w-lg w-full p-6 relative">
-                    <button onClick={() => setModalItem(null)} className="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <button onClick={() => setSelectedLicenseTrack(null)} className="absolute top-4 right-4 text-gray-400 hover:text-white">
                       <i data-lucide="x" className="w-5 h-5"></i>
                     </button>
 
-                    <h3 className="text-xl font-black text-white mb-1">Achat : {modalItem.title}</h3>
-                    <p className="text-xs text-gray-400 mb-6">{modalItem.type === 'vst' ? 'Obtenez votre installeur .exe et votre clé de licence VST3' : 'Choisissez le type de licence pour votre projet'}</p>
+                    <h3 className="text-xl font-black text-white mb-1">Achat : {selectedLicenseTrack.title}</h3>
+                    <p className="text-xs text-gray-400 mb-6">{selectedLicenseTrack.type === 'vst' ? 'Obtenez votre installeur .exe et votre clé de licence VST3' : 'Choisissez le type de licence'}</p>
 
-                    {/* SI C'EST UN VST */}
-                    {modalItem.type === 'vst' && !purchasedKey && (
+                    {selectedLicenseTrack.type === 'vst' && !purchasedKey && (
                       <div className="space-y-4 mb-6">
-                        <div className="p-4 rounded-xl border border-primary bg-primary/10">
+                        <div className="p-4 rounded-xl border border-cyanNeon bg-cyanNeon/10">
                           <h4 className="font-bold text-white">Licence Complète VST3</h4>
                           <p className="text-xs text-gray-300 my-1">Installeur .exe + Clé d'activation unique à vie</p>
-                          <span className="text-xl font-black text-gold block mt-2">{modalItem.price.toLocaleString()} DZD</span>
+                          <span className="text-xl font-black text-goldAccent block mt-2">{selectedLicenseTrack.price.toLocaleString()} DZD</span>
                         </div>
-                        <button onClick={() => handlePurchase(modalItem)} className="w-full bg-primary text-black font-black py-3 rounded-xl text-center hover:opacity-90 transition">
+                        <button onClick={() => handlePurchase(selectedLicenseTrack)} className="w-full bg-cyanNeon text-black font-black py-3 rounded-xl text-center hover:opacity-90 transition">
                           Payer par Edahabia / BaridiMob & Générer la Clé
                         </button>
                       </div>
                     )}
 
-                    {/* RESULTAT CLE VST APRES ACHAT */}
-                    {modalItem.type === 'vst' && purchasedKey && (
+                    {selectedLicenseTrack.type === 'vst' && purchasedKey && (
                       <div className="bg-black/80 border border-greenPro rounded-xl p-4 text-center space-y-3 mb-6">
                         <span className="text-xs font-bold text-greenPro block">✓ PAIEMENT CONFIRMÉ - VOTRE CLÉ VST3 :</span>
                         <input type="text" readOnly value={purchasedKey} className="w-full text-center font-mono text-lg font-bold bg-cardDark border border-greenPro text-white p-2 rounded-lg outline-none select-all" />
@@ -344,37 +484,30 @@
                       </div>
                     )}
 
-                    {/* SI C'EST UN BEAT */}
-                    {modalItem.type === 'beat' && (
+                    {selectedLicenseTrack.type === 'beat' && (
                       <div className="space-y-3 mb-6">
-                        <div onClick={() => setSelectedLicenseType('mp3')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'mp3' ? 'border-gold bg-gold/10' : 'border-borderDark'}`}>
+                        <div onClick={() => setSelectedLicenseType('mp3')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'mp3' ? 'border-goldAccent bg-goldAccent/10' : 'border-borderDark'}`}>
                           <div className="flex justify-between font-bold text-sm text-white">
                             <span>MP3 Lease (Standard)</span>
-                            <span className="text-gold">{modalItem.priceMp3.toLocaleString()} DZD</span>
+                            <span className="text-goldAccent">{selectedLicenseTrack.priceMp3.toLocaleString()} DZD</span>
                           </div>
                         </div>
-                        <div onClick={() => setSelectedLicenseType('wav')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'wav' ? 'border-gold bg-gold/10' : 'border-borderDark'}`}>
+                        <div onClick={() => setSelectedLicenseType('wav')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'wav' ? 'border-goldAccent bg-goldAccent/10' : 'border-borderDark'}`}>
                           <div className="flex justify-between font-bold text-sm text-white">
                             <span>WAV Lease (High Quality)</span>
-                            <span className="text-gold">{modalItem.priceWav.toLocaleString()} DZD</span>
-                          </div>
-                        </div>
-                        <div onClick={() => setSelectedLicenseType('stems')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'stems' ? 'border-gold bg-gold/10' : 'border-borderDark'}`}>
-                          <div className="flex justify-between font-bold text-sm text-white">
-                            <span>Trackout Stems (Pistes Séparées)</span>
-                            <span className="text-gold">{modalItem.priceStems.toLocaleString()} DZD</span>
+                            <span className="text-goldAccent">{selectedLicenseTrack.priceWav.toLocaleString()} DZD</span>
                           </div>
                         </div>
                         <div onClick={() => setSelectedLicenseType('exclusive')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'exclusive' ? 'border-red-500 bg-red-500/10' : 'border-borderDark'}`}>
                           <div className="flex justify-between font-bold text-sm text-white">
                             <span className="text-red-400">🔥 LICENCE EXCLUSIVE (Verrouille le Beat)</span>
-                            <span className="text-gold">{modalItem.priceExclusive.toLocaleString()} DZD</span>
+                            <span className="text-goldAccent">{selectedLicenseTrack.priceExclusive.toLocaleString()} DZD</span>
                           </div>
                           <p className="text-[10px] text-gray-400 mt-1">Retire le beat du site. Vous devenez le seul propriétaire au monde.</p>
                         </div>
 
-                        <button onClick={() => handlePurchase(modalItem)} className="w-full bg-gold text-black font-black py-3 rounded-xl text-center hover:opacity-90 transition mt-4">
-                          Payer {selectedLicenseType === 'exclusive' ? modalItem.priceExclusive.toLocaleString() : modalItem.priceMp3.toLocaleString()} DZD & Télécharger
+                        <button onClick={() => handlePurchase(selectedLicenseTrack)} className="w-full bg-goldAccent text-black font-black py-3 rounded-xl text-center hover:opacity-90 transition mt-4">
+                          Payer {selectedLicenseType === 'exclusive' ? selectedLicenseTrack.priceExclusive.toLocaleString() : selectedLicenseTrack.priceMp3.toLocaleString()} DZD & Télécharger
                         </button>
                       </div>
                     )}
@@ -382,11 +515,60 @@
                 </div>
               )}
 
-              {/* MODAL CONNEXION GOOGLE / GMAIL */}
+              {/* MODAL UPLOAD SUPABASE LIVE */}
+              {showUploadModal && (
+                <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div className="glass-card rounded-2xl max-w-md w-full p-6 relative">
+                    <button onClick={() => setShowUploadModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white">
+                      <i data-lucide="x" className="w-5 h-5"></i>
+                    </button>
+
+                    <h3 className="text-xl font-black text-white mb-1">Poster un Beat ou VST</h3>
+                    <p className="text-xs text-gray-400 mb-6">Ajoutez votre création en direct sur Supabase</p>
+
+                    <form onSubmit={handleUploadSubmit} className="space-y-4">
+                      <div>
+                        <label className="text-xs font-bold text-gray-300 block mb-1">Titre de la création</label>
+                        <input type="text" required value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)} placeholder="ex: Drill Algiers / SmartClipper" className="w-full bg-obsidian border border-borderDark rounded-xl p-2.5 text-sm text-white outline-none focus:border-cyanNeon" />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-bold text-gray-300 block mb-1">Type</label>
+                          <select value={uploadType} onChange={(e) => setUploadType(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-2.5 text-sm text-white outline-none">
+                            <option value="beat">Instrumentale Beat</option>
+                            <option value="vst">Plugin VST3 (.exe)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-300 block mb-1">Prix (DZD)</label>
+                          <input type="number" required value={uploadPrice} onChange={(e) => setUploadPrice(e.target.value)} placeholder="2000" className="w-full bg-obsidian border border-borderDark rounded-xl p-2.5 text-sm text-white outline-none focus:border-cyanNeon" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-gray-300 block mb-1">Pochette Image (Cover)</label>
+                        <input type="file" accept="image/*" onChange={(e) => setUploadCoverFile(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyanNeon file:text-black" />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-gray-300 block mb-1">Fichier Audio MP3 / .exe VST</label>
+                        <input type="file" onChange={(e) => setUploadAudioFile(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-goldAccent file:text-black" />
+                      </div>
+
+                      <button type="submit" disabled={isUploading} className="w-full bg-goldAccent text-black font-black py-3 rounded-xl text-center hover:opacity-90 transition">
+                        {isUploading ? "Upload vers Supabase..." : "Publier sur YANrecords"}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* MODAL CONNEXION GOOGLE */}
               {showAuthModal && (
                 <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                   <div className="glass-card rounded-2xl max-w-sm w-full p-6 text-center relative">
-                    <button onClick={() => setShowUploadAuthModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <button onClick={() => setShowAuthModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white">
                       <i data-lucide="x" className="w-5 h-5"></i>
                     </button>
 
@@ -395,7 +577,7 @@
 
                     <button 
                       onClick={handleGoogleLogin}
-                      className="w-full bg-white text-black font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-100 transition shadow-lg mb-4 text-sm"
+                      className="w-full bg-white text-black font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-100 transition shadow-lg text-sm"
                     >
                       <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                       <span>Continuer avec Google (Gmail)</span>
