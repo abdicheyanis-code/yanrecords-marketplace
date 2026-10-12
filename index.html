@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YANrecords — Beatstore & VST Marketplace 🇩🇿</title>
-    <!-- Tailwind CSS & Lucide Icons -->
+    <!-- Tailwind CSS, Lucide, React, Babel -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script>
       tailwind.config = {
@@ -41,12 +41,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // ===== CONFIGURATION SUPABASE (Colle tes clés ici si besoin) =====
-        const SUPABASE_URL = "https://TON_SUPABASE_URL.supabase.co";
-        const SUPABASE_ANON_KEY = "TON_SUPABASE_ANON_KEY";
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-        // ===== DONNÉES DEMO (Beats & VSTs YANrecords) =====
+        // ===== DONNÉES DE DÉPART =====
         const INITIAL_TRACKS = [
           {
             id: 'vst-1',
@@ -58,8 +53,7 @@
             cover: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=500&q=80',
             audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
             isVst: true,
-            priceMp3: 4500, // DZD
-            priceWav: 4500,
+            priceMp3: 4500,
             desc: 'Plugin de Mastering Intelligent 15s avec Resonance Killer & Maximizer'
           },
           {
@@ -73,7 +67,6 @@
             audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
             isVst: true,
             priceMp3: 3500,
-            priceWav: 3500,
             desc: 'Auto-Slicer 16 Chops Chromatique avec Mode Gate et FX live'
           },
           {
@@ -87,7 +80,6 @@
             audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
             isVst: true,
             priceMp3: 2500,
-            priceWav: 2500,
             desc: 'Soft Clipper Analogique Fluo pour Kick, 808 & Voix'
           },
           {
@@ -123,7 +115,7 @@
         ];
 
         function App() {
-          const [activeTab, setActiveTab] = React.useState('all'); // 'all', 'beats', 'vsts'
+          const [activeTab, setActiveTab] = React.useState('all');
           const [currentTrack, setCurrentTrack] = React.useState(null);
           const [isPlaying, setIsPlaying] = React.useState(false);
           const [selectedLicenseTrack, setSelectedLicenseTrack] = React.useState(null);
@@ -161,7 +153,7 @@
 
           return (
             <div className="relative">
-              {/* ===== HEADER ===== */}
+              {/* HEADER */}
               <header className="sticky top-0 z-40 glass-panel border-b border-borderDark px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyanNeon to-goldAccent flex items-center justify-center font-black text-black text-xl shadow-lg">
@@ -173,7 +165,6 @@
                   </div>
                 </div>
 
-                {/* Search */}
                 <div className="hidden md:flex items-center bg-obsidian/80 border border-borderDark rounded-full px-4 py-2 w-96">
                   <i data-lucide="search" className="w-4 h-4 text-slate-400 mr-2"></i>
                   <input 
@@ -185,7 +176,6 @@
                   />
                 </div>
 
-                {/* Right Actions */}
                 <div className="flex items-center gap-4">
                   <button 
                     onClick={() => setShowUploadModal(true)}
@@ -200,9 +190,8 @@
                 </div>
               </header>
 
-              {/* ===== HERO BANNER ===== */}
+              {/* BANNER */}
               <section className="px-6 py-12 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-cyanNeon/10 via-transparent to-transparent pointer-events-none"></div>
                 <span className="inline-block bg-cyanNeon/10 border border-cyanNeon/30 text-cyanNeon text-xs font-bold px-3 py-1 rounded-full mb-4">
                   🇩🇿 La 1ère Plateforme de Beatmaking en Algérie
                 </span>
@@ -213,13 +202,12 @@
                   Achetez et vendez vos instrumentales et vos plugins avec paiement sécurisé **Edahabia, BaridiMob & PayPal**.
                 </p>
 
-                {/* Tabs Filter */}
                 <div className="inline-flex p-1 bg-cardDark border border-borderDark rounded-2xl">
                   <button 
                     onClick={() => setActiveTab('all')} 
                     className={`px-6 py-2 rounded-xl text-sm font-bold transition ${activeTab === 'all' ? 'bg-cyanNeon text-black' : 'text-slate-400 hover:text-white'}`}
                   >
-                    Tout Tout
+                    Tout
                   </button>
                   <button 
                     onClick={() => setActiveTab('vsts')} 
@@ -236,7 +224,7 @@
                 </div>
               </section>
 
-              {/* ===== MAIN GRID ===== */}
+              {/* GRID */}
               <main className="px-6 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredTracks.map(track => (
@@ -253,7 +241,6 @@
                       <div className="relative aspect-square rounded-xl overflow-hidden mb-4 bg-obsidian">
                         <img src={track.cover} alt={track.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                         
-                        {/* Play Overlay */}
                         <button 
                           onClick={() => togglePlay(track)}
                           className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
@@ -264,7 +251,6 @@
                         </button>
                       </div>
 
-                      {/* Info */}
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <h3 className="font-bold text-lg text-white group-hover:text-cyanNeon transition">{track.title}</h3>
@@ -277,7 +263,6 @@
 
                       <p className="text-xs text-slate-400 mb-4 line-clamp-2">{track.desc || track.genre}</p>
 
-                      {/* Price & Buy */}
                       <div className="flex items-center justify-between pt-3 border-t border-borderDark/60">
                         <div>
                           <span className="text-xs text-slate-400 block">À partir de</span>
@@ -296,7 +281,7 @@
                 </div>
               </main>
 
-              {/* ===== PERSISTENT AUDIO PLAYER (BARRE EN BAS) ===== */}
+              {/* PLAYER EN BAS */}
               {currentTrack && (
                 <div className="fixed bottom-0 inset-x-0 z-50 glass-panel border-t border-cyanNeon/40 px-6 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -307,7 +292,6 @@
                     </div>
                   </div>
 
-                  {/* Player Controls */}
                   <div className="flex items-center gap-4">
                     <button 
                       onClick={() => togglePlay(currentTrack)}
@@ -317,7 +301,6 @@
                     </button>
                   </div>
 
-                  {/* Buy Button */}
                   <button 
                     onClick={() => setSelectedLicenseTrack(currentTrack)}
                     className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs hover:opacity-90 transition gold-glow"
@@ -327,7 +310,7 @@
                 </div>
               )}
 
-              {/* ===== MODAL LICENCES & PAIEMENT ===== */}
+              {/* MODAL ACHAT */}
               {selectedLicenseTrack && (
                 <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                   <div className="glass-panel border-cyanNeon/50 rounded-2xl max-w-lg w-full p-6 relative">
@@ -341,7 +324,6 @@
                     <h3 className="text-xl font-bold text-white mb-1">Acheter : {selectedLicenseTrack.title}</h3>
                     <p className="text-xs text-slate-400 mb-6">Sélectionnez votre licence et le moyen de paiement (DZD / EUR)</p>
 
-                    {/* Options Licences */}
                     <div className="space-y-3 mb-6">
                       <div className="p-3 rounded-xl border border-cyanNeon bg-cyanNeon/5 flex items-center justify-between">
                         <div>
@@ -372,7 +354,6 @@
                       )}
                     </div>
 
-                    {/* Méthodes de paiement */}
                     <h4 className="text-xs font-bold text-slate-400 uppercase mb-3">Moyen de paiement sécurisé</h4>
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       <button className="p-3 rounded-xl border border-goldAccent/60 bg-goldAccent/10 text-left hover:bg-goldAccent/20 transition">
@@ -395,7 +376,7 @@
                 </div>
               )}
 
-              {/* ===== MODAL UPLOAD BEATMAKER ===== */}
+              {/* MODAL UPLOAD */}
               {showUploadModal && (
                 <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                   <div className="glass-panel border-goldAccent/50 rounded-2xl max-w-md w-full p-6 relative">
