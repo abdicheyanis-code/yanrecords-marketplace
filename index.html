@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YANrecords — Beatstore & VST Marketplace 🇩🇿</title>
+    <!-- Tailwind CSS & Lucide Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              obsidian: '#090a10',
+              cardDark: '#131520',
+              borderDark: '#222638',
+              cyanNeon: '#00f0ff',
+              goldAccent: '#e2b053',
+              pinkNeon: '#ff007f'
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { background-color: #090a10; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+      .glass-panel { background: rgba(19, 21, 32, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(34, 38, 56, 0.8); }
+      .cyan-glow { box-shadow: 0 0 20px rgba(0, 240, 255, 0.25); }
+      .gold-glow { box-shadow: 0 0 20px rgba(226, 176, 83, 0.25); }
+    </style>
+</head>
+<body class="min-h-screen pb-32">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // ===== CONFIGURATION SUPABASE (Colle tes clés ici si besoin) =====
+        const SUPABASE_URL = "https://TON_SUPABASE_URL.supabase.co";
+        const SUPABASE_ANON_KEY = "TON_SUPABASE_ANON_KEY";
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // ===== DONNÉES DEMO (Beats & VSTs YANrecords) =====
+        const INITIAL_TRACKS = [
+          {
+            id: 'vst-1',
+            title: 'SmartMaster V2 Pro',
+            producer: 'YANrecords',
+            bpm: 'Mastering',
+            key: 'Auto-AI',
+            genre: 'VST3 Plugin',
+            cover: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=500&q=80',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            isVst: true,
+            priceMp3: 4500, // DZD
+            priceWav: 4500,
+            desc: 'Plugin de Mastering Intelligent 15s avec Resonance Killer & Maximizer'
+          },
+          {
+            id: 'vst-2',
+            title: 'ChopArcade V2',
+            producer: 'YANrecords',
+            bpm: 'Sampler',
+            key: '16 Slices',
+            genre: 'VST3 Sampler',
+            cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            isVst: true,
+            priceMp3: 3500,
+            priceWav: 3500,
+            desc: 'Auto-Slicer 16 Chops Chromatique avec Mode Gate et FX live'
+          },
+          {
+            id: 'vst-3',
+            title: 'PunchClipper V2.1',
+            producer: 'YANrecords',
+            bpm: 'Dynamics',
+            key: 'Analog',
+            genre: 'VST3 Clipper',
+            cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+            isVst: true,
+            priceMp3: 2500,
+            priceWav: 2500,
+            desc: 'Soft Clipper Analogique Fluo pour Kick, 808 & Voix'
+          },
+          {
+            id: 'beat-1',
+            title: 'Marseille Summer',
+            producer: 'Slima Beatz',
+            bpm: 130,
+            key: 'A Minor',
+            genre: 'Jul / Naps Type',
+            cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+            isVst: false,
+            priceMp3: 2000,
+            priceWav: 4000,
+            priceStems: 8000,
+            priceExclusive: 25000
+          },
+          {
+            id: 'beat-2',
+            title: 'Algerian Drill Vibe',
+            producer: 'YANrecords',
+            bpm: 144,
+            key: 'C# Minor',
+            genre: 'Drill',
+            cover: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&q=80',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+            isVst: false,
+            priceMp3: 2500,
+            priceWav: 5000,
+            priceStems: 10000,
+            priceExclusive: 30000
+          }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = React.useState('all'); // 'all', 'beats', 'vsts'
+          const [currentTrack, setCurrentTrack] = React.useState(null);
+          const [isPlaying, setIsPlaying] = React.useState(false);
+          const [selectedLicenseTrack, setSelectedLicenseTrack] = React.useState(null);
+          const [showUploadModal, setShowUploadModal] = React.useState(false);
+          const [searchQuery, setSearchQuery] = React.useState('');
+          const audioRef = React.useRef(new Audio());
+
+          React.useEffect(() => {
+            if (window.lucide) window.lucide.createIcons();
+          }, [activeTab, selectedLicenseTrack, showUploadModal, currentTrack]);
+
+          const togglePlay = (track) => {
+            if (currentTrack?.id === track.id) {
+              if (isPlaying) {
+                audioRef.current.pause();
+                setIsPlaying(false);
+              } else {
+                audioRef.current.play();
+                setIsPlaying(true);
+              }
+            } else {
+              setCurrentTrack(track);
+              audioRef.current.src = track.audio;
+              audioRef.current.play();
+              setIsPlaying(true);
+            }
+          };
+
+          const filteredTracks = INITIAL_TRACKS.filter(t => {
+            if (activeTab === 'beats' && t.isVst) return false;
+            if (activeTab === 'vsts' && !t.isVst) return false;
+            if (searchQuery && !t.title.toLowerCase().includes(searchQuery.toLowerCase()) && !t.genre.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            return true;
+          });
+
+          return (
+            <div className="relative">
+              {/* ===== HEADER ===== */}
+              <header className="sticky top-0 z-40 glass-panel border-b border-borderDark px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyanNeon to-goldAccent flex items-center justify-center font-black text-black text-xl shadow-lg">
+                    Y
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold tracking-wide text-white">YAN<span className="text-cyanNeon">records</span></h1>
+                    <p className="text-xs text-slate-400">Beatstore & VST Marketplace 🇩🇿</p>
+                  </div>
+                </div>
+
+                {/* Search */}
+                <div className="hidden md:flex items-center bg-obsidian/80 border border-borderDark rounded-full px-4 py-2 w-96">
+                  <i data-lucide="search" className="w-4 h-4 text-slate-400 mr-2"></i>
+                  <input 
+                    type="text" 
+                    placeholder="Chercher un beat, VST, genre, BPM..." 
+                    className="bg-transparent border-none outline-none text-sm text-white w-full"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+
+                {/* Right Actions */}
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setShowUploadModal(true)}
+                    className="flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition cyan-glow"
+                  >
+                    <i data-lucide="upload" className="w-4 h-4"></i>
+                    <span>Poster un Beat/VST</span>
+                  </button>
+                  <div className="flex items-center gap-1 text-xs font-bold bg-cardDark border border-borderDark px-3 py-2 rounded-xl text-goldAccent">
+                    <span>🇩🇿 DZD</span>
+                  </div>
+                </div>
+              </header>
+
+              {/* ===== HERO BANNER ===== */}
+              <section className="px-6 py-12 text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-cyanNeon/10 via-transparent to-transparent pointer-events-none"></div>
+                <span className="inline-block bg-cyanNeon/10 border border-cyanNeon/30 text-cyanNeon text-xs font-bold px-3 py-1 rounded-full mb-4">
+                  🇩🇿 La 1ère Plateforme de Beatmaking en Algérie
+                </span>
+                <h2 className="text-4xl md:text-6xl font-black tracking-tight text-white mb-4">
+                  BOOSTE VOS PRODS AVEC DES <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyanNeon to-goldAccent">VSTS & BEATS PRO</span>
+                </h2>
+                <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base mb-8">
+                  Achetez et vendez vos instrumentales et vos plugins avec paiement sécurisé **Edahabia, BaridiMob & PayPal**.
+                </p>
+
+                {/* Tabs Filter */}
+                <div className="inline-flex p-1 bg-cardDark border border-borderDark rounded-2xl">
+                  <button 
+                    onClick={() => setActiveTab('all')} 
+                    className={`px-6 py-2 rounded-xl text-sm font-bold transition ${activeTab === 'all' ? 'bg-cyanNeon text-black' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    Tout Tout
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('vsts')} 
+                    className={`px-6 py-2 rounded-xl text-sm font-bold transition ${activeTab === 'vsts' ? 'bg-goldAccent text-black' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    🎛️ VST Plugins (3)
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('beats')} 
+                    className={`px-6 py-2 rounded-xl text-sm font-bold transition ${activeTab === 'beats' ? 'bg-cyanNeon text-black' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    🎵 Instrumentales
+                  </button>
+                </div>
+              </section>
+
+              {/* ===== MAIN GRID ===== */}
+              <main className="px-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredTracks.map(track => (
+                    <div 
+                      key={track.id} 
+                      className={`glass-panel rounded-2xl p-5 hover:border-cyanNeon/50 transition group relative ${track.isVst ? 'border-goldAccent/40' : ''}`}
+                    >
+                      {track.isVst && (
+                        <span className="absolute top-3 right-3 z-10 bg-goldAccent text-black text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">
+                          VST3 Plugin
+                        </span>
+                      )}
+
+                      <div className="relative aspect-square rounded-xl overflow-hidden mb-4 bg-obsidian">
+                        <img src={track.cover} alt={track.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                        
+                        {/* Play Overlay */}
+                        <button 
+                          onClick={() => togglePlay(track)}
+                          className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                        >
+                          <div className="w-14 h-14 rounded-full bg-cyanNeon text-black flex items-center justify-center shadow-lg">
+                            <i data-lucide={currentTrack?.id === track.id && isPlaying ? "pause" : "play"} className="w-6 h-6 fill-current"></i>
+                          </div>
+                        </button>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h3 className="font-bold text-lg text-white group-hover:text-cyanNeon transition">{track.title}</h3>
+                          <p className="text-xs text-slate-400">par <span className="text-slate-200">{track.producer}</span></p>
+                        </div>
+                        <span className="text-xs font-mono bg-obsidian px-2 py-1 rounded border border-borderDark text-slate-300">
+                          {track.bpm} {track.key !== 'Auto-AI' && `• ${track.key}`}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-400 mb-4 line-clamp-2">{track.desc || track.genre}</p>
+
+                      {/* Price & Buy */}
+                      <div className="flex items-center justify-between pt-3 border-t border-borderDark/60">
+                        <div>
+                          <span className="text-xs text-slate-400 block">À partir de</span>
+                          <span className="text-lg font-black text-goldAccent">{track.priceMp3.toLocaleString()} DZD</span>
+                        </div>
+                        <button 
+                          onClick={() => setSelectedLicenseTrack(track)}
+                          className="bg-cardDark border border-borderDark hover:border-cyanNeon text-white hover:text-cyanNeon font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5"
+                        >
+                          <i data-lucide="shopping-bag" className="w-3.5 h-3.5"></i>
+                          <span>Acheter / Licence</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </main>
+
+              {/* ===== PERSISTENT AUDIO PLAYER (BARRE EN BAS) ===== */}
+              {currentTrack && (
+                <div className="fixed bottom-0 inset-x-0 z-50 glass-panel border-t border-cyanNeon/40 px-6 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <img src={currentTrack.cover} className="w-12 h-12 rounded-lg object-cover" />
+                    <div>
+                      <h4 className="font-bold text-sm text-white">{currentTrack.title}</h4>
+                      <p className="text-xs text-slate-400">{currentTrack.producer} • <span className="text-cyanNeon">{currentTrack.genre}</span></p>
+                    </div>
+                  </div>
+
+                  {/* Player Controls */}
+                  <div className="flex items-center gap-4">
+                    <button 
+                      onClick={() => togglePlay(currentTrack)}
+                      className="w-10 h-10 rounded-full bg-cyanNeon text-black flex items-center justify-center cyan-glow"
+                    >
+                      <i data-lucide={isPlaying ? "pause" : "play"} className="w-5 h-5 fill-current"></i>
+                    </button>
+                  </div>
+
+                  {/* Buy Button */}
+                  <button 
+                    onClick={() => setSelectedLicenseTrack(currentTrack)}
+                    className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs hover:opacity-90 transition gold-glow"
+                  >
+                    Acheter ({currentTrack.priceMp3.toLocaleString()} DZD)
+                  </button>
+                </div>
+              )}
+
+              {/* ===== MODAL LICENCES & PAIEMENT ===== */}
+              {selectedLicenseTrack && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div className="glass-panel border-cyanNeon/50 rounded-2xl max-w-lg w-full p-6 relative">
+                    <button 
+                      onClick={() => setSelectedLicenseTrack(null)}
+                      className="absolute top-4 right-4 text-slate-400 hover:text-white"
+                    >
+                      <i data-lucide="x" className="w-5 h-5"></i>
+                    </button>
+
+                    <h3 className="text-xl font-bold text-white mb-1">Acheter : {selectedLicenseTrack.title}</h3>
+                    <p className="text-xs text-slate-400 mb-6">Sélectionnez votre licence et le moyen de paiement (DZD / EUR)</p>
+
+                    {/* Options Licences */}
+                    <div className="space-y-3 mb-6">
+                      <div className="p-3 rounded-xl border border-cyanNeon bg-cyanNeon/5 flex items-center justify-between">
+                        <div>
+                          <h4 className="font-bold text-sm text-white">Licence Standard (MP3 / VST3 .exe)</h4>
+                          <p className="text-xs text-slate-400">Fichier complet + Licence d'utilisation</p>
+                        </div>
+                        <span className="font-black text-goldAccent">{selectedLicenseTrack.priceMp3.toLocaleString()} DZD</span>
+                      </div>
+
+                      {!selectedLicenseTrack.isVst && (
+                        <>
+                          <div className="p-3 rounded-xl border border-borderDark hover:border-slate-500 flex items-center justify-between">
+                            <div>
+                              <h4 className="font-bold text-sm text-white">Licence HQ (WAV Uncompressed)</h4>
+                              <p className="text-xs text-slate-400">Fichier WAV Haute Qualité</p>
+                            </div>
+                            <span className="font-black text-goldAccent">{(selectedLicenseTrack.priceWav || 4000).toLocaleString()} DZD</span>
+                          </div>
+
+                          <div className="p-3 rounded-xl border border-borderDark hover:border-slate-500 flex items-center justify-between">
+                            <div>
+                              <h4 className="font-bold text-sm text-white">Licence Pro (Stems / Pistes séparées)</h4>
+                              <p className="text-xs text-slate-400">Zip avec toutes les pistes séparées</p>
+                            </div>
+                            <span className="font-black text-goldAccent">{(selectedLicenseTrack.priceStems || 8000).toLocaleString()} DZD</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Méthodes de paiement */}
+                    <h4 className="text-xs font-bold text-slate-400 uppercase mb-3">Moyen de paiement sécurisé</h4>
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      <button className="p-3 rounded-xl border border-goldAccent/60 bg-goldAccent/10 text-left hover:bg-goldAccent/20 transition">
+                        <span className="text-xs font-bold block text-goldAccent">🇩🇿 Chargily Pay / Edahabia</span>
+                        <span className="text-[10px] text-slate-300">Carte CIB, Edahabia ou BaridiMob</span>
+                      </button>
+                      <button className="p-3 rounded-xl border border-borderDark text-left hover:border-slate-500 transition">
+                        <span className="text-xs font-bold block text-white">🌍 PayPal / Credit Card</span>
+                        <span className="text-[10px] text-slate-400">Paiement International (EUR/USD)</span>
+                      </button>
+                    </div>
+
+                    <button 
+                      onClick={() => alert("Redirection sécurisée vers la passerelle de paiement Chargily / BaridiMob...")}
+                      className="w-full bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-black py-3 rounded-xl text-center cyan-glow hover:opacity-90 transition"
+                    >
+                      Payer {selectedLicenseTrack.priceMp3.toLocaleString()} DZD & Télécharger
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ===== MODAL UPLOAD BEATMAKER ===== */}
+              {showUploadModal && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div className="glass-panel border-goldAccent/50 rounded-2xl max-w-md w-full p-6 relative">
+                    <button 
+                      onClick={() => setShowUploadModal(false)}
+                      className="absolute top-4 right-4 text-slate-400 hover:text-white"
+                    >
+                      <i data-lucide="x" className="w-5 h-5"></i>
+                    </button>
+
+                    <h3 className="text-xl font-bold text-white mb-1">Poster un Beat ou VST</h3>
+                    <p className="text-xs text-slate-400 mb-6">Ajoutez vos créations sur YANrecords Marketplace</p>
+
+                    <form onSubmit={(e) => { e.preventDefault(); alert("Track envoyée avec succès sur Supabase !"); setShowUploadModal(false); }} className="space-y-4">
+                      <div>
+                        <label className="text-xs font-bold text-slate-300 block mb-1">Titre de la création</label>
+                        <input type="text" required placeholder="ex: Drill Algiers / SmartClipper" className="w-full bg-obsidian border border-borderDark rounded-xl p-2.5 text-sm text-white outline-none focus:border-cyanNeon" />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-bold text-slate-300 block mb-1">Type</label>
+                          <select className="w-full bg-obsidian border border-borderDark rounded-xl p-2.5 text-sm text-white outline-none">
+                            <option>Instrumentale Beat</option>
+                            <option>Plugin VST3 (.exe)</option>
+                            <option>Drumkit / Sample Pack</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-300 block mb-1">Prix (DZD)</label>
+                          <input type="number" required placeholder="2000" className="w-full bg-obsidian border border-borderDark rounded-xl p-2.5 text-sm text-white outline-none focus:border-cyanNeon" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-300 block mb-1">Fichier Audio MP3 / .exe VST</label>
+                        <input type="file" required className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyanNeon file:text-black hover:file:opacity-90" />
+                      </div>
+
+                      <button type="submit" className="w-full bg-goldAccent text-black font-black py-3 rounded-xl text-center gold-glow hover:opacity-90 transition">
+                        Publier sur YANrecords
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
