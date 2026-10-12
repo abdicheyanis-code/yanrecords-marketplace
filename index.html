@@ -137,7 +137,7 @@
             bpm: 130, 
             key: 'Am', 
             genre: 'Jul Type', 
-            producer: 'YANrecords', 
+            producer: 'Slima Beatz', 
             priceMp3: 2000, 
             priceWav: 4000, 
             priceStems: 8000, 
@@ -200,15 +200,33 @@
           const [priceExclusive, setPriceExclusive] = React.useState(25000);
           const [coverFile, setCoverFile] = React.useState(null);
           const [audioFile, setAudioFile] = React.useState(null);
+          const [isUploading, setIsUploading] = React.useState(false);
 
           const audioRef = React.useRef(new Audio());
 
+          React.useEffect(() => {
+            const savedUser = localStorage.getItem('yanrecords_user');
+            if (savedUser) {
+              try { setCurrentUser(JSON.parse(savedUser)); } catch (e) {}
+            }
+          }, []);
+
           const handleGoogleLogin = () => {
-            setCurrentUser(DEFAULT_USER);
+            const user = {
+              id: 'user-ceo-1',
+              name: 'Yanis (CEO)',
+              email: 'yanis.records@gmail.com',
+              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80',
+              balance: 62500,
+              plays: 14890
+            };
+            localStorage.setItem('yanrecords_user', JSON.stringify(user));
+            setCurrentUser(user);
             setShowAuthModal(false);
           };
 
           const handleLogout = () => {
+            localStorage.removeItem('yanrecords_user');
             setCurrentUser(null);
             setView('home');
           };
@@ -222,7 +240,6 @@
               audioRef.current.src = track.audio;
               audioRef.current.play();
               setIsPlaying(true);
-
               setTracks(prev => prev.map(t => t.id === track.id ? { ...t, plays: (t.plays || 0) + 1 } : t));
             }
           };
@@ -235,7 +252,7 @@
                 setTracks(prev => prev.map(t => t.id === item.id ? { ...t, isSold: true } : t));
                 alert(`LICENCE EXCLUSIVE ACHETÉE ! Le beat "${item.title}" est maintenant VENDU et retiré du marché !`);
               } else {
-                alert(`Paiement confirmé ! Votre fichier audio (${selectedLicenseType.toUpperCase()}) et votre contrat PDF sont disponibles.`);
+                alert(`Paiement confirmé ! Votre fichier audio (${selectedLicenseType.toUpperCase()}) et votre contrat PDF sont prêts.`);
               }
               setSelectedLicenseTrack(null);
             }
@@ -331,6 +348,7 @@
                 </div>
               </nav>
 
+              {/* CONTAINER PRINCIPAL */}
               <div className="pt-28 pb-10 px-6 max-w-7xl mx-auto">
 
                 {/* BOUTON RETOUR A L'ACCUEIL */}
@@ -368,7 +386,7 @@
                       </div>
                     </div>
 
-                    {/* VSTS */}
+                    {/* GRILLE VST */}
                     <section className="mb-16">
                       <h3 className="text-2xl font-bold mb-6 text-white border-l-4 border-cyanNeon pl-4">PLUGINS VST3 OFFICIELS</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -377,6 +395,10 @@
                             <span className="absolute top-3 right-3 bg-cyanNeon text-black text-[10px] font-black px-2 py-1 rounded">VST3 WINDOWS</span>
                             <img src={vst.cover} className="w-full h-44 object-cover rounded-xl mb-4" />
                             <h4 className="text-xl font-black text-white">{vst.title}</h4>
+                            
+                            {/* AUTEUR VISIBLE ICI */}
+                            <p className="text-xs text-goldAccent font-bold mt-1">Par {vst.producer}</p>
+                            
                             <p className="text-xs text-gray-400 my-2 flex-grow">{vst.desc}</p>
                             <div className="flex items-center justify-between pt-4 border-t border-borderDark mt-2">
                               <span className="text-lg font-black text-goldAccent">{vst.price.toLocaleString()} DZD</span>
@@ -408,9 +430,12 @@
                                 <div>
                                   <h4 className="font-bold text-white flex items-center gap-2">
                                     {beat.title}
-                                    {beat.isSold && <span className="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">SOLD</span>}
+                                    {beat.isSold && <span className="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">VENDU / SOLD</span>}
                                   </h4>
-                                  <p className="text-xs text-gray-400">{beat.producer} • {beat.genre}</p>
+                                  
+                                  {/* AUTEUR VISIBLE ICI */}
+                                  <p className="text-xs text-goldAccent font-bold">Par {beat.producer}</p>
+                                  <p className="text-[10px] text-gray-400 mt-0.5">{beat.genre}</p>
                                 </div>
                               </div>
                               <div className="hidden md:block col-span-2 text-sm text-gray-400">{beat.bpm} BPM • {beat.key}</div>
@@ -441,6 +466,7 @@
                         <div key={vst.id} className="glass-card rounded-2xl p-5 flex flex-col justify-between border-cyanNeon/30">
                           <img src={vst.cover} className="w-full h-44 object-cover rounded-xl mb-4" />
                           <h4 className="text-xl font-black text-white">{vst.title}</h4>
+                          <p className="text-xs text-goldAccent font-bold mt-1">Par {vst.producer}</p>
                           <p className="text-xs text-gray-400 my-2">{vst.desc}</p>
                           <div className="flex items-center justify-between pt-4 border-t border-borderDark mt-2">
                             <span className="text-lg font-black text-goldAccent">{vst.price.toLocaleString()} DZD</span>
@@ -476,7 +502,8 @@
                                   {beat.title}
                                   {beat.isSold && <span className="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">SOLD</span>}
                                 </h4>
-                                <p className="text-xs text-gray-400">{beat.producer} • {beat.genre}</p>
+                                <p className="text-xs text-goldAccent font-bold">Par {beat.producer}</p>
+                                <p className="text-[10px] text-gray-400 mt-0.5">{beat.genre}</p>
                               </div>
                             </div>
                             <div className="hidden md:block col-span-2 text-sm text-gray-400">{beat.bpm} BPM • {beat.key}</div>
@@ -499,7 +526,7 @@
 
                 {/* ===== VIEW: DASHBOARD VENDEUR ===== */}
                 {view === 'dashboard' && (
-                  <div className="space-y-8">
+                  <div className="space-y-8 animate-fade-in">
                     {currentUser ? (
                       <>
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-cardDark border border-borderDark p-6 rounded-2xl">
@@ -571,6 +598,7 @@
                         </div>
                       </>
                     ) : (
+                      /* SI PAS CONNECTÉ */
                       <div className="glass-card max-w-md mx-auto p-8 rounded-2xl text-center border-cyanNeon/40">
                         <Icon name="user" className="w-12 h-12 text-cyanNeon mx-auto mb-4" />
                         <h3 className="text-2xl font-black text-white mb-2">Espace Vendeur Protégé</h3>
@@ -586,11 +614,6 @@
                 {/* ===== VIEW: FORMULAIRE UPLOAD ===== */}
                 {view === 'upload' && (
                   <div className="max-w-2xl mx-auto glass-card p-8 rounded-2xl border-goldAccent/40">
-                    <button onClick={() => setView('dashboard')} className="mb-4 flex items-center gap-2 text-gray-400 hover:text-white text-xs font-bold">
-                      <Icon name="arrowLeft" className="w-4 h-4" />
-                      <span>Retour au Dashboard</span>
-                    </button>
-
                     <h2 className="text-2xl font-black text-white mb-2">Poster une nouvelle création</h2>
                     <p className="text-xs text-gray-400 mb-6">Remplissez les détails et fixez vos prix pour l'Algérie</p>
 
@@ -618,27 +641,35 @@
                         </div>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-obsidian/60 border border-borderDark space-y-3">
-                        <span className="text-xs font-bold text-goldAccent block uppercase">Configuration des Prix (DZD)</span>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="text-[11px] text-gray-400 block">Prix MP3 (ou VST)</label>
-                            <input type="number" value={priceMp3} onChange={(e) => setPriceMp3(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
-                          </div>
-                          <div>
-                            <label className="text-[11px] text-gray-400 block">Prix WAV</label>
-                            <input type="number" value={priceWav} onChange={(e) => setPriceWav(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
-                          </div>
-                          <div>
-                            <label className="text-[11px] text-gray-400 block">Prix Stems (Pistes)</label>
-                            <input type="number" value={priceStems} onChange={(e) => setPriceStems(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
-                          </div>
-                          <div>
-                            <label className="text-[11px] text-gray-400 block">Prix Exclusif (SOLD)</label>
-                            <input type="number" value={priceExclusive} onChange={(e) => setPriceExclusive(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
+                      {/* CHOIX DES PRIX (Seulement pour les Beats) */}
+                      {uploadType === 'beat' ? (
+                        <div className="p-4 rounded-xl bg-obsidian/60 border border-borderDark space-y-3">
+                          <span className="text-xs font-bold text-goldAccent block uppercase">Configuration des Prix (DZD)</span>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="text-[11px] text-gray-400 block">Prix MP3 Lease</label>
+                              <input type="number" value={priceMp3} onChange={(e) => setPriceMp3(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
+                            </div>
+                            <div>
+                              <label className="text-[11px] text-gray-400 block">Prix WAV Lease</label>
+                              <input type="number" value={priceWav} onChange={(e) => setPriceWav(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
+                            </div>
+                            <div>
+                              <label className="text-[11px] text-gray-400 block">Prix Stems (Pistes)</label>
+                              <input type="number" value={priceStems} onChange={(e) => setPriceStems(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
+                            </div>
+                            <div>
+                              <label className="text-[11px] text-gray-400 block">Prix Exclusif (SOLD)</label>
+                              <input type="number" value={priceExclusive} onChange={(e) => setPriceExclusive(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-xs text-white" />
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30">
+                          <label className="text-xs font-bold text-cyanNeon block mb-1">Prix Unique du Logiciel (DZD)</label>
+                          <input type="number" value={priceMp3} onChange={(e) => setPriceMp3(e.target.value)} className="w-full bg-cardDark border border-cyanNeon/50 rounded-lg p-2 text-xs text-white" />
+                        </div>
+                      )}
 
                       <div>
                         <label className="text-xs font-bold text-gray-300 block mb-1">Pochette (JPG / PNG)</label>
@@ -650,8 +681,8 @@
                         <input type="file" onChange={(e) => setAudioFile(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-goldAccent file:text-black" />
                       </div>
 
-                      <button type="submit" className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gold-glow hover:opacity-90 transition mt-4">
-                        PUBLIER EN DIRECT SUR YANRECORDS
+                      <button type="submit" disabled={isUploading} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gold-glow hover:opacity-90 transition mt-4">
+                        {isUploading ? "Upload en cours..." : "PUBLIER EN DIRECT SUR YANRECORDS"}
                       </button>
                     </form>
                   </div>
@@ -669,7 +700,7 @@
                       <div>
                         <div className="p-4 rounded-xl border border-cyanNeon bg-cyanNeon/10 mb-6">
                           <h4 className="font-bold text-white">Licence Complète VST3</h4>
-                          <span className="text-xl font-black text-goldAccent block mt-2">{selectedLicenseTrack.price.toLocaleString()} DZD</span>
+                          <span className="text-xl font-black text-goldAccent block mt-2">{selectedLicenseTrack.priceMp3.toLocaleString()} DZD</span>
                         </div>
                         <button onClick={() => handlePurchase(selectedLicenseTrack)} className="w-full bg-cyanNeon text-black font-black py-3 rounded-xl hover:opacity-90">Payer & Générer la Clé VST</button>
                       </div>
@@ -687,10 +718,16 @@
                         <div onClick={() => setSelectedLicenseType('mp3')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'mp3' ? 'border-goldAccent bg-goldAccent/10' : 'border-borderDark'}`}>
                           <div className="flex justify-between font-bold text-white"><span>MP3 Lease</span><span className="text-goldAccent">{selectedLicenseTrack.priceMp3.toLocaleString()} DZD</span></div>
                         </div>
-                        <div onClick={() => setSelectedLicenseType('exclusive')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'exclusive' ? 'border-red-500 bg-red-500/10' : 'border-borderDark'}`}>
-                          <div className="flex justify-between font-bold text-white"><span className="text-red-400">🔥 LICENCE EXCLUSIVE (Verrouille le Beat)</span><span className="text-goldAccent">{selectedLicenseTrack.priceExclusive.toLocaleString()} DZD</span></div>
+                        <div onClick={() => setSelectedLicenseType('wav')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'wav' ? 'border-goldAccent bg-goldAccent/10' : 'border-borderDark'}`}>
+                          <div className="flex justify-between font-bold text-white"><span>WAV Lease</span><span className="text-goldAccent">{selectedLicenseTrack.priceWav.toLocaleString()} DZD</span></div>
                         </div>
-                        <button onClick={() => handlePurchase(selectedLicenseTrack)} className="w-full bg-goldAccent text-black font-black py-3 rounded-xl mt-4">Payer {selectedLicenseType === 'exclusive' ? selectedLicenseTrack.priceExclusive.toLocaleString() : selectedLicenseTrack.priceMp3.toLocaleString()} DZD</button>
+                        <div onClick={() => setSelectedLicenseType('stems')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'stems' ? 'border-goldAccent bg-goldAccent/10' : 'border-borderDark'}`}>
+                          <div className="flex justify-between font-bold text-white"><span>Trackout (Stems)</span><span className="text-goldAccent">{selectedLicenseTrack.priceStems.toLocaleString()} DZD</span></div>
+                        </div>
+                        <div onClick={() => setSelectedLicenseType('exclusive')} className={`p-3 rounded-xl border cursor-pointer ${selectedLicenseType === 'exclusive' ? 'border-red-500 bg-red-500/10' : 'border-borderDark'}`}>
+                          <div className="flex justify-between font-bold text-white"><span className="text-red-400">🔥 LICENCE EXCLUSIVE</span><span className="text-goldAccent">{selectedLicenseTrack.priceExclusive.toLocaleString()} DZD</span></div>
+                        </div>
+                        <button onClick={() => handlePurchase(selectedLicenseTrack)} className="w-full bg-goldAccent text-black font-black py-3 rounded-xl mt-4">Payer {selectedLicenseType === 'exclusive' ? selectedLicenseTrack.priceExclusive.toLocaleString() : selectedLicenseType === 'stems' ? selectedLicenseTrack.priceStems.toLocaleString() : selectedLicenseType === 'wav' ? selectedLicenseTrack.priceWav.toLocaleString() : selectedLicenseTrack.priceMp3.toLocaleString()} DZD</button>
                       </div>
                     )}
                   </div>
