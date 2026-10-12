@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YANrecords | Premium VST & Beatstore 🇩🇿</title>
-    <!-- Tailwind CSS, React 18, Babel -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -46,7 +45,6 @@
 </head>
 <body class="min-h-screen pb-32">
 
-    <!-- FOND ANIMÉ LUXE -->
     <div class="bg-animated-mesh">
         <div class="mesh-blob bg-blue-900 w-[500px] h-[500px] top-[-10%] left-[-10%]"></div>
         <div class="mesh-blob bg-purple-900 w-[600px] h-[600px] bottom-[-20%] right-[-10%]"></div>
@@ -56,53 +54,30 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // ===== DICTIONNAIRE MULTILINGUE (i18n) =====
+        const SUPABASE_URL = 'https://xyz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJ...'; 
+        const supabase = (window.supabase && !SUPABASE_URL.includes('xyz.supabase.co')) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
         const DICT = {
           fr: {
-            home: "Accueil",
-            vsts: "Plugins VST",
-            beats: "Beatstore",
-            dashboard: "Dashboard Vendeur",
-            uploadBtn: "Poster Beat / VST",
-            login: "Connexion / Gmail",
-            lang: "English",
-            settings: "Paramètres",
-            logout: "Déconnexion",
-            back: "Retour à l'accueil",
-            heroTitle1: "LE SON DES",
-            heroTitle2: "PRODUCTEURS PRO",
-            heroSub: "La 1ère Marketplace de Beatmaking en Algérie",
+            home: "Accueil", vsts: "Plugins VST", beats: "Beatstore", dashboard: "Dashboard Vendeur", uploadBtn: "Poster Beat / VST", login: "Connexion / Gmail", lang: "English", settings: "Paramètres", logout: "Déconnexion", back: "Retour à l'accueil",
+            heroTitle1: "LE SON DES", heroTitle2: "PRODUCTEURS PRO", heroSub: "La 1ère Marketplace de Beatmaking en Algérie",
             heroDesc: "Propulsez votre carrière musicale. Accédez à des VSTs exclusifs codés en C++ natif et à des instrumentales uniques réservables en direct avec contrats de licences officiels.",
-            btnVst: "DÉCOUVRIR LES VSTS",
-            btnBeats: "ÉCOUTER LE BEATSTORE",
-            settingsTitle: "Paramètres du Profil",
-            settingsSub: "Gérez vos informations publiques et de paiement",
-            saveChanges: "Enregistrer les modifications",
-            buyLicense: "Acheter Clé VST",
-            buyBeat: "Acheter"
+            btnVst: "DÉCOUVRIR LES VSTS", btnBeats: "ÉCOUTER LE BEATSTORE",
+            q1Title: "VOUS ÊTES BEATMAKER / PRODUCTEUR ?", q1Desc: "Rejoignez la 1ère plateforme d'Algérie. Publiez vos instrumentales et VSTs, fixez vos prix et encaissez via BaridiMob, Edahabia & PayPal.", q1Btn: "REJOINDRE & VENDRE VOS PRODS",
+            q2Title: "TU ES UN(E) ARTISTE / RAPPEUR(SE) ?", q2Desc: "Déniche les meilleures pépites pour tes projets. Réserve des licences exclusives (verrouillage immédiat) ou utilise nos VSTs pro pour le studio.", q2Btn: "DÉNICHER DES PÉPITES",
+            arg1: "Plugins VST3 Négatifs", arg1Desc: "C++ natif pour FL Studio. Zéro latence.", arg2: "Licences Verrouillées", arg2Desc: "Les beats exclusifs sont retirés automatiquement.", arg3: "Paiement Local & Global", arg3Desc: "Edahabia, CIB, BaridiMob et PayPal sécurisés.",
+            settingsTitle: "Paramètres du Profil", settingsSub: "Gérez vos informations publiques et de paiement", saveChanges: "Enregistrer les modifications", buyLicense: "Acheter Clé VST", buyBeat: "Acheter"
           },
           en: {
-            home: "Home",
-            vsts: "VST Plugins",
-            beats: "Beatstore",
-            dashboard: "Seller Dashboard",
-            uploadBtn: "Upload Beat / VST",
-            login: "Login / Gmail",
-            lang: "Français",
-            settings: "Settings",
-            logout: "Logout",
-            back: "Back to Home",
-            heroTitle1: "THE SOUND OF",
-            heroTitle2: "PRO PRODUCERS",
-            heroSub: "The #1 Beatmaking Marketplace in Algeria",
+            home: "Home", vsts: "VST Plugins", beats: "Beatstore", dashboard: "Seller Dashboard", uploadBtn: "Upload Beat / VST", login: "Login / Gmail", lang: "Français", settings: "Settings", logout: "Logout", back: "Back to Home",
+            heroTitle1: "THE SOUND OF", heroTitle2: "PRO PRODUCERS", heroSub: "The #1 Beatmaking Marketplace in Algeria",
             heroDesc: "Elevate your music career. Get access to exclusive native C++ VSTs and unique instrumentals with official license contracts directly.",
-            btnVst: "DISCOVER VSTS",
-            btnBeats: "LISTEN TO BEATSTORE",
-            settingsTitle: "Profile Settings",
-            settingsSub: "Manage your public information and payment details",
-            saveChanges: "Save Changes",
-            buyLicense: "Buy VST Key",
-            buyBeat: "Purchase"
+            btnVst: "DISCOVER VSTS", btnBeats: "LISTEN TO BEATSTORE",
+            q1Title: "ARE YOU A BEATMAKER / PRODUCER?", q1Desc: "Join the #1 platform in Algeria. Upload beats and VSTs, set your prices, and get paid directly via BaridiMob, Edahabia & PayPal.", q1Btn: "JOIN & SELL YOUR BEATS",
+            q2Title: "ARE YOU AN ARTIST / RAPPER?", q2Desc: "Find the best gems for your projects. Secure exclusive licenses (instant lock) or use our pro VSTs for your studio sessions.", q2Btn: "FIND EXCLUSIVE BEATS",
+            arg1: "Native VST3 Plugins", arg1Desc: "Built in pure C++ for FL Studio. Zero latency.", arg2: "Locked Licenses", arg2Desc: "Exclusive beats are instantly removed from the store.", arg3: "Local & Global Payments", arg3Desc: "Edahabia, CIB, BaridiMob and PayPal secured.",
+            settingsTitle: "Profile Settings", settingsSub: "Manage your public information and payment details", saveChanges: "Save Changes", buyLicense: "Buy VST Key", buyBeat: "Purchase"
           }
         };
 
@@ -130,20 +105,10 @@
           return icons[name] || null;
         };
 
-        function generateRealVstKey() {
-            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            let part1 = '';
-            for (let i = 0; i < 4; i++) part1 += chars.charAt(Math.floor(Math.random() * chars.length));
-            let hash = 0;
-            for (let i = 0; i < part1.length; i++) hash += part1.charCodeAt(i) * (i + 5);
-            let part2 = hash.toString(16).toUpperCase().padStart(4, '0').slice(-4);
-            return `SM2-${part1}-${part2}`;
-        }
-
         const INITIAL_TRACKS = [
-          { id: 'vst-1', title: 'SmartMaster V2 Pro', type: 'vst', category: 'Mastering', price: 6500, priceMp3: 6500, cover: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', desc: 'Processeur de mastering intelligent 15s avec Resonance Killer 3 Bandes', producer: 'YANrecords', isSold: false },
-          { id: 'vst-2', title: 'ChopArcade V2', type: 'vst', category: 'Sampler', price: 4500, priceMp3: 4500, cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', desc: 'Auto-slicer 16 Chops Chromatique avec Mode Gate', producer: 'YANrecords', isSold: false },
-          { id: 'vst-3', title: 'PunchClipper V2.1', type: 'vst', category: 'Dynamics', price: 3500, priceMp3: 3500, cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', desc: 'Soft Clipper Analogique pour Kick, 808 & Voix', producer: 'YANrecords', isSold: false },
+          { id: 'vst-1', title: 'SmartMaster V2 Pro', type: 'vst', category: 'Mastering', price: 6500, priceMp3: 6500, cover: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80', audio: '', desc: 'Processeur de mastering intelligent 15s avec Resonance Killer 3 Bandes', producer: 'YANrecords', isSold: false },
+          { id: 'vst-2', title: 'ChopArcade V2', type: 'vst', category: 'Sampler', price: 4500, priceMp3: 4500, cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80', audio: '', desc: 'Auto-slicer 16 Chops Chromatique avec Mode Gate', producer: 'YANrecords', isSold: false },
+          { id: 'vst-3', title: 'PunchClipper V2.1', type: 'vst', category: 'Dynamics', price: 3500, priceMp3: 3500, cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80', audio: '', desc: 'Soft Clipper Analogique pour Kick, 808 & Voix', producer: 'YANrecords', isSold: false },
           { id: 'beat-1', title: 'Marseille Vibes', type: 'beat', bpm: 130, key: 'Am', genre: 'Jul Type', producer: 'Slima Beatz', priceMp3: 2000, priceWav: 4000, priceStems: 8000, priceExclusive: 25000, cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', isSold: false, plays: 1240 },
           { id: 'beat-2', title: 'Algiers Drill', type: 'beat', bpm: 142, key: 'C#m', genre: 'Drill', producer: 'YANrecords', priceMp3: 2500, priceWav: 5000, priceStems: 10000, priceExclusive: 35000, cover: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&q=80', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', isSold: true, plays: 3450 }
         ];
@@ -156,35 +121,23 @@
           const [lang, setLang] = React.useState('fr');
           const t = (key) => DICT[lang][key] || key;
 
-          const [view, setViewState] = React.useState('home'); // home, vsts, beats, dashboard, upload, settings
+          const [view, setViewState] = React.useState('home');
           const [tracks, setTracks] = React.useState(INITIAL_TRACKS);
           const [currentTrack, setCurrentTrack] = React.useState(null);
           const [isPlaying, setIsPlaying] = React.useState(false);
           const [selectedLicenseTrack, setSelectedLicenseTrack] = React.useState(null);
           const [selectedLicenseType, setSelectedLicenseType] = React.useState('mp3');
-          const [showAuthModal, setShowAuthModal] = React.useState(false);
           
+          const [showAuthModal, setShowAuthModal] = React.useState(false);
           const [currentUser, setCurrentUser] = React.useState(DEFAULT_USER);
           const [showProfileMenu, setShowProfileMenu] = React.useState(false);
           
           const [purchasedKey, setPurchasedKey] = React.useState(null);
-          const [searchQuery, setSearchQuery] = React.useState('');
 
-          // Form States
-          const [uploadTitle, setUploadTitle] = React.useState('');
-          const [uploadType, setUploadType] = React.useState('beat');
-          const [uploadGenre, setUploadGenre] = React.useState('Drill');
-          const [uploadBpm, setUploadBpm] = React.useState(140);
-          const [uploadKey, setUploadKey] = React.useState('C Minor');
-          const [priceMp3, setPriceMp3] = React.useState(2000);
-          const [priceWav, setPriceWav] = React.useState(4000);
-          const [priceStems, setPriceStems] = React.useState(8000);
-          const [priceExclusive, setPriceExclusive] = React.useState(25000);
-
-          // Settings State
-          const [editName, setEditName] = React.useState('');
-          const [editAvatar, setEditAvatar] = React.useState('');
-          const [editRip, setEditRip] = React.useState('');
+          // Edit Settings States
+          const [editName, setEditName] = React.useState(DEFAULT_USER.name);
+          const [editAvatarFile, setEditAvatarFile] = React.useState(null);
+          const [editRip, setEditRip] = React.useState(DEFAULT_USER.rip);
 
           const audioRef = React.useRef(new Audio());
 
@@ -194,44 +147,22 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
 
-          React.useEffect(() => {
-            const savedUser = localStorage.getItem('yanrecords_user');
-            if (savedUser) {
-              try { 
-                const u = JSON.parse(savedUser);
-                setCurrentUser(u); 
-                setEditName(u.name);
-                setEditAvatar(u.avatar);
-                setEditRip(u.rip || '');
-              } catch (e) {}
-            } else if (currentUser) {
-                setEditName(currentUser.name);
-                setEditAvatar(currentUser.avatar);
-                setEditRip(currentUser.rip || '');
-            }
-          }, []);
-
           const handleGoogleLogin = () => {
-            localStorage.setItem('yanrecords_user', JSON.stringify(DEFAULT_USER));
             setCurrentUser(DEFAULT_USER);
             setEditName(DEFAULT_USER.name);
-            setEditAvatar(DEFAULT_USER.avatar);
             setEditRip(DEFAULT_USER.rip);
             setShowAuthModal(false);
           };
 
-          const handleLogout = () => {
-            localStorage.removeItem('yanrecords_user');
-            setCurrentUser(null);
-            setShowProfileMenu(false);
-            setView('home');
-          };
+          const handleLogout = () => { setCurrentUser(null); setShowProfileMenu(false); setView('home'); };
 
           const handleSaveSettings = (e) => {
             e.preventDefault();
-            const updatedUser = { ...currentUser, name: editName, avatar: editAvatar, rip: editRip };
-            setCurrentUser(updatedUser);
-            localStorage.setItem('yanrecords_user', JSON.stringify(updatedUser));
+            let newAvatarUrl = currentUser.avatar;
+            if (editAvatarFile) {
+              newAvatarUrl = URL.createObjectURL(editAvatarFile); // Simule l'upload local
+            }
+            setCurrentUser({ ...currentUser, name: editName, avatar: newAvatarUrl, rip: editRip });
             alert(lang === 'fr' ? "Profil mis à jour avec succès !" : "Profile updated successfully!");
             setView('dashboard');
           };
@@ -245,14 +176,12 @@
               audioRef.current.src = track.audio;
               audioRef.current.play();
               setIsPlaying(true);
-              setTracks(prev => prev.map(t => t.id === track.id ? { ...t, plays: (t.plays || 0) + 1 } : t));
             }
           };
 
           const handlePurchase = (item) => {
-            if (item.type === 'vst') {
-              setPurchasedKey(generateRealVstKey());
-            } else {
+            if (item.type === 'vst') { setPurchasedKey(generateRealVstKey()); }
+            else {
               if (selectedLicenseType === 'exclusive') {
                 setTracks(prev => prev.map(t => t.id === item.id ? { ...t, isSold: true } : t));
                 alert(lang === 'fr' ? `LICENCE EXCLUSIVE ACHETÉE ! Le beat "${item.title}" est retiré de la vente.` : `EXCLUSIVE LICENSE BOUGHT! Track "${item.title}" is now sold out.`);
@@ -263,54 +192,9 @@
             }
           };
 
-          const handleDeleteTrack = (id) => {
-            if (confirm(lang === 'fr' ? "Voulez-vous supprimer cette création ?" : "Do you want to delete this track?")) {
-              setTracks(prev => prev.filter(t => t.id !== id));
-            }
-          };
-
-          const handleUploadSubmit = (e) => {
-            e.preventDefault();
-            const newTrack = {
-              id: `track-${Date.now()}`,
-              title: uploadTitle || 'Nouvelle Création',
-              producer: currentUser.name,
-              bpm: uploadBpm,
-              key: uploadKey,
-              genre: uploadGenre,
-              type: uploadType,
-              price: parseInt(priceMp3),
-              priceMp3: parseInt(priceMp3),
-              priceWav: parseInt(priceWav),
-              priceStems: parseInt(priceStems),
-              priceExclusive: parseInt(priceExclusive),
-              cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80',
-              audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-              desc: uploadType === 'vst' ? 'Plugin VST3 officiel' : `Beat ${uploadGenre}`,
-              isSold: false,
-              plays: 0
-            };
-            setTracks(prev => [newTrack, ...prev]);
-            alert(lang === 'fr' ? "Publié avec succès !" : "Published successfully!");
-            setView('dashboard');
-            setUploadTitle('');
-          };
-
-          const filteredTracks = tracks.filter(t => {
-            if (searchQuery) {
-              return t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                     t.genre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                     t.producer.toLowerCase().includes(searchQuery.toLowerCase());
-            }
-            return true;
-          });
-
           return (
             <div className="relative">
-              {/* LAYOUT POUR FERMER LE MENU AU CLIC EXTERIEUR */}
-              {showProfileMenu && (
-                <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)}></div>
-              )}
+              {showProfileMenu && <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)}></div>}
 
               {/* ===== NAVBAR ===== */}
               <nav className="glass fixed top-0 w-full z-50 px-6 py-4 flex items-center justify-between">
@@ -323,9 +207,7 @@
                   <button onClick={() => setView('home')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'home' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>{t('home')}</button>
                   <button onClick={() => setView('vsts')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'vsts' ? 'bg-cyanNeon text-black' : 'text-gray-400 hover:text-white'}`}>{t('vsts')}</button>
                   <button onClick={() => setView('beats')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'beats' ? 'bg-goldAccent text-black' : 'text-gray-400 hover:text-white'}`}>{t('beats')}</button>
-                  {currentUser && (
-                    <button onClick={() => setView('dashboard')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'dashboard' ? 'bg-pinkNeon text-white' : 'text-gray-400 hover:text-white'}`}>{t('dashboard')}</button>
-                  )}
+                  {currentUser && <button onClick={() => setView('dashboard')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view === 'dashboard' ? 'bg-pinkNeon text-white' : 'text-gray-400 hover:text-white'}`}>{t('dashboard')}</button>}
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -335,34 +217,25 @@
 
                   {currentUser ? (
                     <div className="relative z-50">
-                      {/* BOUTON PROFIL (Ouvre le menu) */}
-                      <button 
-                        onClick={() => setShowProfileMenu(!showProfileMenu)} 
-                        className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl cursor-pointer hover:border-cyanNeon transition"
-                      >
+                      <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl cursor-pointer hover:border-cyanNeon transition">
                         <img src={currentUser.avatar} className="w-7 h-7 rounded-full object-cover" />
                         <span className="text-xs font-bold text-white hidden md:block">{currentUser.name}</span>
                         <Icon name="chevronDown" className="w-4 h-4 text-gray-400" />
                       </button>
 
-                      {/* MENU DÉROULANT (DROPDOWN) */}
                       {showProfileMenu && (
                         <div className="absolute right-0 mt-3 w-56 glass-card rounded-xl border-borderDark shadow-2xl p-2 dropdown-anim flex flex-col gap-1">
                           <div className="px-3 py-2 border-b border-borderDark/50 mb-1">
                             <p className="text-xs text-gray-400">Connecté en tant que</p>
                             <p className="text-sm font-bold text-white truncate">{currentUser.name}</p>
                           </div>
-                          
-                          <button onClick={() => { setView('settings'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 hover:text-white transition w-full text-left">
+                          <button onClick={() => setView('settings')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 hover:text-white transition w-full text-left">
                             <Icon name="settings" className="w-4 h-4 text-gray-400" /> {t('settings')}
                           </button>
-                          
                           <button onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 hover:text-white transition w-full text-left">
                             <Icon name="globe" className="w-4 h-4 text-gray-400" /> {t('lang')}
                           </button>
-
                           <div className="h-px bg-borderDark my-1"></div>
-                          
                           <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10 hover:text-red-300 transition w-full text-left">
                             <Icon name="logout" className="w-4 h-4" /> {t('logout')}
                           </button>
@@ -386,8 +259,10 @@
 
                 {/* ===== VIEW: HOME (VITRINE) ===== */}
                 {view === 'home' && (
-                  <div className="space-y-24">
-                    <div className="relative glass-card rounded-[2.5rem] p-12 md:p-20 overflow-hidden border-cyanNeon/30 mt-4 flex flex-col md:flex-row items-center justify-between">
+                  <div className="space-y-24 animate-fade-in">
+                    
+                    {/* HERO BANNER VITRINE */}
+                    <div className="relative glass-card rounded-[2.5rem] p-12 md:p-20 overflow-hidden border-cyanNeon/30 flex flex-col md:flex-row items-center justify-between">
                       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1200&q=80')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
                       <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-obsidian/85 to-transparent"></div>
                       
@@ -409,21 +284,40 @@
                       </div>
                     </div>
 
+                    {/* SECTION 1 : POUR LES BEATMAKERS */}
+                    <div className="glass-card p-8 md:p-12 rounded-3xl border-goldAccent/50 flex flex-col md:flex-row items-center justify-between gap-8">
+                      <div className="max-w-2xl text-center md:text-left">
+                        <h3 className="text-3xl font-black text-white mb-4">{t('q1Title')}</h3>
+                        <p className="text-gray-300 mb-6">{t('q1Desc')}</p>
+                      </div>
+                      <button onClick={() => currentUser ? setView('upload') : setShowAuthModal(true)} className="bg-goldAccent text-black font-black px-8 py-5 rounded-2xl whitespace-nowrap hover:scale-105 transition gold-glow">{t('q1Btn')}</button>
+                    </div>
+
+                    {/* SECTION 2 : POUR LES ARTISTES */}
+                    <div className="glass-card p-8 md:p-12 rounded-3xl border-cyanNeon/50 flex flex-col md:flex-row items-center justify-between gap-8">
+                      <div className="max-w-2xl text-center md:text-left">
+                        <h3 className="text-3xl font-black text-white mb-4">{t('q2Title')}</h3>
+                        <p className="text-gray-300 mb-6">{t('q2Desc')}</p>
+                      </div>
+                      <button onClick={() => setView('beats')} className="bg-cyanNeon text-black font-black px-8 py-5 rounded-2xl whitespace-nowrap hover:scale-105 transition cyan-glow">{t('q2Btn')}</button>
+                    </div>
+
+                    {/* ARGUMENTS */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                      <div className="glass-card p-8 rounded-2xl border-cyanNeon/30 text-center hover:border-cyanNeon transition">
-                        <div className="w-16 h-16 mx-auto bg-cyanNeon/10 rounded-2xl flex items-center justify-center mb-6 border border-cyanNeon/30"><Icon name="cpu" className="w-8 h-8 text-cyanNeon" /></div>
-                        <h3 className="text-xl font-bold text-white mb-3">VST3 Native</h3>
-                        <p className="text-sm text-gray-400">C++ natif pour une performance maximale dans FL Studio. Zéro latence.</p>
+                      <div className="glass-card p-8 rounded-2xl text-center">
+                        <Icon name="cpu" className="w-12 h-12 text-cyanNeon mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-white mb-2">{t('arg1')}</h3>
+                        <p className="text-sm text-gray-400">{t('arg1Desc')}</p>
                       </div>
-                      <div className="glass-card p-8 rounded-2xl border-goldAccent/30 text-center hover:border-goldAccent transition">
-                        <div className="w-16 h-16 mx-auto bg-goldAccent/10 rounded-2xl flex items-center justify-center mb-6 border border-goldAccent/30"><Icon name="shield" className="w-8 h-8 text-goldAccent" /></div>
-                        <h3 className="text-xl font-bold text-white mb-3">Licences Exclusives</h3>
-                        <p className="text-sm text-gray-400">Dès qu'un beat est vendu en exclusive, il est définitivement verrouillé (SOLD).</p>
+                      <div className="glass-card p-8 rounded-2xl text-center">
+                        <Icon name="shield" className="w-12 h-12 text-goldAccent mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-white mb-2">{t('arg2')}</h3>
+                        <p className="text-sm text-gray-400">{t('arg2Desc')}</p>
                       </div>
-                      <div className="glass-card p-8 rounded-2xl border-pinkNeon/30 text-center hover:border-pinkNeon transition">
-                        <div className="w-16 h-16 mx-auto bg-pinkNeon/10 rounded-2xl flex items-center justify-center mb-6 border border-pinkNeon/30"><Icon name="dollar" className="w-8 h-8 text-pinkNeon" /></div>
-                        <h3 className="text-xl font-bold text-white mb-3">Paiement Local</h3>
-                        <p className="text-sm text-gray-400">Payez par Carte Edahabia, CIB, BaridiMob ou PayPal en toute sécurité.</p>
+                      <div className="glass-card p-8 rounded-2xl text-center">
+                        <Icon name="dollar" className="w-12 h-12 text-pinkNeon mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-white mb-2">{t('arg3')}</h3>
+                        <p className="text-sm text-gray-400">{t('arg3Desc')}</p>
                       </div>
                     </div>
                   </div>
@@ -441,11 +335,11 @@
                     </div>
 
                     <form onSubmit={handleSaveSettings} className="space-y-6">
-                      <div className="flex items-center gap-6">
-                        <img src={editAvatar} className="w-24 h-24 rounded-full object-cover border-2 border-borderDark" />
-                        <div className="flex-1">
-                          <label className="text-xs font-bold text-gray-400 block mb-1">URL de la Photo de Profil (Avatar)</label>
-                          <input type="text" value={editAvatar} onChange={e => setEditAvatar(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none" />
+                      <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-obsidian rounded-2xl border border-borderDark">
+                        <img src={currentUser.avatar} className="w-24 h-24 rounded-full object-cover border-4 border-cyanNeon" />
+                        <div className="flex-1 w-full">
+                          <label className="text-xs font-bold text-gray-400 block mb-2">Changer la Photo (Upload PC)</label>
+                          <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) setEditAvatarFile(e.target.files[0]); }} className="w-full text-sm text-gray-400 file:bg-cyanNeon file:text-black file:border-0 file:rounded-xl file:px-4 file:py-2 file:mr-4 file:font-bold hover:file:opacity-90 transition" />
                         </div>
                       </div>
 
@@ -473,12 +367,12 @@
                   </div>
                 )}
 
-                {/* LES AUTRES VUES RESTENT IDENTIQUES (VSTS, BEATS, DASHBOARD, UPLOAD, MODALS) */}
+                {/* ===== VSTS & BEATS LISTS ===== */}
                 {view === 'vsts' && (
                   <section className="mb-16 animate-fade-in">
                     <h3 className="text-3xl font-black mb-6 text-white border-l-4 border-cyanNeon pl-4">PLUGINS VST3 OFFICIELS</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {filteredTracks.filter(t => t.type === 'vst').map(vst => (
+                      {tracks.filter(t => t.type === 'vst').map(vst => (
                         <div key={vst.id} className="glass-card rounded-2xl p-5 flex flex-col justify-between border-cyanNeon/30">
                           <span className="absolute top-3 right-3 bg-cyanNeon text-black text-[10px] font-black px-2 py-1 rounded">VST3 WINDOWS</span>
                           <img src={vst.cover} className="w-full h-44 object-cover rounded-xl mb-4" />
@@ -500,7 +394,7 @@
                     <h3 className="text-3xl font-black mb-6 text-white border-l-4 border-goldAccent pl-4">BEATSTORE OFFICIEL</h3>
                     <div className="glass-card rounded-2xl p-4">
                       <div className="space-y-2">
-                        {filteredTracks.filter(t => t.type === 'beat').map(beat => (
+                        {tracks.filter(t => t.type === 'beat').map(beat => (
                           <div key={beat.id} className={`grid grid-cols-1 md:grid-cols-12 gap-4 items-center p-3 rounded-xl transition ${beat.isSold ? 'opacity-50 bg-black/60' : 'hover:bg-white/5'}`}>
                             <div className="col-span-5 flex items-center gap-4">
                               <div className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer" onClick={() => !beat.isSold && togglePlay(beat)}>
@@ -510,12 +404,10 @@
                               <div>
                                 <h4 className="font-bold text-white flex items-center gap-2">{beat.title} {beat.isSold && <span className="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">SOLD</span>}</h4>
                                 <p className="text-xs text-goldAccent font-bold">Par {beat.producer}</p>
-                                <p className="text-[10px] text-gray-400 mt-0.5">{beat.genre}</p>
                               </div>
                             </div>
-                            <div className="hidden md:block col-span-2 text-sm text-gray-400">{beat.bpm} BPM • {beat.key}</div>
                             <div className="col-span-full md:col-span-3 flex justify-end">
-                              {beat.isSold ? <span className="text-xs font-bold text-red-500 bg-red-950/40 px-4 py-2 rounded-xl">EXCLUSIF VENDU</span> : <button onClick={() => { setSelectedLicenseTrack(beat); setSelectedLicenseType('mp3'); setPurchasedKey(null); }} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">Acheter ({beat.priceMp3.toLocaleString()} DZD)</button>}
+                              {beat.isSold ? <span className="text-xs font-bold text-red-500 bg-red-950/40 px-4 py-2 rounded-xl">EXCLUSIF VENDU</span> : <button onClick={() => { setSelectedLicenseTrack(beat); setSelectedLicenseType('mp3'); }} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">{t('buyBeat')} ({beat.priceMp3.toLocaleString()} DZD)</button>}
                             </div>
                           </div>
                         ))}
@@ -524,45 +416,7 @@
                   </section>
                 )}
 
-                {/* Dashboard & Upload restent identiques pour l'interaction */}
-                {view === 'dashboard' && currentUser && (
-                  <div className="space-y-8 animate-fade-in">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-cardDark border border-borderDark p-6 rounded-2xl">
-                          <div className="flex items-center gap-4">
-                            <img src={currentUser.avatar} className="w-16 h-16 rounded-full object-cover border-2 border-goldAccent" />
-                            <div>
-                              <h2 className="text-2xl font-black text-white">{currentUser.name}</h2>
-                              <p className="text-xs text-gray-400">{currentUser.email} • {currentUser.rip ? `RIP: ${currentUser.rip}` : 'Aucun RIP configuré'}</p>
-                            </div>
-                          </div>
-                          <button onClick={() => setView('upload')} className="bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-black px-6 py-3 rounded-xl flex items-center gap-2 cyan-glow">
-                            <Icon name="upload" className="w-4 h-4" /> <span>Uploader Beat / VST</span>
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <div className="glass-card p-6 rounded-2xl border-cyanNeon/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">REVENUS</span><Icon name="dollar" className="w-5 h-5 text-cyanNeon" /></div><span className="text-3xl font-black text-cyanNeon">{(currentUser.balance || 0).toLocaleString()} DZD</span></div>
-                          <div className="glass-card p-6 rounded-2xl border-goldAccent/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">ÉCOUTES</span><Icon name="activity" className="w-5 h-5 text-goldAccent" /></div><span className="text-3xl font-black text-goldAccent">{(currentUser.plays || 0).toLocaleString()}</span></div>
-                        </div>
-                  </div>
-                )}
-                {/* ... (Upload et Modals intacts en arrière-plan) ... */}
-
               </div>
-
-              {/* LECTEUR AUDIO PERSISTANT */}
-              {currentTrack && currentTrack.type === 'beat' && (
-                <div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-6 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-4 w-1/4">
-                    <img src={currentTrack.cover} className="w-12 h-12 rounded-lg object-cover" />
-                    <div className="hidden md:block">
-                      <h4 className="font-bold text-sm text-white">{currentTrack.title}</h4>
-                      <p className="text-xs text-goldAccent font-bold">{currentTrack.producer}</p>
-                    </div>
-                  </div>
-                  <div className="flex-1 flex justify-center"><button onClick={() => togglePlay(currentTrack)} className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center"><Icon name={isPlaying ? "pause" : "play"} className="w-5 h-5" /></button></div>
-                  <div className="w-1/4 flex justify-end"><button onClick={() => { setSelectedLicenseTrack(currentTrack); setSelectedLicenseType('mp3'); }} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs">Acheter</button></div>
-                </div>
-              )}
             </div>
           );
         }
