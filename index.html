@@ -84,7 +84,8 @@
             activity: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
             cpu: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>,
             shield: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>,
-            sparkles: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            sparkles: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>,
+            mic: <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
           };
           return icons[name] || null;
         };
@@ -102,7 +103,7 @@
         };
 
         function App() {
-          const [view, setView] = React.useState('home'); // 'home', 'vsts', 'beats', 'dashboard', 'upload'
+          const [view, setView] = React.useState('home');
           const [tracks, setTracks] = React.useState(INITIAL_TRACKS);
           const [currentTrack, setCurrentTrack] = React.useState(null);
           const [isPlaying, setIsPlaying] = React.useState(false);
@@ -144,6 +145,15 @@
             localStorage.removeItem('yanrecords_user');
             setCurrentUser(null);
             setView('home');
+          };
+
+          const handlePosterClick = () => {
+            if (!currentUser) {
+              setShowAuthModal(true);
+            } else {
+              setView('upload');
+              window.scrollTo(0, 0);
+            }
           };
 
           const togglePlay = (track) => {
@@ -213,7 +223,7 @@
             <div className="relative">
               {/* ===== NAVBAR ===== */}
               <nav className="glass fixed top-0 w-full z-50 px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-4 cursor-pointer" onClick={() => setView('home')}>
+                <div className="flex items-center gap-4 cursor-pointer" onClick={() => { setView('home'); window.scrollTo(0,0); }}>
                   <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent shadow-lg">
                     Y
                   </div>
@@ -228,7 +238,10 @@
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <button onClick={() => setView('upload')} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs hover:opacity-90 cyan-glow">
+                  <button 
+                    onClick={handlePosterClick}
+                    className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs hover:opacity-90 cyan-glow"
+                  >
                     <Icon name="upload" className="w-4 h-4" />
                     <span>Poster Beat / VST</span>
                   </button>
@@ -260,7 +273,7 @@
                   </button>
                 )}
 
-                {/* ===== VIEW: HOME (PAGE D'ACCUEIL VITRINE & MOTIVATION) ===== */}
+                {/* ===== VIEW: HOME (VITRINE & CIBLAGE MOTIVANT) ===== */}
                 {view === 'home' && (
                   <div className="space-y-24">
                     
@@ -278,7 +291,7 @@
                           <span className="text-gradient-cyan">PRODUCTEURS PRO</span>
                         </h2>
                         <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-                          Propulsez votre carrière musicale avec la référence montante de la prod. Accédez à des VSTs exclusifs codés sur-mesure et à des instrumentales uniques réservables en direct.
+                          Propulsez votre carrière musicale. Accédez à des VSTs exclusifs codés en C++ natif et à des instrumentales uniques réservables en direct avec contrats de licences officiels.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                           <button onClick={() => { setView('vsts'); window.scrollTo(0,0); }} className="w-full sm:w-auto bg-cyanNeon text-black font-black px-8 py-4 rounded-xl text-lg hover:scale-105 transition cyan-glow">
@@ -295,13 +308,45 @@
                       </div>
                     </div>
 
-                    {/* SECTION ARGUMENTS (POURQUOI YANRECORDS ?) */}
+                    {/* SECTION CIBLE 1 : VOUS ÊTES BEATMAKER / PRODUCTEUR ? */}
+                    <div className="glass-card p-8 md:p-12 rounded-3xl border-goldAccent/50 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+                      <div className="space-y-4 max-w-2xl text-center md:text-left z-10">
+                        <span className="bg-goldAccent/20 text-goldAccent text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider inline-flex items-center gap-2">
+                          <Icon name="cpu" className="w-4 h-4" /> VOUS ÊTES BEATMAKER / PRODUCTEUR ?
+                        </span>
+                        <h3 className="text-3xl md:text-4xl font-black text-white">REJOIGNEZ LA 1ÈRE PLATEFORME D'ALGÉRIE</h3>
+                        <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+                          Publiez vos instrumentales et vos VSTs sur la vitrine YANrecords. Fixez vos prix librement (MP3, WAV, Stems, Exclusif) et encaissez vos ventes directement par <strong>BaridiMob, Edahabia & PayPal</strong> sans intermédiaire.
+                        </p>
+                      </div>
+                      <button onClick={handlePosterClick} className="bg-goldAccent text-black font-black px-8 py-5 rounded-2xl text-base hover:scale-105 transition gold-glow whitespace-nowrap z-10">
+                        REJOINDRE & VENDRE VOS PRODS
+                      </button>
+                    </div>
+
+                    {/* SECTION CIBLE 2 : TU ES UN(E) ARTISTE / RAPPEUR(SE) ? */}
+                    <div className="glass-card p-8 md:p-12 rounded-3xl border-cyanNeon/50 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+                      <div className="space-y-4 max-w-2xl text-center md:text-left z-10">
+                        <span className="bg-cyanNeon/20 text-cyanNeon text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wider inline-flex items-center gap-2">
+                          <Icon name="mic" className="w-4 h-4" /> TU ES UN(E) ARTISTE / RAPPEUR(SE) ?
+                        </span>
+                        <h3 className="text-3xl md:text-4xl font-black text-white">DÉNICHE DES PÉPITES POUR TES PROJETS</h3>
+                        <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+                          Rode sur le Beatstore et trouve la prod qui va faire exploser ton prochain single. Réserves des licences exclusives (le beat est verrouillé et retiré du site) ou télécharge nos VST3 pour un enregistrement et mastering studio.
+                        </p>
+                      </div>
+                      <button onClick={() => { setView('beats'); window.scrollTo(0,0); }} className="bg-cyanNeon text-black font-black px-8 py-5 rounded-2xl text-base hover:scale-105 transition cyan-glow whitespace-nowrap z-10">
+                        DÉNICHER DES PÉPITES
+                      </button>
+                    </div>
+
+                    {/* ARGUMENTS RASSURANTS */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                       <div className="glass-card p-8 rounded-2xl border-cyanNeon/30 text-center hover:border-cyanNeon transition">
                         <div className="w-16 h-16 mx-auto bg-cyanNeon/10 rounded-2xl flex items-center justify-center mb-6 border border-cyanNeon/30">
                           <Icon name="cpu" className="w-8 h-8 text-cyanNeon" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-3">Plugins VST3 Négatifs</h3>
+                        <h3 className="text-xl font-bold text-white mb-3">Plugins VST3 Native</h3>
                         <p className="text-sm text-gray-400 leading-relaxed">Développés en C++ natif pour une performance maximale dans FL Studio. Zéro latence, zéro perte de CPU.</p>
                       </div>
 
@@ -320,22 +365,6 @@
                         <h3 className="text-xl font-bold text-white mb-3">Paiement DZD & Global</h3>
                         <p className="text-sm text-gray-400 leading-relaxed">Payez par Carte Edahabia, CIB, BaridiMob ou PayPal en toute sécurité avec livraison automatique immédiate.</p>
                       </div>
-                    </div>
-
-                    {/* BANNIÈRE PUB & BEATMAKER SPOTLIGHT */}
-                    <div className="glass-card p-8 md:p-12 rounded-3xl border-goldAccent/40 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-                      <div className="space-y-4 max-w-xl text-center md:text-left">
-                        <span className="bg-goldAccent/20 text-goldAccent text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
-                          📢 ESPACE PARTENAIRES & SPONSORS
-                        </span>
-                        <h3 className="text-3xl font-black text-white">VOUS ÊTES BEATMAKER EN ALGÉRIE ?</h3>
-                        <p className="text-gray-300 text-sm leading-relaxed">
-                          Rejoignez la première communauté de producteurs du pays. Mettez vos instrumentales et vos kits en vente directement auprès des artistes locaux et internationaux.
-                        </p>
-                      </div>
-                      <button onClick={() => setView('upload')} className="bg-goldAccent text-black font-black px-8 py-4 rounded-xl text-base hover:scale-105 transition gold-glow whitespace-nowrap">
-                        POSTER VOS CRÉATIONS NOW
-                      </button>
                     </div>
 
                   </div>
