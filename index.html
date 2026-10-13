@@ -22,8 +22,7 @@ body{background:#050508;color:#f8fafc;overflow-x:hidden;scroll-behavior:smooth}
 @keyframes shimmer{to{background-position:200% center}}
 .bg-animated-mesh{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;background:#050508}
 .mesh-blob{position:absolute;filter:blur(120px);opacity:.3;border-radius:50%;animation:float 20s ease-in-out infinite}
-.mesh-blob:nth-child(2){animation-delay:-7s;animation-duration:25s}
-.mesh-blob:nth-child(3){animation-delay:-14s;animation-duration:30s}
+.mesh-blob:nth-child(2){animation-delay:-7s;animation-duration:25s}.mesh-blob:nth-child(3){animation-delay:-14s;animation-duration:30s}
 @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-50px) scale(1.1)}66%{transform:translate(-20px,20px) scale(.9)}}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#050508}::-webkit-scrollbar-thumb{background:#222638;border-radius:4px}
 .dropdown-anim{animation:dropIn .2s ease-out forwards;transform-origin:top right}
@@ -60,7 +59,7 @@ class ErrB extends React.Component{
   constructor(p){super(p);this.state={e:false}}
   static getDerivedStateFromError(){return{e:true}}
   render(){
-    if(this.state.e)return<div className="min-h-screen flex items-center justify-center p-4"><div className="glass-card p-8 rounded-2xl text-center max-w-sm"><h2 className="text-2xl font-black text-white">Erreur</h2><p className="text-gray-400 mt-2">Recharge la page.</p><button onClick={()=>location.reload()} className="mt-4 bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Recharger</button></div></div>;
+    if(this.state.e)return<div className="min-h-screen flex items-center justify-center"><div className="glass-card p-8 rounded-2xl text-center max-w-sm"><h2 className="text-2xl font-black text-white">Erreur</h2><p className="text-gray-400 mt-2">Recharge la page.</p><button onClick={()=>location.reload()} className="mt-4 bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Recharger</button></div></div>;
     return this.props.children;
   }
 }
@@ -315,13 +314,7 @@ const refOrder=async(id)=>{
   const r=prompt("Raison du refus :");if(r===null)return;
   await sb.rpc('refuse_order',{p_order_id:id,p_reason:r||'Non vérifié'});toast("Refusée.");loadOrders();
 };
-const dlVst=async(p)=>{
-  const path=p.track?.file_path;
-  if(!path){toast("Fichier indisponible","error");return}
-  const{data,error}=await sb.storage.from('vst-files').createSignedUrl(path,120,{download:true});
-  if(error){toast(error.message,'error');return}
-  window.open(data.signedUrl,'_blank');
-};
+const dlVst=async(p)=>{const path=p.track?.file_path;if(!path){toast("Fichier indisponible","error");return}const{data,error}=await sb.storage.from('vst-files').createSignedUrl(path,120,{download:true});if(error){toast(error.message,'error');return}window.open(data.signedUrl,'_blank')};
 
 // ====== VERIFY ======
 const doVerify=async(e)=>{
@@ -427,7 +420,7 @@ Continuer avec Google</button>
 return(
 <div className="relative">
 <Toasts items={toasts} onRemove={id=>setToasts(p=>p.filter(t=>t.id!==id))}/>
-{menu&&<div className="fixed inset-0 z-40" onClick={()=>setMenu(false)}/>}
+{menu&&<div className="fixed inset-0 z-40" onClick={()=>setMenu(false)}/>
 
 {/* NAVBAR */}
 <nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between">
@@ -562,7 +555,7 @@ return(
 </form>
 {vResult&&<div className={`mt-6 p-5 rounded-2xl border fade-in ${vResult.valid?'border-greenPro bg-greenPro/10':'border-red-500 bg-red-500/10'}`}>
 <div className="flex items-center gap-3 mb-3"><div className={`w-10 h-10 rounded-full flex items-center justify-center ${vResult.valid?'bg-greenPro/20 text-greenPro':'bg-red-500/20 text-red-400'}`}><I name={vResult.valid?'check':'x'} c="w-5 h-5"/></div>
-<h4 className={`font-black text-xl ${vResult.valid?'text-greenPro':'text-red-400'}`}>{vResult.valid?'✅ CLÉ VALIDE':'❌ CLÉ REFUSÉE'}</h4></div>
+<h4 className={`font-black text-xl ${vResult.valid?'text-greenPro':'text-red-400'}`}>{vResult.valid?'✅ CLÍ VALIDE':'❌ CLÍ REFUSÉE'}</h4></div>
 {vResult.product&&<p className="text-sm text-gray-300">Produit : <strong>{vResult.product}</strong></p>}
 {vResult.reason&&<p className="text-sm text-red-300 mt-1">{vResult.reason}</p>}
 {vResult.max_activations!=null&&<p className="text-sm text-gray-300 mt-1">Activations : <strong>{vResult.activations}/{vResult.max_activations}</strong></p>}
@@ -661,7 +654,7 @@ return(
 <div className="flex gap-2 flex-shrink-0">
 {o.status==='pending'&&<><button onClick={()=>valOrder(o.id)} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">✅ Valider</button><button onClick={()=>refOrder(o.id)} className="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">❌ Refuser</button></>}
 {o.status==='validated'&&<span className="text-xs font-bold text-greenPro whitespace-nowrap">✅ Livrée</span>}
-{o.status==='refused'&&<span className="text-xs font-bold text-red-400 whitespace-nowrap">❌ Refusée</span>}
+{o.status==='refused'&&<span className="text-xs font-bold text-red-400 whitespace-nowrap">❌ Refusé</span>}
 </div></div></div>))}</div>}
 </section>}
 </div>
