@@ -1,21 +1,16 @@
-// ===== DONNÉES GLOBALES =====
 const DEFAULT_USER = {
-  id: 'ceo-user-1', name: 'Yanis (CEO)', email: 'yanis.records@gmail.com', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80', balance: 84500, plays: 18920, rip: '00799999000000000012'
+  id: 'ceo-user-1', name: 'Yanis (CEO)', email: 'yanis.records@gmail.com', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80', balance: 84500
 };
 
-function generateRealVstKey() {
-    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let p1 = ''; for (let i = 0; i < 4; i++) p1 += chars.charAt(Math.floor(Math.random() * chars.length));
-    let hash = 0; for (let i = 0; i < p1.length; i++) hash += p1.charCodeAt(i) * (i + 5);
-    return `SM2-${p1}-${hash.toString(16).toUpperCase().padStart(4, '0').slice(-4)}`;
-}
+const INITIAL_TRACKS = [
+  { id: 'vst-1', title: 'SmartMaster V2 Pro', type: 'vst', price: 6500, cover: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80', producer: 'YANrecords', isSold: false },
+  { id: 'beat-1', title: 'Marseille Vibes', type: 'beat', bpm: 130, key: 'Am', genre: 'Jul Type', producer: 'Slima Beatz', priceMp3: 2000, priceWav: 4000, priceStems: 8000, priceExclusive: 25000, cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', isSold: false }
+];
 
-// Composant Principal
 function App() {
   const [view, setViewState] = React.useState('home');
   const [currentUser, setCurrentUser] = React.useState(null);
   
-  // Fonction de navigation qui remonte en haut
   const setView = (newView) => {
     setViewState(newView);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -29,19 +24,13 @@ function App() {
 
   return (
     <div className="relative">
-      <Navbar 
-        view={view} 
-        setView={setView} 
-        currentUser={currentUser} 
-        setCurrentUser={setCurrentUser} 
-        defaultUser={DEFAULT_USER} 
-      />
+      <Navbar view={view} setView={setView} currentUser={currentUser} setCurrentUser={setCurrentUser} defaultUser={DEFAULT_USER} />
       
       <div className="pt-28 pb-10 px-6 max-w-7xl mx-auto">
         {view === 'home' && <Home setView={setView} />}
-        
-        {/* Les autres pages viendront s'ajouter ici dans les prochaines étapes ! */}
-        {view === 'vsts' && <h2 className="text-white text-3xl font-bold">Page VSTs (Bientôt)</h2>}
+        {view === 'vsts' && <VstStore vsts={INITIAL_TRACKS.filter(t => t.type === 'vst')} />}
+        {view === 'beats' && <BeatStore beats={INITIAL_TRACKS.filter(t => t.type === 'beat')} togglePlay={() => {}} currentTrack={null} isPlaying={false} />}
+        {view === 'dashboard' && <Dashboard currentUser={currentUser} tracks={INITIAL_TRACKS} setView={setView} />}
       </div>
     </div>
   );
