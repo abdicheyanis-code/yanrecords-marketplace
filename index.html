@@ -2,200 +2,1497 @@
 <html lang="fr" class="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>YANrecords</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YANrecords | VST & Beatstore 🇩🇿</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script type="text/babel">
-const SB='https://ryhnnlphdeuxrvpxyfgc.supabase.co';
-const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG5ubHBoZGV1eHJ2cHh5ZmdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc1MDIsImV4cCI6MjEwNzM5MzUwMn0.YqjmUuWJK38qjTCB9hCK_N20BFEpUUsOnt77_iDWMCA';
-const sb=window.supabase.createClient(SB,SK);
-const DC='https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80';
-const fmt=n=>(Number(n)||0).toLocaleString();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config={darkMode:'class',theme:{extend:{colors:{obsidian:'#050508',cardDark:'#131520',borderDark:'#222638',cyanNeon:'#00f0ff',goldAccent:'#e2b053',pinkNeon:'#ff007f',greenPro:'#10b981'}}}}
+</script>
+<style>
+*{font-family:'Inter',system-ui,sans-serif;box-sizing:border-box}
+body{background:#050508;color:#f8fafc;overflow-x:hidden}
+.glass{background:rgba(19,21,32,.85);backdrop-filter:blur(20px);border:1px solid rgba(34,38,56,.8)}
+.card{background:linear-gradient(145deg,rgba(20,22,35,.9),rgba(10,11,18,.9));backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.tgold{background:linear-gradient(135deg,#e2b053,#fff176,#e2b053);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:sh 4s linear infinite}
+.tcyan{background:linear-gradient(135deg,#00f0ff,#0080ff,#00f0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:sh 4s linear infinite}
+@keyframes sh{to{background-position:200% center}}
+.mesh{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;background:#050508}
+.blob{position:absolute;filter:blur(120px);opacity:.3;border-radius:50%;animation:fl 20s ease-in-out infinite}
+.blob:nth-child(2){animation-delay:-7s}
+.blob:nth-child(3){animation-delay:-14s}
+@keyframes fl{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-50px) scale(1.1)}}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#050508}
+::-webkit-scrollbar-thumb{background:#222638;border-radius:4px}
+.fade{animation:fi .4s ease-out forwards}
+@keyframes fi{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.gc{box-shadow:0 0 25px rgba(0,240,255,.35)}
+.gg{box-shadow:0 0 25px rgba(226,176,83,.35)}
+.loader{border:3px solid #222638;border-top:3px solid #00f0ff;border-radius:50%;width:40px;height:40px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+input[type=range]{-webkit-appearance:none;background:transparent}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:14px;width:14px;border-radius:50%;background:#00f0ff;margin-top:-5px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:#222638;border-radius:2px}
+</style>
+</head>
+<body class="min-h-screen pb-44 md:pb-28">
+<div class="mesh">
+<div class="blob bg-blue-900 w-[600px] h-[600px] top-[-10%] left-[-10%]"></div>
+<div class="blob bg-purple-900 w-[700px] h-[700px] bottom-[-20%] right-[-10%]"></div>
+<div class="blob bg-teal-900/30 w-[400px] h-[400px] top-[40%] left-[40%]"></div>
+</div>
+<div id="root"></div>
 
-class ErrB extends React.Component{
-  constructor(p){super(p);this.state={e:false}}
-  static getDerivedStateFromError(){return{e:true}}
+<script type="text/babel">
+const SB_URL = 'https://ryhnnlphdeuxrvpxyfgc.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG5ubHBoZGV1eHJ2cHh5ZmdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc1MDIsImV4cCI6MjEwNzM5MzUwMn0.YqjmUuWJK38qjTCB9hCK_N20BFEpUUsOnt77_iDWMCA';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+const DC = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80';
+const AV = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+const GENRES = ['Tous','Drill','Trap','Jul Type','Afrobeat','Boom Bap','Raï','Pop','RnB'];
+const fmt = function(n){ return (Number(n)||0).toLocaleString(); };
+const ftime = function(s){
+  if(!s || !isFinite(s)) return '0:00';
+  return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
+};
+
+/* ---------------- ICONS ---------------- */
+function Icon(props){
+  const c = props.c || 'w-5 h-5';
+  const map = {
+    play: <svg className={c} fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>,
+    pause: <svg className={c} fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>,
+    up: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
+    out: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>,
+    dash: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
+    back: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+    x: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+    trash: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>,
+    money: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+    wave: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+    cpu: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg>,
+    shield: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>,
+    gear: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+    chev: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>,
+    check: <svg className={c} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>,
+    find: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+    mic: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>,
+    note: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
+    home: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    vol: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
+    mute: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>,
+    key: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>,
+    copy: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
+    down: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>,
+    list: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>,
+    bag: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
+    doc: <svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+  };
+  return map[props.n] || null;
+}
+
+/* ---------------- ERROR BOUNDARY ---------------- */
+class Boundary extends React.Component {
+  constructor(p){ super(p); this.state = { err: null }; }
+  static getDerivedStateFromError(e){ return { err: e }; }
   render(){
-    if(this.state.e)return<div className="min-h-screen flex items-center justify-center p-4"><div className="glass-card p-8 rounded-2xl text-center max-w-sm"><h2 className="text-2xl font-black text-white">Erreur</h2><p className="text-gray-400 mt-2">Recharge la page.</p><button onClick={()=>location.reload()} className="mt-4 bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Recharger</button></div></div>;
+    if(this.state.err){
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="card p-8 rounded-2xl text-center max-w-md">
+            <h2 className="text-2xl font-black text-white mb-2">Erreur</h2>
+            <p className="text-xs text-gray-400 mb-4">{String(this.state.err.message || this.state.err)}</p>
+            <button onClick={function(){ location.reload(); }} className="bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Recharger</button>
+          </div>
+        </div>
+      );
+    }
     return this.props.children;
   }
 }
 
-const I=({name,c="w-5 h-5"})=>{
-const d={
-play:<svg className={c} fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>,
-pause:<svg className={c} fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>,
-upload:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
-logout:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>,
-dash:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
-back:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
-x:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
-trash:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>,
-dollar:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
-act:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
-cpu:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg>,
-shield:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>,
-set:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
-chev:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>,
-check:<svg className={c} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>,
-search:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-mic:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>,
-music:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
-home:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-vol:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
-mute:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>,
-key:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>,
-copy:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
-dl:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>,
-list:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
-};return d[name]||null;};
-
-function Toasts({items,onRemove}){
-return<div className="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-sm">
-{items.map(t=><div key={t.id} className="toast-anim glass-card rounded-xl p-4 flex items-center gap-3 border-l-4" style={{borderLeftColor:t.type==='error'?'#ef4444':'#10b981'}}>
-<div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type==='error'?'bg-red-500/20 text-red-400':'bg-greenPro/20 text-greenPro'}`}><I name={t.type==='error'?'x':'check'} c="w-4 h-4"/></div>
-<p className="text-sm font-bold text-white flex-1">{t.msg}</p>
-<button onClick={()=>onRemove(t.id)} className="text-gray-500 hover:text-white"><I name="x" c="w-4 h-4"/></button>
-</div>)}</div>;}
-
-function App(){
-const[loading,setLoading]=React.useState(true);
-const[sess,setSess]=React.useState(null);
-const[prof,setProf]=React.useState(null);
-const[tracks,setTracks]=React.useState([]);
-const[toasts,setToasts]=React.useState([]);
-const[view,_setView]=React.useState('home');
-const[cur,setCur]=React.useState(null);
-const[playing,setPlaying]=React.useState(false);
-const[sel,setSel]=React.useState(null);
-const[lic,setLic]=React.useState('mp3');
-const[menu,setMenu]=React.useState(false);
-const[aMode,setAMode]=React.useState('login');
-const[aEmail,setAEmail]=React.useState('');
-const[aPass,setAPass]=React.useState('');
-const[aName,setAName]=React.useState('');
-const[aErr,setAErr]=React.useState('');
-const[aLoad,setALoad]=React.useState(false);
-const[cgu,setCGU]=React.useState(false);
-const[showCGU,setShowCGU]=React.useState(false);
-const[eName,setEName]=React.useState('');
-const[eRip,setERip]=React.useState('');
-const[eAv,setEAv]=React.useState(null);
-const[eAvP,setEAvP]=React.useState('');
-const[saving,setSaving]=React.useState(false);
-const[uTitle,setUTitle]=React.useState('');
-const[uType,setUType]=React.useState('beat');
-const[uGenre,setUGenre]=React.useState('Drill');
-const[uBpm,setUBpm]=React.useState(140);
-const[uKey,setUKey]=React.useState('Am');
-const[uMp3,setUMp3]=React.useState(2000);
-const[uWav,setUWav]=React.useState(4000);
-const[uStems,setUStems]=React.useState(8000);
-const[uExcl,setUExcl]=React.useState(25000);
-const[uDesc,setUDesc]=React.useState('');
-const[uCover,setUCover]=React.useState(null);
-const[uAudio,setUAudio]=React.useState(null);
-const[uLoad,setULoad]=React.useState(false);
-const[search,setSearch]=React.useState('');
-const[filterG,setFilterG]=React.useState('Tous');
-const[aProg,setAProg]=React.useState(0);
-const[aDur,setADur]=React.useState(0);
-const[aTime,setATime]=React.useState(0);
-const[vol,setVol]=React.useState(1);
-const[muted,setMuted]=React.useState(false);
-const[purch,setPurch]=React.useState([]);
-const[orders,setOrders]=React.useState([]);
-const[vKey,setVKey]=React.useState('');
-const[vResult,setVResult]=React.useState(null);
-const[vLoad,setVLoad]=React.useState(false);
-const[proof,setProof]=React.useState(null);
-const[oLoad,setOLoad]=React.useState(false);
-const[sellerInfo,setSellerInfo]=React.useState(null);
-const[vMachine,setVMachine]=React.useState(()=>('PC-'+Math.random().toString(36).substring(2,8).toUpperCase()));
-
-const aRef=React.useRef(new Audio());
-const GEN=['Tous','Drill','Trap','Jul Type','Afrobeat','Boom Bap','Raï','Pop','RnB'];
-
-const setView=v=>{_setView(v);setMenu(false);window.scrollTo({top:0,behavior:'smooth'})};
-const toast=(msg,type='success')=>{const id=Date.now()+Math.random();setToasts(p=>[...p,{id,msg,type}]);setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),4000)};
-const copyT=async t=>{try{await navigator.clipboard.writeText(t);toast("Copié !")}catch(e){toast("Copie manuelle","error")}};
-const getPr=(item,l)=>{if(!item)return 0;if(item.type==='vst')return item.price_mp3||0;const m={mp3:item.price_mp3,wav:item.price_wav,stems:item.price_stems,exclusive:item.price_exclusive};return m[l]??item.price_mp3??0};
-const getRate=item=>item?.type==='vst'?8:5;
-const fmtTime=s=>{if(!s||!isFinite(s))return'0:00';return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`};
-
-// ====== INIT ======
-React.useEffect(()=>{
-  sb.auth.getSession().then(({data:{session}})=>{
-    setSess(session);
-    if(session){loadProf(session.user.id);loadPurch(session.user.id)}
-    loadTracks();setLoading(false);
-  });
-  const{data:{subscription}}=sb.auth.onAuthStateChange((ev,s)=>{
-    setSess(s);
-    if(s){loadProf(s.user.id);loadPurch(s.user.id)}
-    else{setProf(null);setPurch([]);setOrders([])}
-  });
-  const a=aRef.current;
-  const onEnd=()=>{setPlaying(false);setAProg(0)};
-  const onTime=()=>{setATime(a.currentTime);setAProg((a.currentTime/a.duration)*100||0)};
-  const onMeta=()=>setADur(a.duration);
-  a.addEventListener('ended',onEnd);
-  a.addEventListener('timeupdate',onTime);
-  a.addEventListener('loadedmetadata',onMeta);
-  return()=>{subscription.unsubscribe();a.removeEventListener('ended',onEnd);a.removeEventListener('timeupdate',onTime);a.removeEventListener('loadedmetadata',onMeta)};
-},[]);
-
-React.useEffect(()=>{if(sess&&prof?.is_admin)loadOrders()},[sess,prof?.is_admin]);
-React.useEffect(()=>{
-  if(sel?.producer_id){
-    sb.from('profiles').select('name,rip').eq('id',sel.producer_id).single()
-      .then(({data})=>setSellerInfo(data));
-  } else setSellerInfo(null);
-},[sel?.producer_id]);
-
-const loadTracks=async()=>{const{data}=await sb.from('tracks').select('*').order('created_at',{ascending:false});if(data)setTracks(d)};
-const loadProf=async(uid)=>{const{data}=await sb.from('profiles').select('*').eq('id',uid).single();if(data){setProf(data);setEName(data.name);setERip(data.rip||'');setEAvP(data.avatar_url)}else setTimeout(()=>loadProf(uid),1500)};
-const loadPurch=async(uid)=>{if(!uid)return;const{data:salesData}=await sb.from('sales').select('*').eq('buyer_id',uid).order('created_at',{ascending:false});if(!salesData)return;const ids=[...new Set(salesData.map(s=>s.track_id).filter(Boolean))];const map={};if(ids.length){const{data:tr}=await sb.from('tracks').select('id,title,cover_url,type,file_path,producer_name').in('id',ids);(tr||[]).forEach(t=>{map[t.id]=t});}setPurch(salesData.map(s=>({...s,track:map[s.track_id]||null})));};
-const loadOrders=async()=>{const{data:ordData}=await sb.from('orders').select('*').order('created_at',{ascending:false});if(!ordData)return;const bids=[...new Set(ordData.map(o=>o.buyer_id))];const bm={};if(bids.length){const{data:ps}=await sb.from('profiles').select('id,name').in('id',bids);(ps||[]).forEach(p=>{bm[p.id]=p.name});setOrders(ordData.map(o=>({...o,buyer_name:bm[o.buyer_id]||'Client'})));};
-
-// ====== AUTH ======
-const handleAuth=async(e)=>{e.preventDefault();setAErr('');if(aMode==='register'&&!cgu){setAErr("Acceptez les CGU.");return}setALoad(true);try{if(aMode==='login'){const{error}=await sb.auth.signInWithPassword({email:aEmail,password:aPass});if(error)throw error;toast("Connecté !");}else{const{data,error}=await sb.auth.signUp({email:aEmail,password:aPass,options:{data:{full_name:aName||aEmail.split('@')[0]}});if(error)throw error;if(data.user&&!data.session)toast("Vérifie ton email !","info");else toast("Compte créé !");}}catch(err){setAErr(err.message)}setALoad(false)};
-const handleGoogle=async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});if(error)toast(error.message,'error')};
-const handleLogout=async()=>{aRef.current.pause();setPlaying(false);await sb.auth.signOut();setView('home');toast("Déconnecté.")};
-
-// ====== PROFILE ======
-const handleSave=async(e)=>{e.preventDefault();setSaving(true);try{let au=prof.avatar_url;if(eAv){const n=`${prof.id}-${Date.now()}.${eAv.name.split('.').pop()}`;const{error}=await sb.storage.from('avatars').upload(n,eAv,{upsert:true});if(error)throw error;au=sb.storage.from('avatars').getPublicUrl(n).data.publicUrl;}const{data,error}=await sb.from('profiles').update({name:eName,rip:eRip,avatar_url:au}).eq('id',prof.id).select().single();if(error)throw error;setProf(data);setEAvP(data.avatar_url);setEAv(null);toast("Sauvegardé !");setView('dashboard');}catch(err){toast(err.message,'error')}setSaving(false);};
-
-// ====== PLAYER ======
-const togglePlay=async(t)=>{if(!t.audio_url){toast("Pas d'audio","error");return}if(cur?.id===t.id){if(playing){aRef.current.pause();setPlaying(false)}else{aRef.current.play().catch(()=>{});setPlaying(true)}}else{setCur(t);aRef.current.src=t.audio_url;aRef.current.volume=muted?0:vol;aRef.current.play().catch(()=>{});setPlaying(true);await sb.rpc('increment_plays',{track_id:t.id});}};
-const seek=e=>{aRef.current.currentTime=(e.target.value/100)*aDur;setAProg(e.target.value)};const volCh=e=>{const v=parseFloat(e.target.value);setVol(v);aRef.current.volume=v;setMuted(v===0)};const toggleMute=()=>{if(muted){aRef.current.volume=vol||0.5;setMuted(false)}else{aRef.current.volume=0;setMuted(true)}};
-
-// ====== ORDERS ======
-const submitOrder=async()=>{if(!sel||!sess||!proof){toast("Ajoute la capture d'écran du paiement !","error");return}setOLoad(true);try{const item=sel,l=item.type==='vst'?'vst':lic,amt=getPr(item,l),rate=getRate(item),sAmt=Math.floor(amt*(1-rate/100)),fee=amt-sAmt;let pu='';const pn=`${sess.user.id}-${Date.now()}-proof.${proof.name.split('.').pop()}`;const{error:pe}=await sb.storage.from('covers').upload(pn,proof);if(!pe)pu=sb.storage.from('covers').getPublicUrl(pn).data.publicUrl;const{error:oe}=await sb.from('orders').insert({buyer_id:sess.user.id,seller_id:item.producer_id,track_id:item.id,product_type:item.type,license_type:l,amount:amt,seller_amount:sAmt,platform_fee:fee,rate_percent:rate,proof_url:pu});if(oe)throw oe;toast("Commande envoyée ! L'admin validera sous 24h.");setSel(null);setProof(null);setSellerInfo(null);if(prof?.is_admin)loadOrders();}catch(err){toast(err.message,'error')}setOLoad(false)};
-const valOrder=async(id)=>{if(!confirm("Confirmer le paiement ?"))return;const{data,error}=await sb.rpc('validate_order',{p_order_id:id,p_admin_id:sess.user.id});if(error){toast(error.message,'error');return}if(data?.ok){toast(data.type==='vst'?`✅ Livrée ! Clé : ${data.key}`:'✅ Livrée !');loadOrders();loadTracks();loadPurch(sess.user.id)}else toast(data?.msg||'Erreur','error')};
-const refOrder=async(id)=>{const r=prompt("Raison du refus :");if(r===null)return;await sb.rpc('refuse_order',{p_order_id:id,p_reason:r||'Non vérifié'});toast("Refusée.");loadOrders();
-};
-const dlVst=async(p)=>{const path=p.track?.file_path;if(!path){toast("Fichier indisponible","error");return}const{data,error}=await sb.storage.from('vst-files').createSignedUrl(path,120,{download:true});if(error){toast(error.message,'error');return}window.open(data.signedUrl,'_blank')};
-
-// ====== VERIFY ======
-const doVerify=async(e)=>{e.preventDefault();if(!vKey.trim())return;setVLoad(true);setVResult(null);const{data,error}=await sb.rpc('verify_vst_key',{p_key:vKey.trim().toUpperCase(),p_machine_id:vMachine.trim()||null});if(error)setVResult({valid:false,reason:error.message});else setVResult(data);setVLoad(false)};
-
-// ====== UPLOAD ======
-const handleUpload=async(e)=>{e.preventDefault();if(!sess||!prof){toast("Connecte-toi !","error");return}if(!uTitle.trim()||uTitle.length>100){toast("Titre invalide","error");return}if(uType==='vst'&&!uAudio){toast("Ajoute le fichier du plugin","error");return}if(uAudio&&uAudio.size>50*1024*1024){toast("Trop lourd (50MB max)","error");return}setULoad(true);try{let cu=DC,au='',fp=null;if(uCover){const n=`${prof.id}-${Date.now()}-cover.${uCover.name.split('.').pop()}`;const{error}=await sb.storage.from('covers').upload(n,uCover);if(!error)cu=sb.storage.from('covers').getPublicUrl(n).data.publicUrl;}if(uAudio){const safe=uAudio.name.replace(/[^a-zA-Z0-9._-]/g,'_');if(uType==='vst'){const path=`${prof.id}/${Date.now()}-${safe}`;const{error}=await sb.storage.from('vst-files').upload(path,uAudio);if(error)throw new Error("Upload échoué : "+error.message);fp=path;}else{const n=`${prof.id}-${Date.now()}-audio.${uAudio.name.split('.').pop()}`;const{error}=await sb.storage.from('audio').upload(n,uAudio);if(error)throw new Error("Upload échoué");au=sb.storage.from('audio').getPublicUrl(n).data.publicUrl;}const row={title:uTitle.trim(),type:uType,genre:uGenre,bpm:parseInt(uBpm),key:uKey,producer_id:prof.id,producer_name:prof.name,cover_url:cu,audio_url:au,price_mp3:parseInt(uMp3),price_wav:parseInt(uWav),price_stems:parseInt(uStems),price_exclusive:parseInt(uExcl),description:uDesc.trim()||(uType==='vst'?'Plugin VST':'Beat '+uGenre)};if(fp)row.file_path=fp;const{error}=await sb.from('tracks').insert(row);if(error)throw error;toast("Publié !");setUTitle('');setUDesc('');setUCover(null);setUAudio(null);loadTracks();setView('dashboard');}catch(err){toast(err.message,'error')}setULoad(false)};
-const handleDelete=async(id)=>{if(!confirm("Supprimer ?"))return;const{error}=await sb.from('tracks').delete().eq('id',id);if(error){toast(error.code==='23503'?'Impossible : ce produit a des ventes.':'Erreur.','error');return}toast("Supprimé.");loadTracks();};
-
-// ====== COMPUTED ======
-const fBeats=tracks.filter(t=>{if(t.type!=='beat')return false;if(search){const q=search.toLowerCase();if(!(t.title||'').toLowerCase().includes(q)&&!(t.producer_name||'').toLowerCase().includes(q)&&!(t.genre||'').toLowerCase().includes(q))return false}if(filterG!=='Tous'&&t.genre!==filterG)return false;return true});const vstL=tracks.filter(t=>t.type==='vst');const myT=prof?tracks.filter(t=>t.producer_id===prof.id):[];const pendO=orders.filter(o=>o.status==='pending');const myVKeys=purch.filter(p=>p.license_type==='vst'&&p.vst_key);
-
-if(loading)return<div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
-
-// ========================= AUTH PAGE =========================
-if(!sess){
-return(<div className="min-h-screen flex items-center justify-center p-4 relative"><Toasts items={toasts} onRemove={id=>setToasts(p=>p.filter(t=>t.id!==id))}/><div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80')] bg-cover bg-center></div><div className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"></div><div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in"><div className="text-center lg:text-left space-y-6"><div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent glow-gold">Y</div><h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="text-gradient-gold">YANRECORDS</span></h1><p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie.</p><div className="hidden lg:flex flex-col gap-4 mt-8"><div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-greenPro/20 text-greenPro"><I name="check" c="w-4 h-4"/></div>Vendez et achetez des instrumentales</div><div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-cyanNeon/20 text-cyanNeon"><I name="check" c="w-4 h-4"/></div>Plugins VST avec clés uniques</div><div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-pinkNeon/20 text-pinkNeon"><I name="check" c="w-4 h-4"/></div>Paiement BaridiMob, CCP & Edahabia</div></div></div><div className="glass-card p-8 rounded-[2rem] border-cyanNeon/20 shadow-2xl"><div className="flex bg-obsidian rounded-xl p-1 mb-8 border border-borderDark"><button onClick={()=>{setAMode('login');setAErr('')}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition ${aMode==='login'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white'}`}>Se connecter</button><button onClick={()=>{setAMode('register');setAErr('')}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition ${aMode==='register'?'bg-goldAccent text-black':'text-gray-400 hover:text-white'}`}>Créer un compte</button></form><aMode==='register'&&<div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label><input type="text" required maxLength="50" value={aName} onChange={e=>setAName(e.target.value)} placeholder="DJ Yanis" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div><div><label className="text-xs font-bold text-gray-400 block mb-1">Email</label><input type="email" required value={aEmail} onChange={e=>setAEmail(e.target.value)} placeholder="contact@studio.com" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div><div><label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label><input type="password" required minLength="6" value={aPass} onChange={e=>setAPass(e.target.value)} placeholder="••••••••" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>{aMode==='register'&&<div className="flex items-start gap-3"><input type="checkbox" checked={cgu} onChange={e=>setCGU(e.target.checked)} className="mt-1 accent-goldAccent"/><label className="text-xs text-gray-400">J'accepte les <span onClick={()=>setShowCGU(true)} className="text-goldAccent cursor-pointer hover:underline font-bold">CGU</span>.</label></div>){aErr&&<div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{aErr}</div><button type="submit" disabled={aLoad} className={`w-full font-black py-3.5 rounded-xl mt-4 transition disabled:opacity-50 ${aMode==='login'?'bg-cyanNeon text-black glow-cyan':'bg-goldAccent text-black glow-gold'}`}>{aLoad?'....':aMode==='login'?'CONNEXION':"S'INSCRIRE"}</button></form><div className="flex items-center gap-4 my-6"><div className="h-px bg-borderDark flex-1"/><span className="text-xs font-bold text-gray-500">OU</span><div className="h-px bg-borderDark flex-1"/></div><button onClick={handleGoogle} className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-200 transition"><svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>Continuer avec Google</button></div></div>{showCGU&&<div className="fixed inset-0 z-[150] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"><div className="glass-card rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] flex flex-col"><h3 className="text-2xl font-black text-goldAccent mb-4">CGU YANrecords</h3><div className="flex-1 overflow-y-auto pr-4 space-y-4 text-sm text-gray-300"><p><strong>1.</strong> Marketplace pour beats et VSTs.</p><p><strong>2.</strong> Vous devez être l'auteur de vos uploads.</p><p><strong>3.</strong> Licence Exclusive = beat retiré du catalogue.</p><p><strong>4.</strong> Commission : 5% beats, 8% VST.</p><p><strong>5.</strong> Clé VST unique, 3 machines max.</p><p><strong>6.</strong> Paiement BaridiMob/CCP avec preuve.</p></div><button onClick={()=>{setCGU(true);setShowCGU(false)}} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl mt-6">J'ACCEPTE</button></div></div>}</div>);
+/* ---------------- TOASTS ---------------- */
+function Toasts(props){
+  return (
+    <div className="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-xs">
+      {props.items.map(function(t){
+        return (
+          <div key={t.id} className="card rounded-xl p-4 flex items-center gap-3 border-l-4 fade" style={{borderLeftColor: t.type === 'error' ? '#ef4444' : '#10b981'}}>
+            <p className="text-sm font-bold text-white flex-1">{t.msg}</p>
+            <button onClick={function(){ props.remove(t.id); }} className="text-gray-500"><Icon n="x" c="w-4 h-4"/></button>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
-// ========================= MAIN =========================
-return(<div className="relative"><Toasts items={toasts} onRemove={id=>setToasts(p=>p.filter(t=>t.id!==id))}/>{menu&&<div className="fixed inset-0 z-40" onClick={()=>setMenu(false)}/><nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between"><div className="flex items-center gap-3 cursor-pointer" onClick={()=>setView('home')}<div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent glow-gold">Y</div><h1 className="text-xl font-black tracking-widest text-white hidden sm:block">YAN<span className="text-gradient-gold">RECORDS</span></h1></div><div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1"><button onClick={()=>setView('home')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='home'?'bg-white text-black':'text-gray-400 hover:text-white'}`}>Accueil</button><button onClick={()=>setView('vsts')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='vsts'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white'}`}>VSTs</button><button onClick={()=>setView('beats')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='beats'?'bg-goldAccent text-black':'text-gray-400 hover:text-white'}`}>Beats</button></div><div className="flex items-center gap-3 relative z-50"><button onClick={()=>setView('upload')} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs glow-cyan"><I name="upload" c="w-4 h-4"/>Poster</button><div className="relative"><button onClick={()=>setMenu(!menu)} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl hover:border-cyanNeon transition"><img src={prof?.avatar_url||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'} className="w-7 h-7 rounded-full object-cover" alt="avatar"/><span className="text-xs font-bold text-white hidden md:block max-w-[100px] truncate">{prof?.name||'User'}</span><I name="chev" c="w-4 h-4 text-gray-400"/></button>{menu&&<div className="absolute right-0 top-12 mt-2 w-56 glass-card rounded-xl shadow-2xl p-2 dropdown-anim flex flex-col gap-1"><div className="px-3 py-2 border-b border-borderDark/50 mb-1"><p className="text-xs text-gray-400">Connecté</p><p className="text-sm font-bold text-white truncate">{prof?.name}</p><p className="text-[10px] text-gray-500 truncate">{sess.user.email}</p></div><button onClick={()=>setView('dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="dash" c="w-4 h-4"/>Dashboard</button><button onClick={()=>setView('purchases')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="key" c="w-4 h-4"/>Mes achats & clés</button><button onClick={()=>setView('verify')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="shield" c="w-4 h-4"/>Vérifier une clé</button>{prof?.is_admin&&<button onClick={()=>{setView('admin');loadOrders()}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-pinkNeon hover:bg-pinkNeon/10"><I name="list" c="w-4 h-4"/>Commandes ({pendO.length})</button><button onClick={()=>setView('settings')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="set" c="w-4 h-4"/>Paramètres</button><button onClick={()=>setView('upload')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 md:hidden"><I name="upload" c="w-4 h-4"/>Poster</button><div className="h-px bg-borderDark my-1"/><button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10"><I name="logout" c="w-4 h-4"/>Déconnexion</button></div></div></div></nav><nav className={`md:hidden fixed ${cur?'bottom-[100px]':'bottom-0'} inset-x-0 z-40 glass border-t border-borderDark px-4 py-2 flex justify-around items-center safe-bottom`}<button onClick={()=>setView('home')} className={`flex flex-col items-center gap-1 ${view==='home'?'text-cyanNeon':'text-gray-400'}`}><I name="home" c="w-6 h-6"/><span className="text-[10px] font-bold">Accueil</span></button><button onClick={()=>setView('beats')} className={`flex flex-col items-center gap-1 ${view==='beats'?'text-goldAccent':'text-gray-400'}`}><I name="music" c="w-6 h-6"/><span className="text-[10px] font-bold">Beats</span></button><button onClick={()=>setView('vsts')} className={`flex flex-col items-center gap-1 ${view==='vsts'?'text-cyanNeon':'text-gray-400'}`}><I name="cpu" c="w-6 h-6"/><span className="text-[10px] font-bold">VSTs</span></button><button onClick={()=>setView('purchases')} className={`flex flex-col items-center gap-1 ${view==='purchases'?'text-greenPro':'text-gray-400'}`}><I name="key" c="w-6 h-6"/><span className="text-[10px] font-bold">Clés</span></button><button onClick={()=>setView('upload')} className={`flex flex-col items-center gap-1 ${view==='upload'?'text-goldAccent':'text-gray-400'}`}><I name="upload" c="w-6 h-6"/><span className="text-[10px] font-bold">Poster</span></button></nav><div className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto">{view!=='home'&&<button onClick={()=>setView('home')} className="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition text-sm font-bold"><I name="back" c="w-4 h-4"/>Retour</button>}{view==='home'&&<div className="space-y-12 fade-in"><div className="glass-card p-8 md:p-12 rounded-3xl border-goldAccent/50 relative overflow-hidden"><div className="absolute top-0 right-0 w-64 h-64 bg-goldAccent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"/><div className="relative z-10"><div className="flex items-center gap-3 mb-4"><div className="w-12 h-12 rounded-xl bg-goldAccent/20 flex items-center justify-center"><I name="music" c="w-6 h-6 text-goldAccent"/></div><span className="text-xs font-bold text-goldAccent uppercase tracking-widest">Pour les Producteurs</span></div><h3 className="text-3xl md:text-4xl font-black text-white mb-4">VOUS ÊTES BEATMAKER ?</h3><p className="text-gray-300 mb-8 text-lg max-w-2xl">Publiez vos instrumentales et plugins VST sur la 1ère plateforme d'Algérie.</p><div className="flex flex-col sm:flex-row items-center gap-4"><button onClick={()=>setView('upload')} className="w-full sm:w-auto bg-goldAccent text-black font-black px-8 py-4 rounded-xl hover:scale-105 transition glow-gold text-lg">🎹 PUBLIER MES PRODS</button><button onClick={()=>setView('vsts')} className="w-full sm:w-auto border-2 border-cyanNeon text-cyanNeon font-black px-8 py-4 rounded-xl hover:bg-cyanNeon/10 transition text-lg">⚡ VOIR LES VSTs</button></div></div></div><div className="glass-card p-8 md:p-12 rounded-3xl border-cyanNeon/50 relative overflow-hidden"><div className="absolute top-0 left-0 w-64 h-64 bg-cyanNeon/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2"/><div className="relative z-10"><div className="flex items-center gap-3 mb-4"><div className="w-12 h-12 rounded-xl bg-cyanNeon/20 flex items-center justify-center"><I name="mic" c="w-6 h-6 text-cyanNeon"/></div><span className="text-xs font-bold text-cyanNeon uppercase tracking-widest">Pour les Artistes</span></div><h3 className="text-3xl md:text-4xl font-black text-white mb-4">TU ES ARTISTE / RAPPEUR(SE) ?</h3><p className="text-gray-300 mb-8 text-lg max-w-2xl">Déniche les meilleures instrumentales et démarque-toi avec des sons uniques.</p><button onClick={()=>setView('beats')} className="w-full sm:w-auto bg-cyanNeon text-black font-black px-8 py-4 rounded-xl hover:scale-105 transition glow-cyan text-lg">🎧 EXPLORER LE BEATSTORE</button></div></div><div className="grid grid-cols-1 md:grid-cols-3 gap-8"><div className="glass-card p-8 rounded-2xl border-cyanNeon/30 text-center hover-border-cyanNeon transition"><I name="cpu" c="w-12 h-12 text-cyanNeon mx-auto mb-4"/><h3 className="text-xl font-bold text-white mb-2">Plugins VST Pro</h3><p className="text-sm text-gray-400">Conçus pour FL Studio, Ableton et tous les DAWs majeurs.</p></div><div className="glass-card p-8 rounded-2xl border-goldAccent/30 text-center hover-border-goldAccent transition"><I name="shield" c="w-12 h-12 text-goldAccent mx-auto mb-4"/><h3 className="text-xl font-bold text-white mb-2">Clés Uniques</h3><p className="text-sm text-gray-400">Chaque acheteur reçoit une clé unique, 3 machines max.</p></div><div className="glass-card p-8 rounded-2xl border-pinkNeon/30 text-center hover-border-pinkNeon transition"><I name="dollar" c="w-12 h-12 text-pinkNeon mx-auto mb-4"/><h3 className="text-xl font-bold text-white mb-2">Paiement Local</h3><p className="text-sm text-gray-400">BaridiMob, CCP et Edahabia sécurisés.</p></div></div></div>}{view==='vsts'&&<section className="fade-in"><h3 className="text-3xl font-black mb-6 text-white border-l-4 border-cyanNeon pl-4">PLUGINS VST PROFESSIONNELS</h3>{vstL.length===0?<p className="text-gray-400 text-center py-12">Aucun VST. <button onClick={()=>{setUType('vst');setView('upload')}} className="text-cyanNeon underline">Publie le premier !</button></p>:{vstL.map(v=>{const owned=myVKeys.find(k=>k.track_id===v.id);return(<div key={v.id} className="glass-card rounded-2xl p-5 flex flex-col border-cyanNeon/30"><div className="relative"><img src={v.cover_url||DC} className="w-full h-44 object-cover rounded-xl mb-4"/>{owned&&<span className="absolute top-2 right-2 bg-greenPro text-black text-[10px] font-black px-2 py-1 rounded-lg">✓ POSSÉDÉ</span>}</div><h4 className="text-xl font-black text-white">{v.title}</h4><p className="text-xs text-goldAccent font-bold mt-1">Par {v.producer_name}</p><p className="text-xs text-gray-400 my-3 flex-grow">{v.description}</p><div className="flex items-center justify-between pt-4 border-t border-borderDark"><span className="text-lg font-black text-goldAccent">{fmt(v.price_mp3)} DZD</span>{owned?<button onClick={()=>setView('purchases')} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1"><I name="key" c="w-3 h-3"/>Ma clé</button>:<button onClick={()=>{setSel(v);setProof(null);setLic('vst')}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Acheter</button>}</div>)})</div>}</section>}{view==='beats'&&<section className="fade-in space-y-6"><div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"><h3 className="text-3xl font-black text-white border-l-4 border-goldAccent pl-4">BEATSTORE</h3><div className="relative w-full md:w-64"><input type="text" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Rechercher..." className="w-full bg-cardDark border border-borderDark rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:border-goldAccent outline-none"/><div className="absolute left-3 top-2.5 text-gray-500"><I name="search" c="w-4 h-4"/></div></div></div><div className="flex items-center gap-2 overflow-x-auto pb-2">{GEN.map(g=>{return(<button key={g} onClick={()=>setFilterG(g)} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${filterG===g?'bg-goldAccent text-black':'bg-cardDark text-gray-400 hover:text-white border border-borderDark'}`}>{g}</button>)}</div>){fBeats.length===0?<p className="text-gray-400 text-center py-12">Aucun beat. <button onClick={()=>{setUType('beat');setView('upload')}} className="text-goldAccent underline">Poste le premier !</button></p>:<div className="glass-card rounded-2xl p-4 space-y-2">{fBeats.map(b=><div key={b.id} className={`grid grid-cols-1 md:grid-cols-12 gap-4 items-center p-3 rounded-xl transition ${b.is_sold?'opacity-50 bg-black/60':'hover:bg-white/5'}`}<div className="col-span-5 flex items-center gap-4"><div className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer flex-shrink-0" onClick={()=>!b.is_sold&&b.audio_url&&togglePlay(b)}><img src={b.cover_url||DC} className="w-full h-full object-cover"/>{!b.is_sold&&b.audio_url&&<div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100"><I name={cur?.id===b.id&&playing?"pause":"play"} c="w-5 h-5 text-white"/></div></div><div className="min-w-0"><h4 className="font-bold text-white flex items-center gap-2 truncate">{b.title}{b.is_sold&&<span className="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">SOLD</span>}</h4><p className="text-xs text-goldAccent font-bold truncate">{b.producer_name} • {b.genre}</p></div></div><div className="hidden md:block col-span-2 text-sm text-gray-400">{b.bpm} BPM • {b.key}</div><div className="hidden md:block col-span-2 text-xs text-gray-500">{b.plays||0} écoutes</div><div className="col-span-full md:col-span-3 flex justify-end">{b.is_sold?<span className="text-xs font-bold text-red-500 border border-red-800/50 px-4 py-2 rounded-xl">VENDU</span>:<button onClick={()=>{setSel(b);setLic('mp3');setProof(null)}} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">Acheter ({fmt(b.price_mp3)} DZD)</button></div></div>))}</div>}</section>}{view==='purchases'&&<section className="fade-in space-y-6"><h3 className="text-3xl font-black text-white border-l-4 border-greenPro pl-4">MES ACHATS & CLÉS</h3>{purch.length===0?<p className="text-gray-400 text-center py-12">Aucun achat. <button onClick={()=>setView('vsts')} className="text-cyanNeon underline">Voir les VSTs</button></p>:<div className="space-y-3">{purch.map(p=>(<div key={p.id||(p.track_id+'-'+p.created_at)} className={`glass-card rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center gap-4 ${p.license_type==='vst'?'border-greenPro/30':''}`}<div className="flex items-center gap-4 flex-1 min-w-0"><img src={p.track?.cover_url||DC} className="w-14 h-14 rounded-lg object-cover flex-shrink-0"/><div className="min-w-0"><h4 className="font-bold text-white truncate">{p.track?.title||'Produit'}</h4><p className="text-xs text-gray-400"><span className={p.license_type==='vst'?'text-cyanNeon font-bold':'text-goldAccent font-bold'}>{(p.license_type||'').toUpperCase()}</span> • {fmt(p.amount)} DZD{p.created_at?` • ${new Date(p.created_at).toLocaleDateString('fr-FR')}`:''}</p></div></div>{p.license_type==='vst'&&p.vst_key&&<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"><code className="font-mono text-sm font-bold bg-obsidian border border-greenPro/50 text-greenPro px-3 py-2 rounded-lg text-center select-all">{p.vst_key}</code><span className="text-[11px] text-gray-400 text-center whitespace-nowrap">{(p.activations||[]).length}/{p.max_activations||3} PC</span><button onClick={()=>copyT(p.vst_key)} className="bg-cardDark border border-borderDark text-white font-bold px-3 py-2 rounded-lg text-xs hover:border-greenPro flex items-center justify-center gap-1"><I name="copy" c="w-3 h-3"/>Copier</button><button onClick={()=>dlVst(p)} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1"><I name="dl" c="w-3 h-3"/>Télécharger</button></div></div>))}</div>}</section>}{view==='verify'&&<div className="max-w-2xl mx-auto glass-card p-8 rounded-3xl fade-in border-cyanNeon/30"><div className="flex items-center gap-4 mb-6 border-b border-borderDark pb-6"><div className="w-16 h-16 rounded-full bg-cyanNeon/10 flex items-center justify-center"><I name="key" c="w-8 h-8 text-cyanNeon"/></div><div><h2 className="text-3xl font-black text-white">Vérifier une clé</h2><p className="text-sm text-gray-400">Simule la vérification du plugin.</p></div><form onSubmit={doVerify} className="space-y-4"><div><label className="text-xs font-bold text-gray-400 block mb-1">Clé de licence</label><input type="text" value={vKey} onChange={e=>setVKey(e.target.value.toUpperCase())} maxLength="24" placeholder="YAN-XXXX-XXXX-XXXX" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-lg text-white focus:border-cyanNeon outline-none font-mono tracking-widest text-center"/></div><div><label className="text-xs font-bold text-gray-400 block mb-1">ID Machine</label><div className="flex gap-2"><input type="text" value={vMachine} onChange={e=>setVMachine(e.target.value)} maxLength="32" className="flex-1 bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none font-mono"/><button type="button" onClick={()=>setVMachine('PC-'+Math.random().toString(36).substring(2,8).toUpperCase())} className="bg-cardDark border border-borderDark text-white font-bold px-4 rounded-xl text-xs hover:border-cyanNeon whitespace-nowrap">🖥️ Autre PC</button></div><p className="text-[11px] text-gray-500 mt-1">Chaque ID différent = 1 activation (3 max). Le même ID ne consomme rien.</p></div><button type="submit" disabled={vLoad||!vKey.trim()} className="w-full bg-cyanNeon text-black font-black py-4 rounded-xl glow-cyan disabled:opacity-50">{vLoad?'VÉRIFICATION...':'🔍 VÉRIFIER LA CLÉ'}</button></form>{vResult&&(<div className={`mt-6 p-5 rounded-2xl border fade-in ${vResult.valid?'border-greenPro bg-greenPro/10':'border-red-500 bg-red-500/10'}`}<div className="flex items-center gap-3 mb-3"><div className={`w-10 h-10 rounded-full flex items-center justify-center ${vResult.valid?'bg-greenPro/20 text-greenPro':'bg-red-500/20 text-red-400'}`}><I name={vResult.valid?'check':'x'} c="w-5 h-5"/></div><h4 className={`font-black text-xl ${vResult.valid?'text-greenPro':'text-red-400'}`}>{vResult.valid?'✅ CLÍ VALIDE':'❌ CLÍ REFUSÉE'}</h4></div>{vResult.product&&<p className="text-sm text-gray-300">Produit : <strong>{vResult.product}</strong></p>){vResult.reason&&<p className="text-sm text-red-300 mt-1">{vResult.reason}</p>){vResult.max_activations!=null&&<p className="text-sm text-gray-300 mt-1">Activations : <strong>{vResult.activations}/{vResult.max_activations}</strong></p>}></div>){myVKeys.length>0&&(<div className="mt-8 pt-6 border-t border-borderDark"><p className="text-xs font-bold text-gray-400 mb-3">Tester avec mes clés :</p><div className="flex flex-wrap gap-2">{myVKeys.map(p=>{return(<button key={p.vst_key} onClick={()=>{setVKey(p.vst_key);setVResult(null)}} className="font-mono text-xs bg-obsidian border border-greenPro/40 text-greenPro px-3 py-1.5 rounded-lg hover:border-greenPro">{p.vst_key}</button>)}<button onClick={()=>{setVKey('YAN-FAKE-1234-ABCD');setVResult(null)}} className="font-mono text-xs bg-obsidian border border-red-500/40 text-red-400 px-3 py-1.5 rounded-lg hover:border-red-500">Fausse clé (test)</button>)}</div></div>)}}),view==='dashboard'&&prof&&(<div className="space-y-8 fade-in"><div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-cardDark border border-borderDark p-6 rounded-2xl"><div className="flex items-center gap-4"><img src={prof.avatar_url} className="w-16 h-16 rounded-full object-cover border-2 border-goldAccent" alt="photo"/><div><h2 className="text-2xl font-black text-white">{prof.name}</h2><p className="text-xs text-gray-400">{sess.user.email}</p></div></div><div className="flex gap-3"><button onClick={()=>setView('purchases')} className="border border-greenPro text-greenPro font-black px-5 py-3 rounded-xl flex items-center gap-2 hover:bg-greenPro/10"><I name="key" c="w-4 h-4"/>Mes achats</button><button onClick={()=>setView('upload')} className="bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-black px-6 py-3 rounded-xl flex items-center gap-2 glow-cyan"><I name="upload" c="w-4 h-4"/>Uploader</button></div></div><div className="grid grid-cols-1 md:grid-cols-3 gap-6"><div className="glass-card p-6 rounded-2xl border-cyanNeon/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">REVENUS</span><I name="dollar" c="w-5 h-5 text-cyanNeon"/></div><span className="text-3xl font-black text-cyanNeon">{fmt(prof.balance)} DZD</span></div><div className="glass-card p-6 rounded-2xl border-goldAccent/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">ÉCOUTES</span><I name="act" c="w-5 h-5 text-goldAccent"/></div><span className="text-3xl font-black text-goldAccent">{fmt(myT.reduce((s,t)=>s+(t.plays||0),0))}</span></div><div className="glass-card p-6 rounded-2xl border-pinkNeon/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">CRÉATIONS</span><I name="dash" c="w-5 h-5 text-pinkNeon"/></div><span className="text-3xl font-black text-pinkNeon">{myT.length}</span></div></div><div className="glass-card rounded-2xl p-6"><h3 className="text-lg font-bold text-white mb-4">Mes publications</h3>{myT.length===0?<p className="text-gray-400 text-sm text-center py-6">Aucune création. <button onClick={()=>setView('upload')} className="text-cyanNeon underline">Commence !</button></p>:<div className="space-y-3">{myT.map(t=><div key={t.id} className="flex justify-between items-center p-3 rounded-xl bg-obsidian/60 border border-borderDark"><div className="flex items-center gap-4"><img src={t.cover_url||DC} className="w-12 h-12 rounded-lg object-cover"/><div><h4 className="font-bold text-white text-sm">{t.title}{t.is_sold&&<span className="bg-red-600 text-white text-[9px] px-1 rounded ml-2">SOLD</span>}</h4><p className="text-xs text-gray-400">{(t.type||'').toUpperCase()} • {t.type==='vst'?(t.file_path?'Fichier privé ✓':'⚠️ Pas de fichier'):`${t.plays||0} écoutes`}</p></div></div><div className="flex items-center gap-3"><span className="text-xs font-bold text-goldAccent">{fmt(t.price_mp3)} DZD</span><button onClick={()=>handleDelete(t.id)} className="p-2 bg-red-950/60 text-red-400 hover:bg-red-600 hover:text-white rounded-lg"><I name="trash" c="w-4 h-4"/></button></div></div>))}</div></div>){view==='upload'&&prof&&(<div className="max-w-2xl mx-auto glass-card p-8 rounded-2xl border-goldAccent/40 fade-in"><h2 className="text-2xl font-black text-white mb-2">Nouvelle création</h2><p className="text-xs text-gray-400 mb-6">Publié par : <span className="text-goldAccent font-bold">{prof.name}</span></p><form onSubmit={handleUpload} className="space-y-4"><div><label className="text-xs font-bold text-gray-300 block mb-1">Titre (max 100)</label><input type="text" required maxLength="100" value={uTitle} onChange={e=>setUTitle(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div><div className="grid grid-cols-2 md:grid-cols-4 gap-3"><div><label className="text-xs font-bold text-gray-300 block mb-1">Type</label><select value={uType} onChange={e=>{setUType(e.target.value);setUAudio(null)}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"><option value="beat">Beat</option><option value="vst">VST</option></select></div>{uType==='beat'&&(<div><label className="text-xs font-bold text-gray-300 block mb-1">Genre</label><select value={uGenre} onChange={e=>setUGenre(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white">{GEN.slice(1).map(g=>{return(<option key={g}>{g}</option>)}</select>)}</div><div><label className="text-xs font-bold text-gray-300 block mb-1">BPM</label><input type="number" min="40" max="300" value={uBpm} onChange={e=>setUBpm(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div><div><label className="text-xs font-bold text-gray-300 block mb-1">Gamme</label><input type="text" maxLength="10" value={uKey} onChange={e=>setUKey(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>)}</div>:<div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30 space-y-2"><label className="text-xs font-bold text-cyanNeon block">Prix VST (DZD)</label><input type="number" min="0" value={uMp3} onChange={e=>setUMp3(e.target.value)} className="w-full bg-cardDark border border-cyanNeon/50 rounded-lg p-2 text-white"/><p className="text-[11px] text-gray-400">🔑 Clé unique par acheteur (3 machines max). Fichier en privé.</p></div><div><label className="text-xs font-bold text-gray-300 block mb-1">Description</label><textarea maxLength="300" rows="2" value={uDesc} onChange={e=>setUDesc(e.target.value)} placeholder={uType==='vst'?'Ex : Synthé analogique, 200 presets':'Ex : Drill sombre, piano + 808'} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none resize-none"/></div><div><label className="text-xs font-bold text-gray-300 block mb-1">{uType==='vst'?'Fichier du plugin (ZIP/EXE...)':'Fichier audio (MP3/WAV)'} — max 50MB</label><input key={uType} type="file" accept={uType==='vst'?'.zip,.rar,.7z,.exe,.msi,.dmg,.pkg':'.mp3,.wav,audio/mpeg,audio/wav'} onChange={e=>setUAudio(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-goldAccent file:text-black"/></div><button type="submit" disabled={uLoad} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl glow-gold mt-4 disabled:opacity-50">{uLoad?'UPLOAD EN COURS...':'PUBLIER SUR YANRECORDS'}</button></form></div>){view==='settings'&&prof&&(<div className="max-w-2xl mx-auto glass-card p-8 rounded-3xl fade-in"><div className="flex items-center gap-4 mb-8 border-b border-borderDark pb-6"><div className="w-16 h-16 rounded-full bg-borderDark flex items-center justify-center"><I name="set" c="w-8 h-8 text-gray-400"/></div><div><h2 className="text-3xl font-black text-white">Paramètres</h2><p className="text-sm text-gray-400">Sauvegardé sur le serveur</p></div><form onSubmit={handleSave} className="space-y-6"><div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-obsidian rounded-2xl border border-borderDark"><img src={eAvP||prof.avatar_url} className="w-24 h-24 rounded-full object-cover border-4 border-cyanNeon" alt="avatar"/><div className="flex-1 w-full"><label className="text-xs font-bold text-gray-400 block mb-2">Changer la photo</label><input type="file" accept="image/*" onChange={e=>{const f=e.target.files[0];if(f){setEAv(f);setEAvP(URL.createObjectURL(f))}}} className="w-full text-sm text-gray-400 file:bg-cyanNeon file:text-black file:border-0 file:rounded-xl file:px-4 file:py-2 file:mr-4 file:font-bold cursor-pointer"/></div></div><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label><input type="text" required maxLength="50" value={eName} onChange={e=>setEName(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div><div><label className="text-xs font-bold text-gray-400 block mb-1">Email</label><input type="email" disabled value={sess.user.email} className="w-full bg-obsidian/50 border border-borderDark/50 rounded-xl p-3 text-sm text-gray-500"/></div></div><div className="p-5 rounded-2xl bg-goldAccent/5 border border-goldAccent/30"><label className="text-xs font-bold text-goldAccent block mb-1 uppercase flex items-center gap-2"><I name="dollar" c="w-4 h-4"/>CCP / BaridiMob (pour recevoir vos ventes)</label><input type="text" value={eRip} onChange={e=>setERip(e.target.value)} placeholder="00799999000000000012" className="w-full bg-obsidian border border-goldAccent/40 rounded-xl p-3 text-sm text-white focus:border-goldAccent outline-none font-mono"/></div><button type="submit" disabled={saving} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 mt-4 shadow-lg disabled:opacity-50">{saving?'ENREGISTREMENT...':'✅ ENREGISTRER'}</button></form></div>){view==='admin'&&prof?.is_admin&&(<section className="fade-in space-y-6"><h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">COMMANDRES ADMIN</h3><div className="grid grid-cols-3 gap-4 mb-4"><div className="glass-card p-4 rounded-xl border-pinkNeon/30"><p className="text-xs text-gray-400">En attente</p><p className="text-2xl font-black text-pinkNeon">{pendO.length}</p></div><div className="glass-card p-4 rounded-xl border-greenPro/30"><p className="text-xs text-gray-400">Commission totale</p><p className="text-2xl font-black text-greenPro">{fmt(orders.filter(o=>o.status==='validated').reduce((s,o)=>s+(o.platform_fee||0),0))} DZD</p></div><div className="glass-card p-4 rounded-xl border-cyanNeon/30"><p className="text-xs text-gray-400">Commandes</p><p className="text-2xl font-black text-cyanNeon">{orders.length}</p></div></div>{orders.length===0?<p className="text-gray-400 text-center py-12">Aucune commande.</p>:<div className="space-y-4">{orders.map(o=>(<div key={o.id} className={`glass-card rounded-2xl p-4 ${o.status==='pending'?'border-pinkNeon/50':o.status==='validated'?'border-greenPro/30':'border-red-500/30'}`}<div className="flex flex-col lg:flex-row lg:items-center gap-4"><div className="flex items-center gap-3 flex-1 min-w-0">{o.proof_url&&(<img src={o.proof_url} alt="preuve" className="w-16 h-16 rounded-lg object-cover cursor-pointer border border-borderDark" onClick={()=>window.open(o.proof_url,'_blank')} title="Cliquer pour agrandir"/>)}<div className="min-w-0"><p className="font-bold text-white truncate">{o.buyer_name||'Client'}</p><p className="text-xs text-gray-400">{o.product_type.toUpperCase()} • {(o.license_type||'').toUpperCase()} • {fmt(o.amount)} DZD • Commission {o.rate_percent}% : {fmt(o.platform_fee)} DZD</p><p className="text-[10px] text-gray-500">{new Date(o.created_at).toLocaleString('fr-FR')}</p>{o.status==='validated'&&o.vst_key&&<code className="text-xs text-greenPro font-mono bg-obsidian px-2 py-1 rounded inline-block mt-1">{o.vst_key}</code>){o.admin_note&&<p className="text-[11px] text-red-400 mt-1">Note : {o.admin_note}</p>}</div></div><div className="flex gap-2 flex-shrink-0">{o.status==='pending'&&(<><button onClick={()=>valOrder(o.id)} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">✅ Valider</button><button onClick={()=>refOrder(o.id)} className="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">❌ Refuser</button></>)}<o.status==='validated'&&<span className="text-xs font-bold text-greenPro whitespace-nowrap">✅ Livrée</span>{o.status==='refused'&&<span className="text-xs font-bold text-red-400 whitespace-nowrap">❌ Refusé</span>}</div></div></div>))}</div></section>){view==='modal'&&sel&&(<div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto"><div className="glass-card rounded-2xl max-w-lg w-full p-6 relative my-8"><button onClick={()=>{setSel(null);setProof(null);setSellerInfo(null)}} className="absolute top-4 right-4 text-gray-400 hover:text-white"><I name="x" c="w-5 h-5"/></button><h3 className="text-xl font-black text-white mb-4">Achat : {sel.title}</h3>{sel.type==='beat'&&(<div className="space-y-2 mb-6">{['mp3','wav','stems','exclusive'].map(l=><div key={l} onClick={()=>setLic(l)} className={`p-3 rounded-xl border cursor-pointer transition ${lic===l?(l==='exclusive'?'border-red-500 bg-red-500/10':'border-goldAccent bg-goldAccent/10'):'border-borderDark hover:border-gray-500'}`}<div className="flex justify-between font-bold text-white"><span className={l==='exclusive'?'text-red-400':''}>{l==='mp3'?'MP3 Lease':l==='wav'?'WAV Standard':l==='stems'?'Trackout Stems':'🔥 EXCLUSIVE'}</span><span className="text-goldAccent">{fmt(getPr(sel,l))} DZD</span></div></div>)}</div><div className="p-4 rounded-xl bg-goldAccent/10 border border-goldAccent/30 mb-4"><div className="flex justify-between"><span className="font-bold text-white">Total à payer</span><span className="text-xl font-black text-goldAccent">{fmt(getPr(sel,sel.type==='vst'?'vst':lic))} DZD</span></div></div><div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30 mb-4"><h4 className="font-bold text-white text-sm mb-2">💳 Paiement par CCP / BaridiMob</h4><p className="text-xs text-gray-400 mb-2">Envoyez le montant exact, puis ajoutez la capture d'écran :</p>{sellerInfo?.rip?(<><p className="font-mono text-sm text-greenPro mb-1">CCP : {sellerInfo.rip}</p><p className="font-mono text-sm text-greenPro">BaridiMob : {sellerInfo.rip}</p></>):(<p className="text-sm text-yellow-400">Le vendeur n'a pas configuré son CCP. Contactez-le.</p>)}{p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {getRate(sel)}% (prélevée au vendeur)</p><div className="mb-4"><label className="text-xs font-bold text-gray-300 block mb-1">Capture d'écran du paiement *</label><input type="file" accept="image/*" onChange={e=>setProof(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/></div><button onClick={submitOrder} disabled={oLoad||!proof} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl glow-gold disabled:opacity-50">{oLoad?'ENVOI...':'📱 ENVOYER LA COMMANDE'}</button><p className="text-[11px] text-gray-500 text-center mt-2">L'admin vérifiera ton paiement et livrera ta commande sous 24h.</p></div></div>){cur&&(<div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-4 md:px-6 py-3 flex flex-col gap-2 safe-bottom"><div className="w-full flex items-center gap-3 text-xs text-gray-400 font-mono"><span>{fmtTime(aTime)}</span><input type="range" min="0" max="100" value={aProg} onChange={seek} className="flex-1 h-1 bg-borderDark rounded-lg appearance-none cursor-pointer" style={{background:`linear-gradient(to right,#00f0ff ${aProg}%,#222638 ${aProg}%)`}}/><span>{fmtTime(aDur)}</span></div><div className="flex items-center justify-between"><div className="flex items-center gap-3 w-1/3 min-w-0"><img src={cur.cover_url||DC} className="w-11 h-11 rounded-lg object-cover"/><div className="min-w-0 hidden md:block"><h4 className="font-bold text-sm text-white truncate">{cur.title}</h4><p className="text-xs text-goldAccent font-bold truncate">{cur.producer_name}</p></div></div><div className="flex items-center gap-4"><button onClick={toggleMute} className="text-gray-400 hover:text-white"><I name={muted?'mute':'vol'} c="w-5 h-5"/></button><input type="range" min="0" max="1" step="0.1" value={muted?0:vol} onChange={volCh} className="w-20 hidden md:block"/><button onClick={()=>togglePlay(cur)} className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition"><I name={playing?'pause':'play'} c="w-5 h-5"/></button></div><div className="w-1/3 flex justify-end"><button onClick={()=>{setSel(cur);setLic('mp3');setProof(null)}} className="bg-goldAccent text-black font-bold px-3 md:px-4 py-2 rounded-xl text-xs">Acheter</button></div></div></div>)},view==='admin'&&prof?.is_admin&&(<section className="fade-in space-y-6"><h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">COMMANDRES ADMIN</h3><div className="grid grid-cols-3 gap-4 mb-4"><div className="glass-card p-4 rounded-xl border-pinkNeon/30"><p className="text-xs text-gray-400">En attente</p><p className="text-2xl font-black text-pinkNeon">{pendO.length}</p></div><div className="glass-card p-4 rounded-xl border-greenPro/30"><p className="text-xs text-gray-400">Commission totale</p><p className="text-2xl font-black text-greenPro">{fmt(orders.filter(o=>o.status==='validated').reduce((s,o)=>s+(o.platform_fee||0),0))} DZD</p></div><div className="glass-card p-4 rounded-xl border-cyanNeon/30"><p className="text-xs text-gray-400">Commandes</p><p className="text-2xl font-black text-cyanNeon">{orders.length}</p></div></div>{orders.length===0?<p className="text-gray-400 text-center py-12">Aucune commande.</p>:<div className="space-y-4">{orders.map(o=>(<div key={o.id} className={`glass-card rounded-2xl p-4 ${o.status==='pending'?'border-pinkNeon/50':o.status==='validated'?'border-greenPro/30':'border-red-500/30'}`}<div className="flex flex-col lg:flex-row lg:items-center gap-4"><div className="flex items-center gap-3 flex-1 min-w-0">{o.proof_url&&(<img src={o.proof_url} alt="preuve" className="w-16 h-16 rounded-lg object-cover cursor-pointer border border-borderDark" onClick={()=>window.open(o.proof_url,'_blank')} title="Cliquer pour agrandir"/>)}<div className="min-w-0"><p className="font-bold text-white truncate">{o.buyer_name||'Client'}</p><p className="text-xs text-gray-400">{o.product_type.toUpperCase()} • {(o.license_type||'').toUpperCase()} • {fmt(o.amount)} DZD • Commission {o.rate_percent}% : {fmt(o.platform_fee)} DZD</p><p className="text-[10px] text-gray-500">{new Date(o.created_at).toLocaleString('fr-FR')}</p>{o.status==='validated'&&o.vst_key&&(<code className="text-xs text-greenPro font-mono bg-obsidian px-2 py-1 rounded inline-block mt-1">{o.vst_key}</code>){o.admin_note&&(<p className="text-[11px] text-red-400 mt-1">Note : {o.admin_note}</p>)}</div></div><div className="flex gap-2 flex-shrink-0">{o.status==='pending'&&(<><button onClick={()=>valOrder(o.id)} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">✅ Valider</button><button onClick={()=>refOrder(o.id)} className="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">❌ Refuser</button></>)}<o.status==='validated'&&<span className="text-xs font-bold text-greenPro whitespace-nowrap">✅ Livrée</span>{o.status==='refused'&&<span className="text-xs font-bold text-red-400 whitespace-nowrap">❌ Refusé</span>}</div></div></div>))}</div></section>))}}),view==='modal'&&sel&&(<div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto"><div className="glass-card rounded-2xl max-w-lg w-full p-6 relative my-8"><button onClick={()=>{setSel(null);setProof(null);setSellerInfo(null)}} className="absolute top-4 right-4 text-gray-400 hover:text-white"><I name="x" c="w-5 h-5"/></button><h3 className="text-xl font-black text-white mb-4">Achat : {sel.title}</h3>{sel.type==='beat'&&(<div className="space-y-2 mb-6">{['mp3','wav','stems','exclusive'].map(l=><div key={l} onClick={()=>setLic(l)} className={`p-3 rounded-xl border cursor-pointer transition ${lic===l?(l==='exclusive'?'border-red-500 bg-red-500/10':'border-goldAccent bg-goldAccent/10'):'border-borderDark hover:border-gray-500'}`}<div className="flex justify-between font-bold text-white"><span className={l==='exclusive'?'text-red-400':''}>{l==='mp3'?'MP3 Lease':l==='wav'?'WAV Standard':l==='stems'?'Trackout Stems':'🔥 EXCLUSIVE'}</span><span className="text-goldAccent">{fmt(getPr(sel,l))} DZD</span></div></div>)}</div><div className="p-4 rounded-xl bg-goldAccent/10 border border-goldAccent/30 mb-4"><div className="flex justify-between"><span className="font-bold text-white">Total à payer</span><span className="text-xl font-black text-goldAccent">{fmt(getPr(sel,sel.type==='vst'?'vst':lic))} DZD</span></div></div><div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30 mb-4"><h4 className="font-bold text-white text-sm mb-2">💳 Paiement par CCP / BaridiMob</h4><p className="text-xs text-gray-400 mb-2">Envoyez le montant exact, puis ajoutez la capture d'écran :</p>{sellerInfo?.rip?(<><p className="font-mono text-sm text-greenPro mb-1">CCP : {sellerInfo.rip}</p><p className="font-mono text-sm text-greenPro">BaridiMob : {sellerInfo.rip}</p></>):(<p className="text-sm text-yellow-400">Le vendeur n'a pas configuré son CCP. Contactez-le.</p>)}{p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {getRate(sel)}% (prélevée au vendeur)</p><div className="mb-4"><label className="text-xs font-bold text-gray-300 block mb-1">Capture d'écran du paiement *</label><input type="file" accept="image/*" onChange={e=>setProof(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/></div><button onClick={submitOrder} disabled={oLoad||!proof} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl glow-gold disabled:opacity-50">{oLoad?'ENVOI...':'📱 ENVOYER LA COMMANDE'}</button><p className="text-[11px] text-gray-500 text-center mt-2">L'admin vérifiera ton paiement et livrera ta commande sous 24h.</p></div></div>){cur&&(<div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-4 md:px-6 py-3 flex flex-col gap-2 safe-bottom"><div className="w-full flex items-center gap-3 text-xs text-gray-400 font-mono"><span>{fmtTime(aTime)}</span><input type="range" min="0" max="100" value={aProg} onChange={seek} className="flex-1 h-1 bg-borderDark rounded-lg appearance-none cursor-pointer" style={{background:`linear-gradient(to right,#00f0ff ${aProg}%,#222638 ${aProg}%)`}}/><span>{fmtTime(aDur)}</span></div><div className="flex items-center justify-between"><div className="flex items-center gap-3 w-1/3 min-w-0"><img src={cur.cover_url||DC} className="w-11 h-11 rounded-lg object-cover"/><div className="min-w-0 hidden md:block"><h4 className="font-bold text-sm text-white truncate">{cur.title}</h4><p className="text-xs text-goldAccent font-bold truncate">{cur.producer_name}</p></div></div><div className="flex items-center gap-4"><button onClick={toggleMute} className="text-gray-400 hover:text-white"><I name={muted?'mute':'vol'} c="w-5 h-5"/></button><input type="range" min="0" max="1" step="0.1" value={muted?0:vol} onChange={volCh} className="w-20 hidden md:block"/><button onClick={()=>togglePlay(cur)} className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition"><I name={playing?'pause':'play'} c="w-5 h-5"/></button></div><div className="w-1/3 flex justify-end"><button onClick={()=>{setSel(cur);setLic('mp3');setProof(null)}} className="bg-goldAccent text-black font-bold px-3 md:px-4 py-2 rounded-xl text-xs">Acheter</button></div></div></div>)},ErrB><App/></ErrB>);
+/* ---------------- CGU ---------------- */
+function CguText(){
+  return (
+    <div className="space-y-3 text-sm text-gray-300">
+      <p><b className="text-goldAccent">1. OBJET</b><br/>YANrecords est une marketplace algérienne de beats et de plugins VST.</p>
+      <p><b className="text-goldAccent">2. PROPRIÉTÉ INTELLECTUELLE</b><br/>Le vendeur garantit être l'auteur original du contenu publié. Toute violation entraîne la suppression du compte.</p>
+      <p><b className="text-goldAccent">3. LICENCES BEATS</b><br/>MP3 Lease, WAV Standard, Trackout Stems, Exclusive (beat retiré définitivement du catalogue).</p>
+      <p><b className="text-goldAccent">4. LICENCES VST</b><br/>Clé unique par acheteur, 3 machines maximum. Le partage entraîne la révocation sans remboursement.</p>
+      <p><b className="text-goldAccent">5. COMMISSIONS</b><br/>5% sur les beats, 8% sur les VST, déduits de la part du vendeur.</p>
+      <p><b className="text-goldAccent">6. PAIEMENT</b><br/>CCP, BaridiMob ou Edahabia. Livraison après vérification manuelle sous 24h.</p>
+      <p><b className="text-goldAccent">7. REMBOURSEMENT</b><br/>Produits numériques non remboursables, sauf fichier défectueux (réclamation sous 48h).</p>
+      <p><b className="text-goldAccent">8. RETRAITS</b><br/>Minimum 1000 DZD, versement sous 7 jours ouvrés.</p>
+      <p><b className="text-goldAccent">9. DONNÉES</b><br/>Email, nom, photo et coordonnées bancaires sont stockés et jamais revendus.</p>
+      <p><b className="text-goldAccent">10. RESPONSABILITÉ</b><br/>YANrecords est un intermédiaire technique et n'est pas responsable des litiges entre membres.</p>
+      <p><b className="text-goldAccent">11. DROIT APPLICABLE</b><br/>Droit algérien.</p>
+    </div>
+  );
+}
+
+/* ---------------- AUTH PAGE ---------------- */
+function AuthPage(props){
+  const [mode, setMode] = React.useState('login');
+  const [email, setEmail] = React.useState('');
+  const [pass, setPass] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [err, setErr] = React.useState('');
+  const [busy, setBusy] = React.useState(false);
+  const [cgu, setCgu] = React.useState(false);
+  const [showCgu, setShowCgu] = React.useState(false);
+
+  async function submit(e){
+    e.preventDefault();
+    setErr('');
+    if(mode === 'register' && !cgu){ setErr('Vous devez accepter les CGU.'); return; }
+    setBusy(true);
+    try {
+      if(mode === 'login'){
+        const res = await sb.auth.signInWithPassword({ email: email, password: pass });
+        if(res.error) throw res.error;
+        props.toast('Connecté !');
+      } else {
+        const res = await sb.auth.signUp({ email: email, password: pass, options: { data: { full_name: name || email.split('@')[0] } } });
+        if(res.error) throw res.error;
+        if(res.data.user && !res.data.session) props.toast('Vérifie ton email pour activer ton compte');
+        else props.toast('Compte créé !');
+      }
+    } catch(ex){ setErr(ex.message); }
+    setBusy(false);
+  }
+
+  async function google(){
+    const res = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+    if(res.error) props.toast(res.error.message, 'error');
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80')] bg-cover bg-center"></div>
+      <div className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"></div>
+      <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade">
+        <div className="text-center lg:text-left space-y-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg">Y</div>
+          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tgold">YANRECORDS</span></h1>
+          <p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie.</p>
+          <div className="hidden lg:block space-y-3 pt-4">
+            <p className="text-sm font-bold text-white">✅ Vendez et achetez des instrumentales</p>
+            <p className="text-sm font-bold text-white">🔑 Plugins VST avec clés uniques</p>
+            <p className="text-sm font-bold text-white">💳 Paiement BaridiMob, CCP & Edahabia</p>
+          </div>
+        </div>
+
+        <div className="card p-8 rounded-[2rem] border-cyanNeon/20">
+          <div className="flex bg-obsidian rounded-xl p-1 mb-8 border border-borderDark">
+            <button onClick={function(){ setMode('login'); setErr(''); }} className={'flex-1 py-2.5 text-sm font-bold rounded-lg ' + (mode === 'login' ? 'bg-cyanNeon text-black' : 'text-gray-400')}>Se connecter</button>
+            <button onClick={function(){ setMode('register'); setErr(''); }} className={'flex-1 py-2.5 text-sm font-bold rounded-lg ' + (mode === 'register' ? 'bg-goldAccent text-black' : 'text-gray-400')}>Créer un compte</button>
+          </div>
+
+          <form onSubmit={submit} className="space-y-4">
+            {mode === 'register' ? (
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label>
+                <input type="text" required maxLength="50" value={name} onChange={function(e){ setName(e.target.value); }} placeholder="DJ Yanis" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/>
+              </div>
+            ) : null}
+            <div>
+              <label className="text-xs font-bold text-gray-400 block mb-1">Email</label>
+              <input type="email" required value={email} onChange={function(e){ setEmail(e.target.value); }} placeholder="contact@studio.com" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label>
+              <input type="password" required minLength="6" value={pass} onChange={function(e){ setPass(e.target.value); }} placeholder="••••••••" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/>
+            </div>
+            {mode === 'register' ? (
+              <div className="flex items-start gap-3">
+                <input type="checkbox" checked={cgu} onChange={function(e){ setCgu(e.target.checked); }} className="mt-1 accent-goldAccent"/>
+                <label className="text-xs text-gray-400">J'accepte les <span onClick={function(){ setShowCgu(true); }} className="text-goldAccent cursor-pointer font-bold hover:underline">CGU</span>.</label>
+              </div>
+            ) : null}
+            {err ? <div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{err}</div> : null}
+            <button type="submit" disabled={busy} className={'w-full font-black py-3.5 rounded-xl mt-4 disabled:opacity-50 ' + (mode === 'login' ? 'bg-cyanNeon text-black gc' : 'bg-goldAccent text-black gg')}>
+              {busy ? '...' : (mode === 'login' ? 'CONNEXION' : "S'INSCRIRE")}
+            </button>
+          </form>
+
+          <div className="flex items-center gap-4 my-6">
+            <div className="h-px bg-borderDark flex-1"></div>
+            <span className="text-xs font-bold text-gray-500">OU</span>
+            <div className="h-px bg-borderDark flex-1"></div>
+          </div>
+
+          <button onClick={google} className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-200">
+            <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            Continuer avec Google
+          </button>
+        </div>
+      </div>
+
+      {showCgu ? (
+        <div className="fixed inset-0 z-[150] bg-black/90 flex items-center justify-center p-4">
+          <div className="card rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] flex flex-col">
+            <h3 className="text-2xl font-black text-goldAccent mb-4">CGU YANrecords</h3>
+            <div className="flex-1 overflow-y-auto pr-3"><CguText/></div>
+            <button onClick={function(){ setCgu(true); setShowCgu(false); }} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl mt-6">J'ACCEPTE</button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/* ---------------- NAVBAR ---------------- */
+function NavBar(props){
+  const [open, setOpen] = React.useState(false);
+  const p = props.profile;
+
+  function go(v){ setOpen(false); props.setView(v); }
+
+  return (
+    <React.Fragment>
+      {open ? <div className="fixed inset-0 z-40" onClick={function(){ setOpen(false); }}></div> : null}
+      <nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3 cursor-pointer" onClick={function(){ go('home'); }}>
+          <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent gg">Y</div>
+          <h1 className="text-xl font-black tracking-widest text-white hidden sm:block">YAN<span className="tgold">RECORDS</span></h1>
+        </div>
+
+        <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
+          <button onClick={function(){ go('home'); }} className={'px-5 py-2 rounded-full text-sm font-bold ' + (props.view === 'home' ? 'bg-white text-black' : 'text-gray-400')}>Accueil</button>
+          <button onClick={function(){ go('vsts'); }} className={'px-5 py-2 rounded-full text-sm font-bold ' + (props.view === 'vsts' ? 'bg-cyanNeon text-black' : 'text-gray-400')}>VSTs</button>
+          <button onClick={function(){ go('beats'); }} className={'px-5 py-2 rounded-full text-sm font-bold ' + (props.view === 'beats' ? 'bg-goldAccent text-black' : 'text-gray-400')}>Beats</button>
+        </div>
+
+        <div className="flex items-center gap-3 relative z-50">
+          <button onClick={function(){ go('upload'); }} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs gc">
+            <Icon n="up" c="w-4 h-4"/>Poster
+          </button>
+          <div className="relative">
+            <button onClick={function(){ setOpen(!open); }} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl hover:border-cyanNeon relative">
+              <img src={(p && p.avatar_url) ? p.avatar_url : AV} className="w-7 h-7 rounded-full object-cover" alt=""/>
+              <span className="text-xs font-bold text-white hidden md:block max-w-[100px] truncate">{p ? p.name : 'User'}</span>
+              <Icon n="chev" c="w-4 h-4 text-gray-400"/>
+              {(p && p.is_admin && props.pending > 0) ? <span className="absolute -top-1 -right-1 bg-pinkNeon text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{props.pending}</span> : null}
+            </button>
+
+            {open ? (
+              <div className="absolute right-0 top-12 mt-2 w-60 card rounded-xl p-2 flex flex-col gap-1 fade">
+                <div className="px-3 py-2 border-b border-borderDark/50 mb-1">
+                  <p className="text-xs text-gray-400">Connecté</p>
+                  <p className="text-sm font-bold text-white truncate">{p ? p.name : ''}</p>
+                  <p className="text-[10px] text-gray-500 truncate">{props.email}</p>
+                </div>
+                <button onClick={function(){ go('dashboard'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon n="dash" c="w-4 h-4"/>Dashboard</button>
+                <button onClick={function(){ go('myorders'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon n="bag" c="w-4 h-4"/>Mes commandes</button>
+                <button onClick={function(){ go('keys'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon n="key" c="w-4 h-4"/>Mes clés VST</button>
+                <button onClick={function(){ go('verify'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon n="shield" c="w-4 h-4"/>Vérifier une clé</button>
+                {(p && p.is_admin) ? <button onClick={function(){ go('admin'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-pinkNeon hover:bg-pinkNeon/10"><Icon n="list" c="w-4 h-4"/>Admin ({props.pending})</button> : null}
+                <button onClick={function(){ go('settings'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon n="gear" c="w-4 h-4"/>Paramètres</button>
+                <button onClick={function(){ go('cgu'); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon n="doc" c="w-4 h-4"/>CGU</button>
+                <div className="h-px bg-borderDark my-1"></div>
+                <button onClick={props.logout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10"><Icon n="out" c="w-4 h-4"/>Déconnexion</button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </nav>
+    </React.Fragment>
+  );
+}
+
+/* ---------------- MOBILE NAV ---------------- */
+function MobileNav(props){
+  const items = [
+    { v: 'home', n: 'home', l: 'Accueil' },
+    { v: 'beats', n: 'note', l: 'Beats' },
+    { v: 'vsts', n: 'cpu', l: 'VSTs' },
+    { v: 'myorders', n: 'bag', l: 'Cmd' },
+    { v: 'upload', n: 'up', l: 'Poster' }
+  ];
+  return (
+    <nav className={'md:hidden fixed inset-x-0 z-40 glass border-t border-borderDark px-2 py-2 flex justify-around ' + (props.hasPlayer ? 'bottom-[96px]' : 'bottom-0')}>
+      {items.map(function(it){
+        return (
+          <button key={it.v} onClick={function(){ props.setView(it.v); }} className={'flex flex-col items-center gap-1 ' + (props.view === it.v ? 'text-cyanNeon' : 'text-gray-400')}>
+            <Icon n={it.n} c="w-5 h-5"/>
+            <span className="text-[9px] font-bold">{it.l}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+/* ---------------- HOME ---------------- */
+function HomeView(props){
+  return (
+    <div className="space-y-10 fade">
+      <div className="card p-8 md:p-12 rounded-3xl border-goldAccent/50">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 rounded-xl bg-goldAccent/20 flex items-center justify-center"><Icon n="note" c="w-6 h-6 text-goldAccent"/></div>
+          <span className="text-xs font-bold text-goldAccent uppercase tracking-widest">Pour les Producteurs</span>
+        </div>
+        <h3 className="text-3xl md:text-4xl font-black text-white mb-4">VOUS ÊTES BEATMAKER ?</h3>
+        <p className="text-gray-300 mb-8 text-lg max-w-2xl">Publiez vos instrumentales et plugins VST. Commission réduite : 5% sur les beats, 8% sur les VST.</p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <button onClick={function(){ props.setView('upload'); }} className="bg-goldAccent text-black font-black px-8 py-4 rounded-xl gg text-lg">🎹 PUBLIER MES PRODS</button>
+          <button onClick={function(){ props.setView('vsts'); }} className="border-2 border-cyanNeon text-cyanNeon font-black px-8 py-4 rounded-xl text-lg">⚡ VOIR LES VSTs</button>
+        </div>
+      </div>
+
+      <div className="card p-8 md:p-12 rounded-3xl border-cyanNeon/50">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 rounded-xl bg-cyanNeon/20 flex items-center justify-center"><Icon n="mic" c="w-6 h-6 text-cyanNeon"/></div>
+          <span className="text-xs font-bold text-cyanNeon uppercase tracking-widest">Pour les Artistes</span>
+        </div>
+        <h3 className="text-3xl md:text-4xl font-black text-white mb-4">TU ES ARTISTE / RAPPEUR(SE) ?</h3>
+        <p className="text-gray-300 mb-8 text-lg max-w-2xl">Déniche les meilleures instrumentales et démarque-toi avec des sons uniques.</p>
+        <button onClick={function(){ props.setView('beats'); }} className="bg-cyanNeon text-black font-black px-8 py-4 rounded-xl gc text-lg">🎧 EXPLORER LE BEATSTORE</button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="card p-8 rounded-2xl border-cyanNeon/30 text-center">
+          <Icon n="cpu" c="w-12 h-12 text-cyanNeon mx-auto mb-4"/>
+          <h3 className="text-xl font-bold text-white mb-2">Plugins VST Pro</h3>
+          <p className="text-sm text-gray-400">FL Studio, Ableton et tous les DAWs.</p>
+        </div>
+        <div className="card p-8 rounded-2xl border-goldAccent/30 text-center">
+          <Icon n="shield" c="w-12 h-12 text-goldAccent mx-auto mb-4"/>
+          <h3 className="text-xl font-bold text-white mb-2">Clés Uniques</h3>
+          <p className="text-sm text-gray-400">Une clé par acheteur, 3 machines max.</p>
+        </div>
+        <div className="card p-8 rounded-2xl border-pinkNeon/30 text-center">
+          <Icon n="money" c="w-12 h-12 text-pinkNeon mx-auto mb-4"/>
+          <h3 className="text-xl font-bold text-white mb-2">Paiement Local</h3>
+          <p className="text-sm text-gray-400">BaridiMob, CCP et Edahabia.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- BEATS ---------------- */
+function BeatsView(props){
+  const [q, setQ] = React.useState('');
+  const [genre, setGenre] = React.useState('Tous');
+  const [sort, setSort] = React.useState('recent');
+  const [limit, setLimit] = React.useState(15);
+
+  let list = props.tracks.filter(function(t){
+    if(t.type !== 'beat') return false;
+    if(genre !== 'Tous' && t.genre !== genre) return false;
+    if(q){
+      const s = q.toLowerCase();
+      const ok = (t.title||'').toLowerCase().indexOf(s) >= 0 || (t.producer_name||'').toLowerCase().indexOf(s) >= 0;
+      if(!ok) return false;
+    }
+    return true;
+  });
+  if(sort === 'pop') list = list.slice().sort(function(a,b){ return (b.plays||0) - (a.plays||0); });
+  if(sort === 'cheap') list = list.slice().sort(function(a,b){ return (a.price_mp3||0) - (b.price_mp3||0); });
+
+  return (
+    <section className="fade space-y-4">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <h3 className="text-3xl font-black text-white border-l-4 border-goldAccent pl-4">BEATSTORE</h3>
+        <div className="flex gap-2">
+          <div className="relative flex-1 md:w-56">
+            <input type="text" value={q} onChange={function(e){ setQ(e.target.value); setLimit(15); }} placeholder="Rechercher..." className="w-full bg-cardDark border border-borderDark rounded-xl pl-9 pr-4 py-2 text-xs text-white outline-none"/>
+            <div className="absolute left-3 top-2.5 text-gray-500"><Icon n="find" c="w-4 h-4"/></div>
+          </div>
+          <select value={sort} onChange={function(e){ setSort(e.target.value); }} className="bg-cardDark border border-borderDark rounded-xl px-3 text-xs text-white">
+            <option value="recent">Récent</option>
+            <option value="pop">Populaire</option>
+            <option value="cheap">Prix bas</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {GENRES.map(function(g){
+          return <button key={g} onClick={function(){ setGenre(g); setLimit(15); }} className={'px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap ' + (genre === g ? 'bg-goldAccent text-black' : 'bg-cardDark text-gray-400 border border-borderDark')}>{g}</button>;
+        })}
+      </div>
+
+      {list.length === 0 ? (
+        <p className="text-gray-400 text-center py-12">Aucun beat trouvé.</p>
+      ) : (
+        <div className="card rounded-2xl p-4 space-y-2">
+          {list.slice(0, limit).map(function(b){
+            const isCur = props.current && props.current.id === b.id;
+            return (
+              <div key={b.id} className={'grid grid-cols-1 md:grid-cols-12 gap-3 items-center p-3 rounded-xl ' + (b.is_sold ? 'opacity-50 bg-black/60' : 'hover:bg-white/5')}>
+                <div className="col-span-6 flex items-center gap-3">
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer flex-shrink-0" onClick={function(){ if(!b.is_sold && b.audio_url) props.play(b); }}>
+                    <img loading="lazy" src={b.cover_url || DC} className="w-full h-full object-cover" alt=""/>
+                    {(!b.is_sold && b.audio_url) ? <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><Icon n={(isCur && props.playing) ? 'pause' : 'play'} c="w-5 h-5 text-white"/></div> : null}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-white truncate">{b.title} {b.is_sold ? <span className="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">SOLD</span> : null}</h4>
+                    <p className="text-xs text-goldAccent font-bold truncate">{b.producer_name} • {b.genre}</p>
+                  </div>
+                </div>
+                <div className="hidden md:block col-span-3 text-sm text-gray-400">{b.bpm} BPM • {b.key} • {b.plays || 0} ▶</div>
+                <div className="col-span-full md:col-span-3 flex justify-end">
+                  {b.is_sold ? (
+                    <span className="text-xs font-bold text-red-500 border border-red-800/50 px-4 py-2 rounded-xl">VENDU</span>
+                  ) : (
+                    <button onClick={function(){ props.buy(b); }} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black">Acheter ({fmt(b.price_mp3)} DZD)</button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {limit < list.length ? (
+        <button onClick={function(){ setLimit(limit + 15); }} className="w-full py-3 card rounded-xl text-sm font-bold text-cyanNeon">Charger plus ({list.length - limit} restants)</button>
+      ) : null}
+    </section>
+  );
+}
+
+/* ---------------- VSTS ---------------- */
+function VstsView(props){
+  const list = props.tracks.filter(function(t){ return t.type === 'vst'; });
+  return (
+    <section className="fade">
+      <h3 className="text-3xl font-black mb-6 text-white border-l-4 border-cyanNeon pl-4">PLUGINS VST</h3>
+      {list.length === 0 ? (
+        <p className="text-gray-400 text-center py-12">Aucun VST pour le moment.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {list.map(function(v){
+            const owned = props.myKeys.filter(function(k){ return k.track_id === v.id; })[0];
+            return (
+              <div key={v.id} className="card rounded-2xl p-5 flex flex-col border-cyanNeon/30">
+                <div className="relative">
+                  <img loading="lazy" src={v.cover_url || DC} className="w-full h-44 object-cover rounded-xl mb-4" alt=""/>
+                  {owned ? <span className="absolute top-2 right-2 bg-greenPro text-black text-[10px] font-black px-2 py-1 rounded-lg">POSSÉDÉ</span> : null}
+                </div>
+                <h4 className="text-xl font-black text-white">{v.title}</h4>
+                <p className="text-xs text-goldAccent font-bold mt-1">Par {v.producer_name}</p>
+                <p className="text-xs text-gray-400 my-3 flex-grow">{v.description}</p>
+                <div className="flex items-center justify-between pt-4 border-t border-borderDark">
+                  <span className="text-lg font-black text-goldAccent">{fmt(v.price_mp3)} DZD</span>
+                  {owned ? (
+                    <button onClick={function(){ props.setView('keys'); }} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs">Ma clé</button>
+                  ) : (
+                    <button onClick={function(){ props.buy(v); }} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Acheter</button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ---------------- MY ORDERS ---------------- */
+function MyOrdersView(props){
+  return (
+    <section className="fade space-y-4">
+      <h3 className="text-3xl font-black text-white border-l-4 border-greenPro pl-4">MES COMMANDES</h3>
+      {props.orders.length === 0 ? (
+        <p className="text-gray-400 text-center py-12">Aucune commande pour le moment.</p>
+      ) : (
+        <div className="space-y-3">
+          {props.orders.map(function(o){
+            let badge = null;
+            if(o.status === 'pending') badge = <span className="bg-yellow-500/20 text-yellow-400 font-bold px-4 py-2 rounded-xl text-xs">⏳ En vérification</span>;
+            if(o.status === 'validated') badge = <span className="bg-greenPro/20 text-greenPro font-bold px-4 py-2 rounded-xl text-xs">✅ Livrée</span>;
+            if(o.status === 'refused') badge = <span className="bg-red-500/20 text-red-400 font-bold px-4 py-2 rounded-xl text-xs">❌ Refusée</span>;
+            return (
+              <div key={o.id} className="card rounded-2xl p-4 flex flex-col md:flex-row md:items-center gap-4">
+                <img loading="lazy" src={(o.track && o.track.cover_url) ? o.track.cover_url : DC} className="w-14 h-14 rounded-lg object-cover" alt=""/>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-white truncate">{o.track ? o.track.title : 'Produit'}</h4>
+                  <p className="text-xs text-gray-400">{o.product_type.toUpperCase()} • {o.license_type.toUpperCase()} • {fmt(o.amount)} DZD</p>
+                  <p className="text-[10px] text-gray-500">{new Date(o.created_at).toLocaleString('fr-FR')}</p>
+                  {o.admin_note ? <p className="text-[11px] text-red-400">Raison : {o.admin_note}</p> : null}
+                  {o.vst_key ? (
+                    <div className="mt-2">
+                      <code className="font-mono text-sm text-greenPro bg-obsidian px-2 py-1 rounded select-all">{o.vst_key}</code>
+                      <button onClick={function(){ props.copy(o.vst_key); }} className="ml-2 text-[11px] text-cyanNeon">Copier</button>
+                    </div>
+                  ) : null}
+                </div>
+                <div>{badge}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ---------------- KEYS ---------------- */
+function KeysView(props){
+  return (
+    <section className="fade space-y-4">
+      <h3 className="text-3xl font-black text-white border-l-4 border-greenPro pl-4">MES CLÉS & ACHATS</h3>
+      {props.purchases.length === 0 ? (
+        <p className="text-gray-400 text-center py-12">Aucun achat.</p>
+      ) : (
+        <div className="space-y-3">
+          {props.purchases.map(function(p, i){
+            return (
+              <div key={p.id || i} className="card rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center gap-4">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <img loading="lazy" src={(p.track && p.track.cover_url) ? p.track.cover_url : DC} className="w-14 h-14 rounded-lg object-cover" alt=""/>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-white truncate">{p.track ? p.track.title : 'Produit'}</h4>
+                    <p className="text-xs text-gray-400">{(p.license_type||'').toUpperCase()} • {fmt(p.amount)} DZD</p>
+                  </div>
+                </div>
+                {(p.license_type === 'vst' && p.vst_key) ? (
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <code className="font-mono text-sm font-bold bg-obsidian border border-greenPro/50 text-greenPro px-3 py-2 rounded-lg select-all">{p.vst_key}</code>
+                    <span className="text-[11px] text-gray-400">{(p.activations || []).length}/{p.max_activations || 3} PC</span>
+                    <button onClick={function(){ props.copy(p.vst_key); }} className="bg-cardDark border border-borderDark text-white font-bold px-3 py-2 rounded-lg text-xs">Copier</button>
+                    <button onClick={function(){ props.download(p); }} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs">Télécharger</button>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ---------------- VERIFY ---------------- */
+function VerifyView(props){
+  const [key, setKey] = React.useState('');
+  const [machine, setMachine] = React.useState('PC-' + Math.random().toString(36).substring(2,8).toUpperCase());
+  const [result, setResult] = React.useState(null);
+  const [busy, setBusy] = React.useState(false);
+
+  async function run(e){
+    e.preventDefault();
+    if(!key.trim()) return;
+    setBusy(true);
+    setResult(null);
+    const res = await sb.rpc('verify_vst_key', { p_key: key.trim().toUpperCase(), p_machine_id: machine.trim() || null });
+    if(res.error) setResult({ valid: false, reason: res.error.message });
+    else setResult(res.data);
+    setBusy(false);
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto card p-8 rounded-3xl fade border-cyanNeon/30">
+      <div className="flex items-center gap-4 mb-6 border-b border-borderDark pb-6">
+        <div className="w-16 h-16 rounded-full bg-cyanNeon/10 flex items-center justify-center"><Icon n="key" c="w-8 h-8 text-cyanNeon"/></div>
+        <div>
+          <h2 className="text-3xl font-black text-white">Vérifier une clé</h2>
+          <p className="text-sm text-gray-400">Simule ce que fait le plugin.</p>
+        </div>
+      </div>
+
+      <form onSubmit={run} className="space-y-4">
+        <div>
+          <label className="text-xs font-bold text-gray-400 block mb-1">Clé de licence</label>
+          <input type="text" value={key} onChange={function(e){ setKey(e.target.value.toUpperCase()); }} maxLength="24" placeholder="YAN-XXXX-XXXX-XXXX" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-lg text-white font-mono text-center outline-none"/>
+        </div>
+        <div>
+          <label className="text-xs font-bold text-gray-400 block mb-1">ID Machine</label>
+          <div className="flex gap-2">
+            <input type="text" value={machine} onChange={function(e){ setMachine(e.target.value); }} className="flex-1 bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white font-mono outline-none"/>
+            <button type="button" onClick={function(){ setMachine('PC-' + Math.random().toString(36).substring(2,8).toUpperCase()); }} className="bg-cardDark border border-borderDark text-white font-bold px-4 rounded-xl text-xs">Autre PC</button>
+          </div>
+          <p className="text-[11px] text-gray-500 mt-1">Chaque ID différent compte pour 1 activation (3 max).</p>
+        </div>
+        <button type="submit" disabled={busy} className="w-full bg-cyanNeon text-black font-black py-4 rounded-xl gc disabled:opacity-50">{busy ? 'VÉRIFICATION...' : 'VÉRIFIER'}</button>
+      </form>
+
+      {result ? (
+        <div className={'mt-6 p-5 rounded-2xl border fade ' + (result.valid ? 'border-greenPro bg-greenPro/10' : 'border-red-500 bg-red-500/10')}>
+          <h4 className={'font-black text-xl mb-2 ' + (result.valid ? 'text-greenPro' : 'text-red-400')}>{result.valid ? '✅ CLÉ VALIDE' : '❌ CLÉ REFUSÉE'}</h4>
+          {result.product ? <p className="text-sm text-gray-300">Produit : <b>{result.product}</b></p> : null}
+          {result.reason ? <p className="text-sm text-red-300">{result.reason}</p> : null}
+          {(result.max_activations !== undefined && result.max_activations !== null) ? <p className="text-sm text-gray-300">Activations : <b>{result.activations}/{result.max_activations}</b></p> : null}
+        </div>
+      ) : null}
+
+      {props.myKeys.length > 0 ? (
+        <div className="mt-8 pt-6 border-t border-borderDark">
+          <p className="text-xs font-bold text-gray-400 mb-3">Tester avec mes clés :</p>
+          <div className="flex flex-wrap gap-2">
+            {props.myKeys.map(function(k){
+              return <button key={k.vst_key} onClick={function(){ setKey(k.vst_key); setResult(null); }} className="font-mono text-xs bg-obsidian border border-greenPro/40 text-greenPro px-3 py-1.5 rounded-lg">{k.vst_key}</button>;
+            })}
+            <button onClick={function(){ setKey('YAN-FAKE-1234-ABCD'); setResult(null); }} className="font-mono text-xs bg-obsidian border border-red-500/40 text-red-400 px-3 py-1.5 rounded-lg">Fausse clé</button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function DashboardView(props){
+  const [amount, setAmount] = React.useState('');
+  const p = props.profile;
+  const mine = props.tracks.filter(function(t){ return t.producer_id === p.id; });
+  const plays = mine.reduce(function(s,t){ return s + (t.plays || 0); }, 0);
+
+  return (
+    <div className="space-y-6 fade">
+      <div className="flex flex-col md:flex-row justify-between gap-4 bg-cardDark border border-borderDark p-6 rounded-2xl">
+        <div className="flex items-center gap-4">
+          <img src={p.avatar_url || AV} className="w-16 h-16 rounded-full object-cover border-2 border-goldAccent" alt=""/>
+          <div>
+            <h2 className="text-2xl font-black text-white">{p.name}</h2>
+            <p className="text-xs text-gray-400">{props.email}</p>
+          </div>
+        </div>
+        <button onClick={function(){ props.setView('upload'); }} className="bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-black px-6 py-3 rounded-xl flex items-center gap-2 gc self-start"><Icon n="up" c="w-4 h-4"/>Uploader</button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card p-6 rounded-2xl border-cyanNeon/30">
+          <p className="text-xs font-bold text-gray-400 mb-1">SOLDE</p>
+          <p className="text-3xl font-black text-cyanNeon">{fmt(p.balance)} DZD</p>
+        </div>
+        <div className="card p-6 rounded-2xl border-goldAccent/30">
+          <p className="text-xs font-bold text-gray-400 mb-1">ÉCOUTES</p>
+          <p className="text-3xl font-black text-goldAccent">{fmt(plays)}</p>
+        </div>
+        <div className="card p-6 rounded-2xl border-pinkNeon/30">
+          <p className="text-xs font-bold text-gray-400 mb-1">CRÉATIONS</p>
+          <p className="text-3xl font-black text-pinkNeon">{mine.length}</p>
+        </div>
+      </div>
+
+      <div className="card rounded-2xl p-6 border-greenPro/30">
+        <h3 className="text-lg font-bold text-white mb-2">Retirer mes gains</h3>
+        <p className="text-xs text-gray-400 mb-3">Minimum 1000 DZD. Versement CCP/BaridiMob sous 7 jours.</p>
+        <div className="flex gap-2">
+          <input type="number" value={amount} onChange={function(e){ setAmount(e.target.value); }} placeholder="Montant en DZD" className="flex-1 bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/>
+          <button onClick={function(){ props.withdraw(amount); setAmount(''); }} className="bg-greenPro text-black font-black px-6 rounded-xl text-sm">Demander</button>
+        </div>
+      </div>
+
+      <div className="card rounded-2xl p-6">
+        <h3 className="text-lg font-bold text-white mb-4">Mes publications</h3>
+        {mine.length === 0 ? (
+          <p className="text-gray-400 text-sm text-center py-6">Aucune création.</p>
+        ) : (
+          <div className="space-y-3">
+            {mine.map(function(t){
+              return (
+                <div key={t.id} className="flex justify-between items-center p-3 rounded-xl bg-obsidian/60 border border-borderDark">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <img loading="lazy" src={t.cover_url || DC} className="w-12 h-12 rounded-lg object-cover" alt=""/>
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-white text-sm truncate">{t.title}</h4>
+                      <p className="text-xs text-gray-400">{(t.type||'').toUpperCase()} • {t.plays || 0} écoutes</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-goldAccent">{fmt(t.price_mp3)} DZD</span>
+                    <button onClick={function(){ props.remove(t.id); }} className="p-2 bg-red-950/60 text-red-400 rounded-lg"><Icon n="trash" c="w-4 h-4"/></button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- UPLOAD ---------------- */
+function UploadView(props){
+  const [title, setTitle] = React.useState('');
+  const [type, setType] = React.useState('beat');
+  const [genre, setGenre] = React.useState('Drill');
+  const [bpm, setBpm] = React.useState(140);
+  const [musicKey, setMusicKey] = React.useState('Am');
+  const [p1, setP1] = React.useState(2000);
+  const [p2, setP2] = React.useState(4000);
+  const [p3, setP3] = React.useState(8000);
+  const [p4, setP4] = React.useState(25000);
+  const [desc, setDesc] = React.useState('');
+  const [cover, setCover] = React.useState(null);
+  const [file, setFile] = React.useState(null);
+  const [busy, setBusy] = React.useState(false);
+
+  async function submit(e){
+    e.preventDefault();
+    setBusy(true);
+    const ok = await props.upload({
+      title: title, type: type, genre: genre, bpm: bpm, key: musicKey,
+      p1: p1, p2: p2, p3: p3, p4: p4, desc: desc, cover: cover, file: file
+    });
+    if(ok){ setTitle(''); setDesc(''); setCover(null); setFile(null); }
+    setBusy(false);
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto card p-8 rounded-2xl border-goldAccent/40 fade">
+      <h2 className="text-2xl font-black text-white mb-2">Nouvelle création</h2>
+      <p className="text-xs text-gray-400 mb-6">Par <span className="text-goldAccent font-bold">{props.profile.name}</span></p>
+
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <label className="text-xs font-bold text-gray-300 block mb-1">Titre</label>
+          <input type="text" required maxLength="100" value={title} onChange={function(e){ setTitle(e.target.value); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div>
+            <label className="text-xs font-bold text-gray-300 block mb-1">Type</label>
+            <select value={type} onChange={function(e){ setType(e.target.value); setFile(null); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white">
+              <option value="beat">Beat</option>
+              <option value="vst">VST</option>
+            </select>
+          </div>
+          {type === 'beat' ? (
+            <React.Fragment>
+              <div>
+                <label className="text-xs font-bold text-gray-300 block mb-1">Genre</label>
+                <select value={genre} onChange={function(e){ setGenre(e.target.value); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white">
+                  {GENRES.slice(1).map(function(g){ return <option key={g} value={g}>{g}</option>; })}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-300 block mb-1">BPM</label>
+                <input type="number" min="40" max="300" value={bpm} onChange={function(e){ setBpm(e.target.value); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-300 block mb-1">Gamme</label>
+                <input type="text" maxLength="10" value={musicKey} onChange={function(e){ setMusicKey(e.target.value); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/>
+              </div>
+            </React.Fragment>
+          ) : null}
+        </div>
+
+        {type === 'beat' ? (
+          <div className="p-4 rounded-xl bg-obsidian/60 border border-borderDark">
+            <p className="text-xs font-bold text-goldAccent uppercase mb-3">Prix (DZD) • commission 5%</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-[11px] text-gray-400">MP3</label><input type="number" min="0" value={p1} onChange={function(e){ setP1(e.target.value); }} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+              <div><label className="text-[11px] text-gray-400">WAV</label><input type="number" min="0" value={p2} onChange={function(e){ setP2(e.target.value); }} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+              <div><label className="text-[11px] text-gray-400">Stems</label><input type="number" min="0" value={p3} onChange={function(e){ setP3(e.target.value); }} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+              <div><label className="text-[11px] text-gray-400">Exclusif</label><input type="number" min="0" value={p4} onChange={function(e){ setP4(e.target.value); }} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30">
+            <label className="text-xs font-bold text-cyanNeon block mb-1">Prix VST (DZD) • commission 8%</label>
+            <input type="number" min="0" value={p1} onChange={function(e){ setP1(e.target.value); }} className="w-full bg-cardDark border border-cyanNeon/50 rounded-lg p-2 text-white"/>
+            <p className="text-[11px] text-gray-400 mt-2">Clé unique par acheteur, 3 machines max.</p>
+          </div>
+        )}
+
+        <div>
+          <label className="text-xs font-bold text-gray-300 block mb-1">Description</label>
+          <textarea maxLength="300" rows="2" value={desc} onChange={function(e){ setDesc(e.target.value); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white resize-none outline-none"></textarea>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-300 block mb-1">Pochette (max 5MB)</label>
+          <input type="file" accept="image/*" onChange={function(e){ setCover(e.target.files[0]); }} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-300 block mb-1">{type === 'vst' ? 'Fichier plugin (ZIP/EXE)' : 'Audio (MP3/WAV)'} — max 50MB</label>
+          <input key={type} type="file" accept={type === 'vst' ? '.zip,.rar,.7z,.exe,.msi,.dmg,.pkg' : '.mp3,.wav'} onChange={function(e){ setFile(e.target.files[0]); }} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-goldAccent file:text-black"/>
+        </div>
+
+        <button type="submit" disabled={busy} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-50">{busy ? 'UPLOAD...' : 'PUBLIER'}</button>
+      </form>
+    </div>
+  );
+}
+
+/* ---------------- SETTINGS ---------------- */
+function SettingsView(props){
+  const p = props.profile;
+  const [name, setName] = React.useState(p.name || '');
+  const [rip, setRip] = React.useState(p.rip || '');
+  const [bio, setBio] = React.useState(p.bio || '');
+  const [avatar, setAvatar] = React.useState(null);
+  const [preview, setPreview] = React.useState(p.avatar_url || AV);
+  const [busy, setBusy] = React.useState(false);
+
+  async function submit(e){
+    e.preventDefault();
+    setBusy(true);
+    await props.save({ name: name, rip: rip, bio: bio, avatar: avatar });
+    setAvatar(null);
+    setBusy(false);
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto card p-8 rounded-3xl fade">
+      <h2 className="text-3xl font-black text-white mb-6 border-b border-borderDark pb-6">Paramètres</h2>
+      <form onSubmit={submit} className="space-y-5">
+        <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-obsidian rounded-2xl border border-borderDark">
+          <img src={preview} className="w-24 h-24 rounded-full object-cover border-4 border-cyanNeon" alt=""/>
+          <div className="flex-1 w-full">
+            <label className="text-xs font-bold text-gray-400 block mb-2">Photo (max 5MB)</label>
+            <input type="file" accept="image/*" onChange={function(e){ const f = e.target.files[0]; if(f){ setAvatar(f); setPreview(URL.createObjectURL(f)); } }} className="w-full text-sm text-gray-400 file:bg-cyanNeon file:text-black file:border-0 file:rounded-xl file:px-4 file:py-2 file:mr-4 file:font-bold"/>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label>
+          <input type="text" required maxLength="50" value={name} onChange={function(e){ setName(e.target.value); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-400 block mb-1">Bio</label>
+          <textarea maxLength="200" rows="2" value={bio} onChange={function(e){ setBio(e.target.value); }} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white resize-none outline-none"></textarea>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-goldAccent/5 border border-goldAccent/30">
+          <label className="text-xs font-bold text-goldAccent block mb-1 uppercase">CCP / BaridiMob</label>
+          <p className="text-[11px] text-gray-400 mb-2">Obligatoire pour vendre et retirer vos gains.</p>
+          <input type="text" value={rip} onChange={function(e){ setRip(e.target.value); }} placeholder="00799999000000000012" className="w-full bg-obsidian border border-goldAccent/40 rounded-xl p-3 text-sm text-white font-mono outline-none"/>
+        </div>
+
+        <button type="submit" disabled={busy} className="w-full bg-white text-black font-black py-4 rounded-xl disabled:opacity-50">{busy ? 'ENREGISTREMENT...' : 'ENREGISTRER'}</button>
+      </form>
+    </div>
+  );
+}
+
+/* ---------------- ADMIN ---------------- */
+function AdminView(props){
+  const [tab, setTab] = React.useState('orders');
+  const pendingOrders = props.orders.filter(function(o){ return o.status === 'pending'; });
+  const totalFee = props.orders.filter(function(o){ return o.status === 'validated'; }).reduce(function(s,o){ return s + (o.platform_fee || 0); }, 0);
+
+  return (
+    <section className="fade space-y-5">
+      <h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">ADMINISTRATION</h3>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="card p-4 rounded-xl border-greenPro/30">
+          <p className="text-xs text-gray-400">MA COMMISSION</p>
+          <p className="text-2xl font-black text-greenPro">{fmt(totalFee)} DZD</p>
+        </div>
+        <div className="card p-4 rounded-xl border-pinkNeon/30">
+          <p className="text-xs text-gray-400">EN ATTENTE</p>
+          <p className="text-2xl font-black text-pinkNeon">{pendingOrders.length}</p>
+        </div>
+        <div className="card p-4 rounded-xl border-cyanNeon/30">
+          <p className="text-xs text-gray-400">TOTAL COMMANDES</p>
+          <p className="text-2xl font-black text-cyanNeon">{props.orders.length}</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={function(){ setTab('orders'); }} className={'px-5 py-2 rounded-xl text-sm font-bold ' + (tab === 'orders' ? 'bg-pinkNeon text-black' : 'bg-cardDark text-gray-400')}>Commandes</button>
+        <button onClick={function(){ setTab('wd'); }} className={'px-5 py-2 rounded-xl text-sm font-bold ' + (tab === 'wd' ? 'bg-greenPro text-black' : 'bg-cardDark text-gray-400')}>Retraits</button>
+      </div>
+
+      {tab === 'orders' ? (
+        props.orders.length === 0 ? <p className="text-gray-400 text-center py-10">Aucune commande.</p> : (
+          <div className="space-y-3">
+            {props.orders.map(function(o){
+              return (
+                <div key={o.id} className={'card rounded-2xl p-4 ' + (o.status === 'pending' ? 'border-pinkNeon/50' : o.status === 'validated' ? 'border-greenPro/30' : 'border-red-500/30')}>
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {o.proof_url ? <img loading="lazy" src={o.proof_url} className="w-16 h-16 rounded-lg object-cover cursor-pointer border border-borderDark" onClick={function(){ window.open(o.proof_url, '_blank'); }} alt="preuve"/> : null}
+                      <div className="min-w-0">
+                        <p className="font-bold text-white truncate">{o.buyer_name} → {o.track_title}</p>
+                        <p className="text-xs text-gray-400">{o.product_type.toUpperCase()} • {o.license_type.toUpperCase()} • {fmt(o.amount)} DZD</p>
+                        <p className="text-xs text-greenPro font-bold">Ma part {o.rate_percent}% : {fmt(o.platform_fee)} DZD</p>
+                        <p className="text-[10px] text-gray-500">{new Date(o.created_at).toLocaleString('fr-FR')}</p>
+                        {o.vst_key ? <code className="text-xs text-greenPro font-mono bg-obsidian px-2 py-1 rounded inline-block mt-1">{o.vst_key}</code> : null}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {o.status === 'pending' ? (
+                        <React.Fragment>
+                          <button onClick={function(){ props.validate(o.id); }} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs">Valider</button>
+                          <button onClick={function(){ props.refuse(o.id); }} className="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-xs">Refuser</button>
+                        </React.Fragment>
+                      ) : (
+                        <span className={'text-xs font-bold ' + (o.status === 'validated' ? 'text-greenPro' : 'text-red-400')}>{o.status === 'validated' ? '✅ Livrée' : '❌ Refusée'}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
+      ) : (
+        props.withdrawals.length === 0 ? <p className="text-gray-400 text-center py-10">Aucune demande.</p> : (
+          <div className="space-y-3">
+            {props.withdrawals.map(function(w){
+              return (
+                <div key={w.id} className="card rounded-2xl p-4 flex justify-between items-center">
+                  <div>
+                    <p className="font-bold text-white">{fmt(w.amount)} DZD</p>
+                    <p className="text-xs font-mono text-goldAccent">{w.rip}</p>
+                    <p className="text-[10px] text-gray-500">{new Date(w.created_at).toLocaleString('fr-FR')}</p>
+                  </div>
+                  {w.status === 'pending' ? (
+                    <button onClick={function(){ props.payWd(w.id); }} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs">Marquer payé</button>
+                  ) : (
+                    <span className="text-xs font-bold text-greenPro">✅ Payé</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )
+      )}
+    </section>
+  );
+}
+
+/* ---------------- BUY MODAL ---------------- */
+function BuyModal(props){
+  const item = props.item;
+  const [license, setLicense] = React.useState(item.type === 'vst' ? 'vst' : 'mp3');
+  const [proof, setProof] = React.useState(null);
+  const [seller, setSeller] = React.useState(null);
+  const [busy, setBusy] = React.useState(false);
+
+  React.useEffect(function(){
+    sb.rpc('get_seller_payment', { p_track_id: item.id }).then(function(res){
+      if(res.data) setSeller(res.data);
+    });
+  }, [item.id]);
+
+  function priceOf(l){
+    if(item.type === 'vst') return item.price_mp3 || 0;
+    if(l === 'wav') return item.price_wav || 0;
+    if(l === 'stems') return item.price_stems || 0;
+    if(l === 'exclusive') return item.price_exclusive || 0;
+    return item.price_mp3 || 0;
+  }
+
+  const rate = item.type === 'vst' ? 8 : 5;
+  const labels = { mp3: 'MP3 Lease', wav: 'WAV Standard', stems: 'Trackout Stems', exclusive: '🔥 EXCLUSIVE' };
+
+  async function send(){
+    setBusy(true);
+    await props.submit(item, license, priceOf(license), rate, proof);
+    setBusy(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="card rounded-2xl max-w-lg w-full p-6 relative my-8">
+        <button onClick={props.close} className="absolute top-4 right-4 text-gray-400"><Icon n="x" c="w-5 h-5"/></button>
+        <h3 className="text-xl font-black text-white mb-4">Achat : {item.title}</h3>
+
+        {item.type === 'beat' ? (
+          <div className="space-y-2 mb-4">
+            {['mp3','wav','stems','exclusive'].map(function(l){
+              const on = license === l;
+              return (
+                <div key={l} onClick={function(){ setLicense(l); }} className={'p-3 rounded-xl border cursor-pointer ' + (on ? (l === 'exclusive' ? 'border-red-500 bg-red-500/10' : 'border-goldAccent bg-goldAccent/10') : 'border-borderDark')}>
+                  <div className="flex justify-between font-bold text-white">
+                    <span className={l === 'exclusive' ? 'text-red-400' : ''}>{labels[l]}</span>
+                    <span className="text-goldAccent">{fmt(priceOf(l))} DZD</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
+
+        <div className="p-4 rounded-xl bg-goldAccent/10 border border-goldAccent/30 mb-4 flex justify-between items-center">
+          <span className="font-bold text-white">Total à payer</span>
+          <span className="text-xl font-black text-goldAccent">{fmt(priceOf(license))} DZD</span>
+        </div>
+
+        <div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30 mb-4">
+          <h4 className="font-bold text-white text-sm mb-2">Paiement CCP / BaridiMob</h4>
+          {seller && seller.rip ? (
+            <React.Fragment>
+              <p className="font-mono text-base text-greenPro font-bold select-all">{seller.rip}</p>
+              <p className="text-xs text-gray-400 mt-1">Bénéficiaire : {seller.name}</p>
+            </React.Fragment>
+          ) : (
+            <p className="text-sm text-yellow-400">Le vendeur n'a pas encore configuré son CCP.</p>
+          )}
+          <p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {rate}% (prélevée au vendeur)</p>
+        </div>
+
+        <div className="mb-4">
+          <label className="text-xs font-bold text-gray-300 block mb-1">Capture d'écran du paiement (obligatoire)</label>
+          <input type="file" accept="image/*" onChange={function(e){ setProof(e.target.files[0]); }} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/>
+        </div>
+
+        <button onClick={send} disabled={busy || !proof} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-50">{busy ? 'ENVOI...' : 'ENVOYER LA COMMANDE'}</button>
+        <p className="text-[11px] text-gray-500 text-center mt-2">Suivi dans "Mes commandes". Livraison sous 24h.</p>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- PLAYER ---------------- */
+function Player(props){
+  const t = props.track;
+  return (
+    <div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-4 md:px-6 py-3">
+      <div className="flex items-center gap-3 text-xs text-gray-400 font-mono mb-2">
+        <span>{ftime(props.time)}</span>
+        <input type="range" min="0" max="100" value={props.progress} onChange={props.seek} className="flex-1 h-1 rounded-lg cursor-pointer" style={{background: 'linear-gradient(to right,#00f0ff ' + props.progress + '%,#222638 ' + props.progress + '%)'}}/>
+        <span>{ftime(props.duration)}</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3 w-1/3 min-w-0">
+          <img loading="lazy" src={t.cover_url || DC} className="w-11 h-11 rounded-lg object-cover" alt=""/>
+          <div className="min-w-0 hidden md:block">
+            <h4 className="font-bold text-sm text-white truncate">{t.title}</h4>
+            <p className="text-xs text-goldAccent font-bold truncate">{t.producer_name}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={props.toggleMute} className="text-gray-400"><Icon n={props.muted ? 'mute' : 'vol'} c="w-5 h-5"/></button>
+          <input type="range" min="0" max="1" step="0.1" value={props.muted ? 0 : props.volume} onChange={props.setVolume} className="w-20 hidden md:block"/>
+          <button onClick={function(){ props.play(t); }} className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center"><Icon n={props.playing ? 'pause' : 'play'} c="w-5 h-5"/></button>
+        </div>
+        <div className="w-1/3 flex justify-end">
+          <button onClick={function(){ props.buy(t); }} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs">Acheter</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= APP ================= */
+function App(){
+  const [loading, setLoading] = React.useState(true);
+  const [session, setSession] = React.useState(null);
+  const [profile, setProfile] = React.useState(null);
+  const [tracks, setTracks] = React.useState([]);
+  const [purchases, setPurchases] = React.useState([]);
+  const [myOrders, setMyOrders] = React.useState([]);
+  const [adminOrders, setAdminOrders] = React.useState([]);
+  const [withdrawals, setWithdrawals] = React.useState([]);
+  const [toasts, setToasts] = React.useState([]);
+  const [view, setViewRaw] = React.useState('home');
+  const [buyItem, setBuyItem] = React.useState(null);
+
+  const [current, setCurrent] = React.useState(null);
+  const [playing, setPlaying] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
+  const [duration, setDuration] = React.useState(0);
+  const [time, setTime] = React.useState(0);
+  const [volume, setVolume] = React.useState(1);
+  const [muted, setMuted] = React.useState(false);
+
+  const audio = React.useRef(null);
+  if(!audio.current) audio.current = new Audio();
+
+  function setView(v){ setViewRaw(v); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+  function toast(msg, type){
+    const id = Date.now() + Math.random();
+    setToasts(function(p){ return p.concat([{ id: id, msg: msg, type: type || 'success' }]); });
+    setTimeout(function(){ setToasts(function(p){ return p.filter(function(t){ return t.id !== id; }); }); }, 4000);
+  }
+
+  async function copy(txt){
+    try { await navigator.clipboard.writeText(txt); toast('Copié !'); }
+    catch(e){ toast('Copie manuelle', 'error'); }
+  }
+
+  React.useEffect(function(){
+    sb.auth.getSession().then(function(res){
+      const s = res.data.session;
+      setSession(s);
+      if(s){ loadProfile(s.user.id); loadPurchases(s.user.id); loadMyOrders(s.user.id); }
+      loadTracks();
+      setLoading(false);
+    });
+
+    const sub = sb.auth.onAuthStateChange(function(ev, s){
+      setSession(s);
+      if(s){ loadProfile(s.user.id); loadPurchases(s.user.id); loadMyOrders(s.user.id); }
+      else { setProfile(null); setPurchases([]); setMyOrders([]); setAdminOrders([]); }
+    });
+
+    const a = audio.current;
+    function onEnd(){ setPlaying(false); setProgress(0); }
+    function onTime(){ setTime(a.currentTime); setProgress((a.currentTime / a.duration) * 100 || 0); }
+    function onMeta(){ setDuration(a.duration); }
+    a.addEventListener('ended', onEnd);
+    a.addEventListener('timeupdate', onTime);
+    a.addEventListener('loadedmetadata', onMeta);
+
+    return function(){
+      sub.data.subscription.unsubscribe();
+      a.removeEventListener('ended', onEnd);
+      a.removeEventListener('timeupdate', onTime);
+      a.removeEventListener('loadedmetadata', onMeta);
+    };
+  }, []);
+
+  React.useEffect(function(){
+    if(profile && profile.is_admin){ loadAdminOrders(); loadWithdrawals(); }
+  }, [profile && profile.is_admin]);
+
+  async function loadTracks(){
+    const res = await sb.from('tracks').select('*').order('created_at', { ascending: false });
+    if(res.data) setTracks(res.data);
+  }
+
+  async function loadProfile(uid){
+    const res = await sb.from('profiles').select('*').eq('id', uid).single();
+    if(res.data) setProfile(res.data);
+    else setTimeout(function(){ loadProfile(uid); }, 1500);
+  }
+
+  async function loadPurchases(uid){
+    const res = await sb.from('sales').select('*').eq('buyer_id', uid).order('created_at', { ascending: false });
+    if(!res.data) return;
+    const ids = res.data.map(function(s){ return s.track_id; }).filter(Boolean);
+    const map = {};
+    if(ids.length){
+      const tr = await sb.from('tracks').select('id,title,cover_url,type,file_path').in('id', ids);
+      (tr.data || []).forEach(function(t){ map[t.id] = t; });
+    }
+    setPurchases(res.data.map(function(s){ s.track = map[s.track_id] || null; return s; }));
+  }
+
+  async function loadMyOrders(uid){
+    const res = await sb.from('orders').select('*').eq('buyer_id', uid).order('created_at', { ascending: false });
+    if(!res.data) return;
+    const ids = res.data.map(function(o){ return o.track_id; });
+    const map = {};
+    if(ids.length){
+      const tr = await sb.from('tracks').select('id,title,cover_url').in('id', ids);
+      (tr.data || []).forEach(function(t){ map[t.id] = t; });
+    }
+    setMyOrders(res.data.map(function(o){ o.track = map[o.track_id] || null; return o; }));
+  }
+
+  async function loadAdminOrders(){
+    const res = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if(!res.data) return;
+    const bids = res.data.map(function(o){ return o.buyer_id; });
+    const tids = res.data.map(function(o){ return o.track_id; });
+    const bm = {}; const tm = {};
+    if(bids.length){
+      const pr = await sb.from('public_profiles').select('id,name').in('id', bids);
+      (pr.data || []).forEach(function(p){ bm[p.id] = p.name; });
+    }
+    if(tids.length){
+      const tr = await sb.from('tracks').select('id,title').in('id', tids);
+      (tr.data || []).forEach(function(t){ tm[t.id] = t.title; });
+    }
+    setAdminOrders(res.data.map(function(o){
+      o.buyer_name = bm[o.buyer_id] || 'Client';
+      o.track_title = tm[o.track_id] || '—';
+      return o;
+    }));
+  }
+
+  async function loadWithdrawals(){
+    const res = await sb.from('withdrawals').select('*').order('created_at', { ascending: false });
+    if(res.data) setWithdrawals(res.data);
+  }
+
+  async function logout(){
+    audio.current.pause();
+    setPlaying(false);
+    await sb.auth.signOut();
+    setView('home');
+    toast('Déconnecté.');
+  }
+
+  async function play(t){
+    if(!t.audio_url){ toast("Pas d'audio", 'error'); return; }
+    if(current && current.id === t.id){
+      if(playing){ audio.current.pause(); setPlaying(false); }
+      else { audio.current.play().catch(function(){}); setPlaying(true); }
+      return;
+    }
+    setCurrent(t);
+    audio.current.src = t.audio_url;
+    audio.current.volume = muted ? 0 : volume;
+    audio.current.play().catch(function(){});
+    setPlaying(true);
+    await sb.rpc('increment_plays', { track_id: t.id });
+  }
+
+  function seek(e){
+    audio.current.currentTime = (e.target.value / 100) * duration;
+    setProgress(e.target.value);
+  }
+
+  function changeVolume(e){
+    const v = parseFloat(e.target.value);
+    setVolume(v);
+    audio.current.volume = v;
+    setMuted(v === 0);
+  }
+
+  function toggleMute(){
+    if(muted){ audio.current.volume = volume || 0.5; setMuted(false); }
+    else { audio.current.volume = 0; setMuted(true); }
+  }
+
+  async function submitOrder(item, license, amount, rate, proof){
+    if(!proof){ toast('Ajoute la capture du paiement', 'error'); return; }
+    if(proof.size > 5 * 1024 * 1024){ toast('Image max 5MB', 'error'); return; }
+    try {
+      const sellerAmount = Math.floor(amount * (1 - rate / 100));
+      const fee = amount - sellerAmount;
+      let proofUrl = '';
+      const pname = session.user.id + '-' + Date.now() + '-proof.' + proof.name.split('.').pop();
+      const up = await sb.storage.from('covers').upload(pname, proof);
+      if(!up.error) proofUrl = sb.storage.from('covers').getPublicUrl(pname).data.publicUrl;
+
+      const res = await sb.from('orders').insert({
+        buyer_id: session.user.id,
+        seller_id: item.producer_id,
+        track_id: item.id,
+        product_type: item.type,
+        license_type: license,
+        amount: amount,
+        seller_amount: sellerAmount,
+        platform_fee: fee,
+        rate_percent: rate,
+        proof_url: proofUrl
+      });
+      if(res.error) throw res.error;
+      toast('Commande envoyée ! Suivi dans "Mes commandes".');
+      setBuyItem(null);
+      loadMyOrders(session.user.id);
+      if(profile && profile.is_admin) loadAdminOrders();
+    } catch(ex){ toast(ex.message, 'error'); }
+  }
+
+  async function validateOrder(id){
+    if(!confirm('Confirmer que le paiement est bien reçu ?')) return;
+    const res = await sb.rpc('validate_order', { p_order_id: id, p_admin_id: session.user.id });
+    if(res.error){ toast(res.error.message, 'error'); return; }
+    if(res.data && res.data.ok){
+      toast(res.data.key ? ('Livrée ! Clé : ' + res.data.key) : 'Commande livrée !');
+      loadAdminOrders(); loadTracks(); loadPurchases(session.user.id);
+    } else {
+      toast((res.data && res.data.msg) || 'Erreur', 'error');
+    }
+  }
+
+  async function refuseOrder(id){
+    const reason = prompt('Raison du refus :');
+    if(reason === null) return;
+    await sb.rpc('refuse_order', { p_order_id: id, p_reason: reason || 'Paiement non vérifié' });
+    toast('Commande refusée.');
+    loadAdminOrders();
+  }
+
+  async function payWithdrawal(id){
+    if(!confirm('Marquer comme payé ?')) return;
+    const res = await sb.rpc('pay_withdrawal', { p_id: id });
+    if(res.error){ toast(res.error.message, 'error'); return; }
+    toast('Payé !');
+    loadWithdrawals();
+  }
+
+  async function requestWithdrawal(amount){
+    const a = parseInt(amount, 10);
+    if(!a){ toast('Montant invalide', 'error'); return; }
+    const res = await sb.rpc('request_withdrawal', { p_amount: a });
+    if(res.error){ toast(res.error.message, 'error'); return; }
+    toast('Demande envoyée !');
+    loadProfile(session.user.id);
+    loadWithdrawals();
+  }
+
+  async function downloadVst(p){
+    if(!p.track || !p.track.file_path){ toast('Fichier indisponible', 'error'); return; }
+    const res = await sb.storage.from('vst-files').createSignedUrl(p.track.file_path, 120, { download: true });
+    if(res.error){ toast(res.error.message, 'error'); return; }
+    window.open(res.data.signedUrl, '_blank');
+  }
+
+  async function saveProfile(d){
+    try {
+      let url = profile.avatar_url;
+      if(d.avatar){
+        if(d.avatar.size > 5 * 1024 * 1024) throw new Error('Image max 5MB');
+        const n = profile.id + '-' + Date.now() + '.' + d.avatar.name.split('.').pop();
+        const up = await sb.storage.from('avatars').upload(n, d.avatar, { upsert: true });
+        if(up.error) throw up.error;
+        url = sb.storage.from('avatars').getPublicUrl(n).data.publicUrl;
+      }
+      const res = await sb.from('profiles').update({ name: d.name, rip: d.rip, bio: d.bio, avatar_url: url }).eq('id', profile.id).select().single();
+      if(res.error) throw res.error;
+      setProfile(res.data);
+      toast('Profil sauvegardé !');
+      setView('dashboard');
+    } catch(ex){ toast(ex.message, 'error'); }
+  }
+
+  async function uploadTrack(d){
+    try {
+      if(!d.title.trim()) throw new Error('Titre obligatoire');
+      if(d.type === 'vst' && !d.file) throw new Error('Ajoute le fichier du plugin');
+      if(d.file && d.file.size > 50 * 1024 * 1024) throw new Error('Fichier max 50MB');
+      if(d.cover && d.cover.size > 5 * 1024 * 1024) throw new Error('Pochette max 5MB');
+
+      let coverUrl = DC; let audioUrl = ''; let filePath = null;
+
+      if(d.cover){
+        const n = profile.id + '-' + Date.now() + '-c.' + d.cover.name.split('.').pop();
+        const up = await sb.storage.from('covers').upload(n, d.cover);
+        if(!up.error) coverUrl = sb.storage.from('covers').getPublicUrl(n).data.publicUrl;
+      }
+
+      if(d.file){
+        const safe = d.file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        if(d.type === 'vst'){
+          const path = profile.id + '/' + Date.now() + '-' + safe;
+          const up = await sb.storage.from('vst-files').upload(path, d.file);
+          if(up.error) throw new Error('Upload échoué : ' + up.error.message);
+          filePath = path;
+        } else {
+          const n = profile.id + '-' + Date.now() + '-a.' + d.file.name.split('.').pop();
+          const up = await sb.storage.from('audio').upload(n, d.file);
+          if(up.error) throw new Error('Upload échoué : ' + up.error.message);
+          audioUrl = sb.storage.from('audio').getPublicUrl(n).data.publicUrl;
+        }
+      }
+
+      const row = {
+        title: d.title.trim(),
+        type: d.type,
+        genre: d.genre,
+        bpm: parseInt(d.bpm, 10) || 140,
+        key: d.key,
+        producer_id: profile.id,
+        producer_name: profile.name,
+        cover_url: coverUrl,
+        audio_url: audioUrl,
+        price_mp3: parseInt(d.p1, 10) || 0,
+        price_wav: parseInt(d.p2, 10) || 0,
+        price_stems: parseInt(d.p3, 10) || 0,
+        price_exclusive: parseInt(d.p4, 10) || 0,
+        description: d.desc.trim() || (d.type === 'vst' ? 'Plugin VST' : 'Beat ' + d.genre)
+      };
+      if(filePath) row.file_path = filePath;
+
+      const res = await sb.from('tracks').insert(row);
+      if(res.error) throw res.error;
+      toast('Publié avec succès !');
+      loadTracks();
+      setView('dashboard');
+      return true;
+    } catch(ex){
+      toast(ex.message, 'error');
+      return false;
+    }
+  }
+
+  async function removeTrack(id){
+    if(!confirm('Supprimer ?')) return;
+    const res = await sb.from('tracks').delete().eq('id', id);
+    if(res.error){
+      toast(res.error.code === '23503' ? 'Impossible : ce produit a des ventes.' : res.error.message, 'error');
+      return;
+    }
+    toast('Supprimé.');
+    loadTracks();
+  }
+
+  function openBuy(item){
+    if(!session){ toast('Connecte-toi', 'error'); return; }
+    setBuyItem(item);
+  }
+
+  if(loading){
+    return <div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
+  }
+
+  if(!session){
+    return (
+      <React.Fragment>
+        <Toasts items={toasts} remove={function(id){ setToasts(function(p){ return p.filter(function(t){ return t.id !== id; }); }); }}/>
+        <AuthPage toast={toast}/>
+      </React.Fragment>
+    );
+  }
+
+  if(!profile){
+    return <div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
+  }
+
+  const myKeys = purchases.filter(function(p){ return p.license_type === 'vst' && p.vst_key; });
+  const pendingCount = adminOrders.filter(function(o){ return o.status === 'pending'; }).length
+    + withdrawals.filter(function(w){ return w.status === 'pending'; }).length;
+
+  return (
+    <div className="relative">
+      <Toasts items={toasts} remove={function(id){ setToasts(function(p){ return p.filter(function(t){ return t.id !== id; }); }); }}/>
+
+      <NavBar view={view} setView={setView} profile={profile} email={session.user.email} logout={logout} pending={pendingCount}/>
+      <MobileNav view={view} setView={setView} hasPlayer={!!current}/>
+
+      <div className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto">
+        {view !== 'home' ? (
+          <button onClick={function(){ setView('home'); }} className="mb-6 flex items-center gap-2 text-gray-400 text-sm font-bold"><Icon n="back" c="w-4 h-4"/>Retour</button>
+        ) : null}
+
+        {view === 'home' ? <HomeView setView={setView}/> : null}
+        {view === 'beats' ? <BeatsView tracks={tracks} play={play} playing={playing} current={current} buy={openBuy}/> : null}
+        {view === 'vsts' ? <VstsView tracks={tracks} myKeys={myKeys} buy={openBuy} setView={setView}/> : null}
+        {view === 'myorders' ? <MyOrdersView orders={myOrders} copy={copy}/> : null}
+        {view === 'keys' ? <KeysView purchases={purchases} copy={copy} download={downloadVst}/> : null}
+        {view === 'verify' ? <VerifyView myKeys={myKeys}/> : null}
+        {view === 'dashboard' ? <DashboardView profile={profile} email={session.user.email} tracks={tracks} setView={setView} withdraw={requestWithdrawal} remove={removeTrack}/> : null}
+        {view === 'upload' ? <UploadView profile={profile} upload={uploadTrack}/> : null}
+        {view === 'settings' ? <SettingsView profile={profile} save={saveProfile}/> : null}
+        {view === 'cgu' ? <div className="max-w-3xl mx-auto card p-8 rounded-3xl fade"><h2 className="text-3xl font-black text-goldAccent mb-6">CGU</h2><CguText/></div> : null}
+        {(view === 'admin' && profile.is_admin) ? <AdminView orders={adminOrders} withdrawals={withdrawals} validate={validateOrder} refuse={refuseOrder} payWd={payWithdrawal}/> : null}
+      </div>
+
+      {buyItem ? <BuyModal item={buyItem} close={function(){ setBuyItem(null); }} submit={submitOrder}/> : null}
+
+      {current ? (
+        <Player track={current} playing={playing} play={play} progress={progress} duration={duration} time={time}
+          seek={seek} volume={volume} muted={muted} setVolume={changeVolume} toggleMute={toggleMute} buy={openBuy}/>
+      ) : null}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Boundary><App/></Boundary>
+);
 </script>
 </body>
 </html>
