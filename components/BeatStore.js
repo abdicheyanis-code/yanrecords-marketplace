@@ -1,4 +1,4 @@
-function BeatStore({ beats, togglePlay, currentTrack, isPlaying }) {
+window.BeatStoreComponent = function({ beats, togglePlay, currentTrack, isPlaying, setSelectedLicenseTrack, setSelectedLicenseType, setPurchasedKey, t }) {
   return (
     <section className="animate-fade-in">
       <h3 className="text-3xl font-black mb-6 text-white border-l-4 border-goldAccent pl-4">BEATSTORE OFFICIEL</h3>
@@ -11,7 +11,7 @@ function BeatStore({ beats, togglePlay, currentTrack, isPlaying }) {
                   <img src={beat.cover} className="w-full h-full object-cover" />
                   {!beat.isSold && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100">
-                      <Icon name={currentTrack?.id === beat.id && isPlaying ? "pause" : "play"} className="w-5 h-5 text-white" />
+                      <Icon name={currentTrack?.id === beat.id && isPlaying ? "pause" : "play"} className="w-5 h-5 text-white fill-current" />
                     </div>
                   )}
                 </div>
@@ -24,12 +24,16 @@ function BeatStore({ beats, togglePlay, currentTrack, isPlaying }) {
                 </div>
               </div>
               <div className="hidden md:block col-span-2 text-sm text-gray-400">{beat.bpm} BPM • {beat.key}</div>
-              <div className="col-span-full md:col-span-5 flex justify-end items-center gap-3">
+              <div className="hidden md:block col-span-2 text-xs text-gray-500">{beat.plays || 0} écoutes</div>
+              <div className="col-span-full md:col-span-3 flex justify-end items-center gap-3">
                 {beat.isSold ? (
                   <span className="text-xs font-bold text-red-500 bg-red-950/40 border border-red-800/50 px-4 py-2 rounded-xl">EXCLUSIF VENDU</span>
                 ) : (
-                  <button onClick={() => alert("Achat Beat: " + beat.title)} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">
-                    Acheter ({beat.priceMp3.toLocaleString()} DZD)
+                  <button 
+                    onClick={() => { setSelectedLicenseTrack(beat); setSelectedLicenseType('mp3'); setPurchasedKey(null); }} 
+                    className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition"
+                  >
+                    {t('buyBeat')} ({beat.priceMp3.toLocaleString()} DZD)
                   </button>
                 )}
               </div>
@@ -39,4 +43,4 @@ function BeatStore({ beats, togglePlay, currentTrack, isPlaying }) {
       </div>
     </section>
   );
-}
+};
