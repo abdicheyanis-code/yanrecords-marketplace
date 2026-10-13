@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YANrecords | Premium VST & Beatstore 🇩🇿</title>
-    <!-- Tailwind & Scripts -->
+    <!-- Tailwind CSS, React 18, Babel -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel standalone pour lire le JSX en direct -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Icones Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Tailwind Config -->
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -31,7 +34,6 @@
         }
       }
     </script>
-
     <style>
       body { background-color: #050508; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
       .glass { background: rgba(19, 21, 32, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(34, 38, 56, 0.8); }
@@ -49,20 +51,27 @@
 </head>
 <body class="min-h-screen pb-32">
 
-    <!-- Fond Animé -->
+    <!-- FOND ANIMÉ LUXE -->
     <div class="bg-animated-mesh">
         <div class="mesh-blob bg-blue-900 w-[500px] h-[500px] top-[-10%] left-[-10%]"></div>
         <div class="mesh-blob bg-purple-900 w-[600px] h-[600px] bottom-[-20%] right-[-10%]"></div>
         <div class="mesh-blob bg-teal-900/30 w-[400px] h-[400px] top-[40%] left-[40%]"></div>
     </div>
 
+    <!-- Le conteneur où React va tout afficher -->
     <div id="root"></div>
 
-    <!-- Chargement des composants séparés (L'ordre est important) -->
-    <script type="text/babel" src="components/Icons.js"></script>
-    <script type="text/babel" src="components/Navbar.js"></script>
-    <script type="text/babel" src="components/Home.js"></script>
-    <script type="text/babel" src="app.js"></script>
+    <!-- ===== CHARGEMENT DES COMPOSANTS EXTERNES ===== -->
+    <!-- Important : Il faut rajouter data-type="module" pour Babel -->
+    <script type="text/babel" data-type="module" src="./components/Icons.js"></script>
+    <script type="text/babel" data-type="module" src="./components/Navbar.js"></script>
+    <script type="text/babel" data-type="module" src="./components/Home.js"></script>
+    <script type="text/babel" data-type="module" src="./components/VstStore.js"></script>
+    <script type="text/babel" data-type="module" src="./components/BeatStore.js"></script>
+    <script type="text/babel" data-type="module" src="./components/Dashboard.js"></script>
+    
+    <!-- L'application principale -->
+    <script type="text/babel" data-type="module" src="./app.js"></script>
 
 </body>
 </html>
