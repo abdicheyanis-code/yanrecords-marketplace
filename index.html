@@ -1,429 +1,607 @@
 <!DOCTYPE html>
 <html lang="fr" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YANrecords | Premium VST & Beatstore 🇩🇿</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config={darkMode:'class',theme:{extend:{colors:{obsidian:'#050508',cardDark:'#131520',borderDark:'#222638',cyanNeon:'#00f0ff',goldAccent:'#e2b053',pinkNeon:'#ff007f',greenPro:'#10b981'},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}
-    </script>
-    <style>
-      *{font-family:'Inter',system-ui,sans-serif;box-sizing:border-box}
-      body{background:#050508;color:#f8fafc;overflow-x:hidden;scroll-behavior:smooth}
-      .glass{background:rgba(19,21,32,.85);backdrop-filter:blur(20px);border:1px solid rgba(34,38,56,.8)}
-      .glass-card{background:linear-gradient(145deg,rgba(20,22,35,.9),rgba(10,11,18,.9));backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-      .text-gradient-gold{background:linear-gradient(135deg,#e2b053,#fff176,#e2b053);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:shimmer 4s linear infinite}
-      .text-gradient-cyan{background:linear-gradient(135deg,#00f0ff,#0080ff,#00f0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:shimmer 4s linear infinite}
-      @keyframes shimmer{to{background-position:200% center}}
-      .bg-animated-mesh{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;background:#050508}
-      .mesh-blob{position:absolute;filter:blur(120px);opacity:.3;border-radius:50%;animation:float 20s ease-in-out infinite}
-      .mesh-blob:nth-child(2){animation-delay:-7s;animation-duration:25s}
-      .mesh-blob:nth-child(3){animation-delay:-14s;animation-duration:30s}
-      @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-50px) scale(1.1)}66%{transform:translate(-20px,20px) scale(.9)}}
-      ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#050508}::-webkit-scrollbar-thumb{background:#222638;border-radius:4px}
-      .dropdown-anim{animation:dropIn .2s ease-out forwards;transform-origin:top right}
-      @keyframes dropIn{from{opacity:0;transform:scale(.95) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-      .fade-in{animation:fadeIn .4s ease-out forwards}
-      @keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-      .glow-cyan{box-shadow:0 0 25px rgba(0,240,255,.35)}
-      .glow-gold{box-shadow:0 0 25px rgba(226,176,83,.35)}
-      .loader{border:3px solid #222638;border-top:3px solid #00f0ff;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}
-      @keyframes spin{to{transform:rotate(360deg)}}
-      .toast-anim{animation:toastIn .3s ease-out forwards}
-      @keyframes toastIn{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}
-      input[type=range]{-webkit-appearance:none;background:transparent}
-      input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:14px;width:14px;border-radius:50%;background:#00f0ff;margin-top:-5px;cursor:pointer}
-      input[type=range]::-webkit-slider-runnable-track{width:100%;height:4px;background:#222638;border-radius:2px}
-      .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>YANrecords | Premium VST & Beatstore 🇩🇿</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script>tailwind.config={darkMode:'class',theme:{extend:{colors:{obsidian:'#050508',cardDark:'#131520',borderDark:'#222638',cyanNeon:'#00f0ff',goldAccent:'#e2b053',pinkNeon:'#ff007f',greenPro:'#10b981'},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+<style>
+*{font-family:'Inter',system-ui,sans-serif;box-sizing:border-box}body{background:#050508;color:#f8fafc;overflow-x:hidden;scroll-behavior:smooth}
+.glass{background:rgba(19,21,32,.85);backdrop-filter:blur(20px);border:1px solid rgba(34,38,56,.8)}
+.glass-card{background:linear-gradient(145deg,rgba(20,22,35,.9),rgba(10,11,18,.9));backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.text-gradient-gold{background:linear-gradient(135deg,#e2b053,#fff176,#e2b053);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:shimmer 4s linear infinite}
+.text-gradient-cyan{background:linear-gradient(135deg,#00f0ff,#0080ff,#00f0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:shimmer 4s linear infinite}
+@keyframes shimmer{to{background-position:200% center}}
+.bg-animated-mesh{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;background:#050508}
+.mesh-blob{position:absolute;filter:blur(120px);opacity:.3;border-radius:50%;animation:float 20s ease-in-out infinite}
+.mesh-blob:nth-child(2){animation-delay:-7s;animation-duration:25s}.mesh-blob:nth-child(3){animation-delay:-14s;animation-duration:30s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-50px) scale(1.1)}66%{transform:translate(-20px,20px) scale(.9)}}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#050508}::-webkit-scrollbar-thumb{background:#222638;border-radius:4px}
+.dropdown-anim{animation:dropIn .2s ease-out forwards;transform-origin:top right}
+@keyframes dropIn{from{opacity:0;transform:scale(.95) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.fade-in{animation:fadeIn .4s ease-out forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.glow-cyan{box-shadow:0 0 25px rgba(0,240,255,.35)}.glow-gold{box-shadow:0 0 25px rgba(226,176,83,.35)}
+.loader{border:3px solid #222638;border-top:3px solid #00f0ff;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast-anim{animation:toastIn .3s ease-out forwards}@keyframes toastIn{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}
+input[type=range]{-webkit-appearance:none;background:transparent}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:14px;width:14px;border-radius:50%;background:#00f0ff;margin-top:-5px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{width:100%;height:4px;background:#222638;border-radius:2px}.safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+</style>
 </head>
 <body class="min-h-screen pb-48 md:pb-32">
-    <div class="bg-animated-mesh">
-        <div class="mesh-blob bg-blue-900 w-[600px] h-[600px] top-[-10%] left-[-10%]"></div>
-        <div class="mesh-blob bg-purple-900 w-[700px] h-[700px] bottom-[-20%] right-[-10%]"></div>
-        <div class="mesh-blob bg-teal-900/30 w-[400px] h-[400px] top-[40%] left-[40%]"></div>
-    </div>
-    <div id="root"></div>
-
+<div class="bg-animated-mesh">
+<div class="mesh-blob bg-blue-900 w-[600px] h-[600px] top-[-10%] left-[-10%]"></div>
+<div class="mesh-blob bg-purple-900 w-[700px] h-[700px] bottom-[-20%] right-[-10%]"></div>
+<div class="mesh-blob bg-teal-900/30 w-[400px] h-[400px] top-[40%] left-[40%]"></div>
+</div>
+<div id="root"></div>
 <script type="text/babel">
-const SUPABASE_URL = 'https://ryhnnlphdeuxrvpxyfgc.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG5ubHBoZGV1eHJ2cHh5ZmdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc1MDIsImV4cCI6MjEwNzM5MzUwMn0.YqjmUuWJK38qjTCB9hCK_N20BFEpUUsOnt77_iDWMCA';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const DEFAULT_COVER = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80';
-const fmt = (n) => (Number(n)||0).toLocaleString();
+const SB='https://ryhnnlphdeuxrvpxyfgc.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG5ubHBoZGV1eHJ2cHh5ZmdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc1MDIsImV4cCI6MjEwNzM5MzUwMn0.YqjmUuWJK38qjTCB9hCK_N20BFEpUUsOnt77_iDWMCA';
+const sb=window.supabase.createClient(SB,SK);
+const DC='https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80';
+const fmt=n=>(Number(n)||0).toLocaleString();
 
-// Ton ID admin (le premier compte créé = admin)
-// On le détecte automatiquement : si tu es le vendeur du produit, tu es admin
-const ADMIN_EMAILS = ['admin@yanrecords.com']; // ← AJOUTE TON EMAIL ICI
+class ErrB extends React.Component{
+  constructor(p){super(p);this.state={e:false};}
+  static getDerivedStateFromError(){return{e:true};}
+  render(){if(this.state.e)return<div className="min-h-screen flex items-center justify-center"><div className="glass-card p-8 rounded-2xl text-center"><h2 className="text-2xl font-black text-white">Erreur</h2><p className="text-gray-400 mt-2">Recharge la page.</p><button onClick={()=>location.reload()} className="mt-4 bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Recharger</button></div></div>;return this.props.children;}
+}
 
-const Icon = ({name, className="w-5 h-5"}) => {
-  const d = {
-    play:<svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>,
-    pause:<svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>,
-    upload:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
-    logout:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>,
-    dashboard:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
-    arrowLeft:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
-    x:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
-    trash:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>,
-    dollar:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
-    activity:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
-    cpu:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg>,
-    shield:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>,
-    settings:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
-    chevronDown:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>,
-    check:<svg className={className} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>,
-    search:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-    mic:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>,
-    music:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
-    headphones:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>,
-    home:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-    volume:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
-    volumeMute:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>,
-    key:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>,
-    copy:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
-    download:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>,
-    clock:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-    image:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>,
-    list:<svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
-  };
-  return d[name]||null;
+const I=({name,c="w-5 h-5"})=>{
+const d={
+play:<svg className={c} fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>,
+pause:<svg className={c} fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>,
+upload:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
+logout:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>,
+dash:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
+back:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+x:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+trash:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>,
+dollar:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+act:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+cpu:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg>,
+shield:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>,
+set:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+chev:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>,
+check:<svg className={c} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>,
+search:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+mic:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>,
+music:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
+home:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+vol:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
+mute:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>,
+key:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>,
+copy:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
+dl:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>,
+list:<svg className={c} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+};
+return d[name]||null;
 };
 
 function Toasts({items,onRemove}){
-  return <div className="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-sm">
-    {items.map(t=>(
-      <div key={t.id} className="toast-anim glass-card rounded-xl p-4 flex items-center gap-3 border-l-4" style={{borderLeftColor:t.type==='error'?'#ef4444':t.type==='success'?'#10b981':'#00f0ff'}}>
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type==='error'?'bg-red-500/20 text-red-400':t.type==='success'?'bg-greenPro/20 text-greenPro':'bg-cyanNeon/20 text-cyanNeon'}`}>
-          <Icon name={t.type==='error'?'x':t.type==='success'?'check':'activity'} className="w-4 h-4"/>
-        </div>
-        <p className="text-sm font-bold text-white flex-1">{t.msg}</p>
-        <button onClick={()=>onRemove(t.id)} className="text-gray-500 hover:text-white"><Icon name="x" className="w-4 h-4"/></button>
-      </div>
-    ))}
-  </div>;
+return<div className="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-sm">{items.map(t=>
+<div key={t.id} className="toast-anim glass-card rounded-xl p-4 flex items-center gap-3 border-l-4" style={{borderLeftColor:t.type==='error'?'#ef4444':t.type==='success'?'#10b981':'#00f0ff'}}>
+<div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type==='error'?'bg-red-500/20 text-red-400':'bg-greenPro/20 text-greenPro'}`}><I name={t.type==='error'?'x':'check'} c="w-4 h-4"/></div>
+<p className="text-sm font-bold text-white flex-1">{t.msg}</p><button onClick={()=>onRemove(t.id)} className="text-gray-500 hover:text-white"><I name="x" c="w-4 h-4"/></button>
+</div>)}</div>;
 }
 
 function App(){
-  const [loading,setLoading]=React.useState(true);
-  const [session,setSession]=React.useState(null);
-  const [profile,setProfile]=React.useState(null);
-  const [tracks,setTracks]=React.useState([]);
-  const [toasts,setToasts]=React.useState([]);
-  const [view,_setView]=React.useState('home');
-  const [currentTrack,setCurrentTrack]=React.useState(null);
-  const [isPlaying,setIsPlaying]=React.useState(false);
-  const [selectedTrack,setSelectedTrack]=React.useState(null);
-  const [licenseType,setLicenseType]=React.useState('mp3');
-  const [showMenu,setShowMenu]=React.useState(false);
-  const [authMode,setAuthMode]=React.useState('login');
-  const [authEmail,setAuthEmail]=React.useState('');
-  const [authPass,setAuthPass]=React.useState('');
-  const [authName,setAuthName]=React.useState('');
-  const [authErr,setAuthErr]=React.useState('');
-  const [authLoad,setAuthLoad]=React.useState(false);
-  const [acceptCGU,setAcceptCGU]=React.useState(false);
-  const [showCGU,setShowCGU]=React.useState(false);
-  const [editName,setEditName]=React.useState('');
-  const [editRip,setEditRip]=React.useState('');
-  const [editAvatarFile,setEditAvatarFile]=React.useState(null);
-  const [editAvatarPreview,setEditAvatarPreview]=React.useState('');
-  const [saving,setSaving]=React.useState(false);
-  const [upTitle,setUpTitle]=React.useState('');
-  const [upType,setUpType]=React.useState('beat');
-  const [upGenre,setUpGenre]=React.useState('Drill');
-  const [upBpm,setUpBpm]=React.useState(140);
-  const [upKey,setUpKey]=React.useState('Am');
-  const [upMp3,setUpMp3]=React.useState(2000);
-  const [upWav,setUpWav]=React.useState(4000);
-  const [upStems,setUpStems]=React.useState(8000);
-  const [upExcl,setUpExcl]=React.useState(25000);
-  const [upDesc,setUpDesc]=React.useState('');
-  const [upCover,setUpCover]=React.useState(null);
-  const [upAudio,setUpAudio]=React.useState(null);
-  const [upLoad,setUpLoad]=React.useState(false);
-  const [search,setSearch]=React.useState('');
-  const [filterGenre,setFilterGenre]=React.useState('Tous');
-  const [audioProgress,setAudioProgress]=React.useState(0);
-  const [audioDuration,setAudioDuration]=React.useState(0);
-  const [audioCurrentTime,setAudioCurrentTime]=React.useState(0);
-  const [volume,setVolume]=React.useState(1);
-  const [isMuted,setIsMuted]=React.useState(false);
-  const [myPurchases,setMyPurchases]=React.useState([]);
-  const [adminOrders,setAdminOrders]=React.useState([]);
-  const [verifyKey,setVerifyKey]=React.useState('');
-  const [verifyResult,setVerifyResult]=React.useState(null);
-  const [verifyLoad,setVerifyLoad]=React.useState(false);
-  const [orderProof,setOrderProof]=React.useState(null);
-  const [orderLoading,setOrderLoading]=React.useState(false);
-  const [showPayModal,setShowPayModal]=React.useState(false);
-  const [pendingItem,setPendingItem]=React.useState(null);
+const[loading,setLoading]=React.useState(true);
+const[sess,setSess]=React.useState(null);
+const[prof,setProf]=React.useState(null);
+const[tracks,setTracks]=React.useState([]);
+const[toasts,setToasts]=React.useState([]);
+const[view,_setView]=React.useState('home');
+const[cur,setCur]=React.useState(null);
+const[playing,setPlaying]=React.useState(false);
+const[sel,setSel]=React.useState(null);
+const[lic,setLic]=React.useState('mp3');
+const[menu,setMenu]=React.useState(false);
+const[aMode,setAMode]=React.useState('login');
+const[aEmail,setAEmail]=React.useState('');
+const[aPass,setAPass]=React.useState('');
+const[aName,setAName]=React.useState('');
+const[aErr,setAErr]=React.useState('');
+const[aLoad,setALoad]=React.useState(false);
+const[cgu,setCGU]=React.useState(false);
+const[showCGU,setShowCGU]=React.useState(false);
+const[eName,setEName]=React.useState('');
+const[eRip,setERip]=React.useState('');
+const[eAv,setEAv]=React.useState(null);
+const[eAvP,setEAvP]=React.useState('');
+const[saving,setSaving]=React.useState(false);
+const[uTitle,setUTitle]=React.useState('');
+const[uType,setUType]=React.useState('beat');
+const[uGenre,setUGenre]=React.useState('Drill');
+const[uBpm,setUBpm]=React.useState(140);
+const[uKey,setUKey]=React.useState('Am');
+const[uMp3,setUMp3]=React.useState(2000);
+const[uWav,setUWav]=React.useState(4000);
+const[uStems,setUStems]=React.useState(8000);
+const[uExcl,setUExcl]=React.useState(25000);
+const[uDesc,setUDesc]=React.useState('');
+const[uCover,setUCover]=React.useState(null);
+const[uAudio,setUAudio]=React.useState(null);
+const[uLoad,setULoad]=React.useState(false);
+const[search,setSearch]=React.useState('');
+const[filterG,setFilterG]=React.useState('Tous');
+const[aProg,setAProg]=React.useState(0);
+const[aDur,setADur]=React.useState(0);
+const[aTime,setATime]=React.useState(0);
+const[vol,setVol]=React.useState(1);
+const[muted,setMuted]=React.useState(false);
+const[purch,setPurch]=React.useState([]);
+const[orders,setOrders]=React.useState([]);
+const[vKey,setVKey]=React.useState('');
+const[vResult,setVResult]=React.useState(null);
+const[vLoad,setVLoad]=React.useState(false);
+const[proof,setProof]=React.useState(null);
+const[oLoad,setOLoad]=React.useState(false);
+const[sellerInfo,setSellerInfo]=React.useState(null);
+const[vMachine,setVMachine]=React.useState(()=>('PC-'+Math.random().toString(36).substring(2,8).toUpperCase()));
 
-  const audioRef=React.useRef(new Audio());
-  const GENRES=['Tous','Drill','Trap','Jul Type','Afrobeat','Boom Bap','Raï','Pop','RnB'];
+const aRef=React.useRef(new Audio());
+const GEN=['Tous','Drill','Trap','Jul Type','Afrobeat','Boom Bap','Raï','Pop','RnB'];
 
-  const setView=(v)=>{_setView(v);setShowMenu(false);window.scrollTo({top:0,behavior:'smooth'});};
-  const toast=(msg,type='success')=>{const id=Date.now()+Math.random();setToasts(p=>[...p,{id,msg,type}]);setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),4000);};
-  const copyText=async(txt)=>{try{await navigator.clipboard.writeText(txt);toast("Copié ! 📋");}catch(e){toast("Sélectionne et copie manuellement","error");}};
-  const getPrice=(item,lic)=>{if(!item)return 0;if(item.type==='vst')return item.price_mp3||0;const m={mp3:item.price_mp3,wav:item.price_wav,stems:item.price_stems,exclusive:item.price_exclusive};return m[lic]??item.price_mp3??0;};
-  const getRate=(item)=>item?.type==='vst'?8:5;
-  const isAdmin=()=>session&&profile&&(ADMIN_EMAILS.includes(session.user.email)||session.user.email==='admin@yanrecords.com');
+const setView=v=>{_setView(v);setMenu(false);window.scrollTo({top:0,behavior:'smooth'});};
+const toast=(msg,type='success')=>{const id=Date.now()+Math.random();setToasts(p=>[...p,{id,msg,type}]);setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),4000);};
+const copyT=async t=>{try{await navigator.clipboard.writeText(t);toast("Copié !");}catch(e){toast("Copie manuelle","error");}};
+const getPr=(item,l)=>{if(!item)return 0;if(item.type==='vst')return item.price_mp3||0;const m={mp3:item.price_mp3,wav:item.price_wav,stems:item.price_stems,exclusive:item.price_exclusive};return m[l]??item.price_mp3??0;};
+const getRate=item=>item?.type==='vst'?8:5;
+const fmtTime=s=>{if(!s||!isFinite(s))return'0:00';return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;};
 
-  React.useEffect(()=>{
-    sb.auth.getSession().then(({data:{session:s}})=>{
-      setSession(s);
-      if(s){loadProfile(s.user.id);loadMyPurchases(s.user.id);loadAdminOrders(s.user.id);}
-      loadTracks();setLoading(false);
-    });
-    const{data:{subscription}}=sb.auth.onAuthStateChange((ev,s)=>{
-      setSession(s);
-      if(s){loadProfile(s.user.id);loadMyPurchases(s.user.id);loadAdminOrders(s.user.id);}
-      else{setProfile(null);setMyPurchases([]);setAdminOrders([]);}
-    });
-    const audio=audioRef.current;
-    const onEnd=()=>{setIsPlaying(false);setAudioProgress(0);};
-    const onTime=()=>{setAudioCurrentTime(audio.currentTime);setAudioProgress((audio.currentTime/audio.duration)*100||0);};
-    const onMeta=()=>setAudioDuration(audio.duration);
-    const onErr=()=>{if(audio.src){setIsPlaying(false);}};
-    audio.addEventListener('ended',onEnd);audio.addEventListener('timeupdate',onTime);audio.addEventListener('loadedmetadata',onMeta);audio.addEventListener('error',onErr);
-    return()=>{subscription.unsubscribe();audio.removeEventListener('ended',onEnd);audio.removeEventListener('timeupdate',onTime);audio.removeEventListener('loadedmetadata',onMeta);audio.removeEventListener('error',onErr);};
-  },[]);
+React.useEffect(()=>{
+sb.auth.getSession().then(({data:{session:s}})=>{setSess(s);if(s){loadProf(s.user.id);loadPurch(s.user.id);}loadTracks();setLoading(false);});
+const{data:{subscription}}=sb.auth.onAuthStateChange((ev,s)=>{setSess(s);if(s){loadProf(s.user.id);loadPurch(s.user.id);}else{setProf(null);setPurch([]);setOrders([]);}});
+const a=aRef.current;
+a.addEventListener('ended',()=>{setPlaying(false);setAProg(0);});
+a.addEventListener('timeupdate',()=>{setATime(a.currentTime);setAProg((a.currentTime/a.duration)*100||0);});
+a.addEventListener('loadedmetadata',()=>setADur(a.duration));
+return()=>{subscription.unsubscribe();};
+},[]);
 
-  const loadTracks=async()=>{const{data}=await sb.from('tracks').select('*').order('created_at',{ascending:false});if(data)setTracks(data);};
-  const loadProfile=async(uid)=>{const{data}=await sb.from('profiles').select('*').eq('id',uid).single();if(data){setProfile(data);setEditName(data.name);setEditRip(data.rip||'');setEditAvatarPreview(data.avatar_url);}else setTimeout(()=>loadProfile(uid),1500);};
-  const loadMyPurchases=async(uid)=>{
-    if(!uid)return;
-    const{data:sales}=await sb.from('sales').select('*').eq('buyer_id',uid).order('created_at',{ascending:false});
-    if(!sales)return;
-    const ids=[...new Set(sales.map(s=>s.track_id).filter(Boolean))];
-    const map={};
-    if(ids.length){const{data:tr}=await sb.from('tracks').select('id,title,cover_url,type,file_path,producer_name').in('id',ids);(tr||[]).forEach(t=>{map[t.id]=t;});}
-    setMyPurchases(sales.map(s=>({...s,track:map[s.track_id]||null})));
-  };
-  const loadAdminOrders=async(uid)=>{
-    if(!uid)return;
-    const{data}=await sb.from('orders').select('*,buyer:profiles!orders_buyer_id_fkey(name,avatar_url)').order('created_at',{ascending:false});
-    if(data)setAdminOrders(data);
-  };
+React.useEffect(()=>{if(sess&&prof?.is_admin)loadOrders();},[sess,prof?.is_admin]);
+React.useEffect(()=>{if(sel?.producer_id){sb.from('profiles').select('name,rip').eq('id',sel.producer_id).single().then(({data})=>setSellerInfo(data));}else setSellerInfo(null);},[sel?.producer_id]);
 
-  const handleAuth=async(e)=>{
-    e.preventDefault();setAuthErr('');
-    if(authMode==='register'&&!acceptCGU){setAuthErr("Acceptez les CGU.");return;}
-    setAuthLoad(true);
-    try{
-      if(authMode==='login'){const{error}=await sb.auth.signInWithPassword({email:authEmail,password:authPass});if(error)throw error;toast("Connecté ! 🎵");}
-      else{const{data,error}=await sb.auth.signUp({email:authEmail,password:authPass,options:{data:{full_name:authName||authEmail.split('@')[0]}}});if(error)throw error;if(data.user&&!data.session)toast("Vérifie ton email !","info");else toast("Compte créé ! 🎵");}
-    }catch(err){setAuthErr(err.message);}
-    setAuthLoad(false);
-  };
-  const handleGoogle=async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});if(error)toast(error.message,'error');};
-  const handleLogout=async()=>{audioRef.current.pause();setIsPlaying(false);await sb.auth.signOut();setView('home');toast("Déconnecté.");};
+const loadTracks=async()=>{const{d}=await sb.from('tracks').select('*').order('created_at',{ascending:false});if(d)setTracks(d);};
+const loadProf=async(uid)=>{const{d}=await sb.from('profiles').select('*').eq('id',uid).single();if(d){setProf(d);setEName(d.name);setERip(d.rip||'');setEAvP(d.avatar_url);}else setTimeout(()=>loadProf(uid),1500);};
+const loadPurch=async(uid)=>{if(!uid)return;const{d:sl}=await sb.from('sales').select('*').eq('buyer_id',uid).order('created_at',{ascending:false});if(!sl)return;const ids=[...new Set(sl.map(s=>s.track_id).filter(Boolean))];const map={};if(ids.length){const{d:tr}=await sb.from('tracks').select('id,title,cover_url,type,file_path,producer_name').in('id',ids);(tr||[]).forEach(t=>{map[t.id]=t;});}setPurch(sl.map(s=>({...s,track:map[s.track_id]||null})));};
+const loadOrders=async()=>{const{d}=await sb.from('orders').select('*').order('created_at',{ascending:false});if(d){const bids=[...new Set(d.map(o=>o.buyer_id))];const bm={};if(bids.length){const{d:ps}=await sb.from('profiles').select('id,name').in('id',bids);(ps||[]).forEach(p=>{bm[p.id]=p.name;});}setOrders(d.map(o=>({...o,buyer_name:bm[o.buyer_id]||'Client'})));}};
 
-  const handleSaveProfile=async(e)=>{
-    e.preventDefault();setSaving(true);
-    try{
-      let avatarUrl=profile.avatar_url;
-      if(editAvatarFile){const n=`${profile.id}-${Date.now()}.${editAvatarFile.name.split('.').pop()}`;const{error}=await sb.storage.from('avatars').upload(n,editAvatarFile,{upsert:true});if(error)throw error;avatarUrl=sb.storage.from('avatars').getPublicUrl(n).data.publicUrl;}
-      const{data,error}=await sb.from('profiles').update({name:editName,rip:editRip,avatar_url:avatarUrl}).eq('id',profile.id).select().single();
-      if(error)throw error;setProfile(data);setEditAvatarPreview(data.avatar_url);setEditAvatarFile(null);toast("Profil sauvegardé ! ✅");setView('dashboard');
-    }catch(err){toast(err.message,'error');}
-    setSaving(false);
-  };
+const handleAuth=async(e)=>{
+e.preventDefault();setAErr('');
+if(aMode==='register'&&!cgu){setAErr("Acceptez les CGU.");return;}
+setALoad(true);
+try{
+if(aMode==='login'){const{error}=await sb.auth.signInWithPassword({email:aEmail,password:aPass});if(error)throw error;toast("Connecté !");}
+else{const{d,error}=await sb.auth.signUp({email:aEmail,password:aPass,options:{data:{full_name:aName||aEmail.split('@')[0]}}});if(error)throw error;if(d.user&&!d.session)toast("Vérifie ton email !","info");else toast("Compte créé !");}
+}catch(err){setAErr(err.message);}
+setALoad(false);
+};
+const handleGoogle=async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});if(error)toast(error.message,'error');};
+const handleLogout=async()=>{aRef.current.pause();setPlaying(false);await sb.auth.signOut();setView('home');toast("Déconnecté.");};
+const handleSave=async(e)=>{
+e.preventDefault();setSaving(true);
+try{
+let au=prof.avatar_url;
+if(eAv){const n=`${prof.id}-${Date.now()}.${eAv.name.split('.').pop()}`;const{error}=await sb.storage.from('avatars').upload(n,eAv,{upsert:true});if(error)throw error;au=sb.storage.from('avatars').getPublicUrl(n).data.publicUrl;}
+const{d,error}=await sb.from('profiles').update({name:eName,rip:eRip,avatar_url:au}).eq('id',prof.id).select().single();
+if(error)throw error;setProf(d);setEAvP(d.avatar_url);setEAv(null);toast("Sauvegardé !");setView('dashboard');
+}catch(err){toast(err.message,'error');}
+setSaving(false);
+};
 
-  const togglePlay=async(track)=>{
-    if(!track.audio_url){toast("Pas d'audio","error");return;}
-    if(currentTrack?.id===track.id){if(isPlaying){audioRef.current.pause();setIsPlaying(false);}else{audioRef.current.play().catch(()=>{});setIsPlaying(true);}}
-    else{setCurrentTrack(track);audioRef.current.src=track.audio_url;audioRef.current.volume=isMuted?0:volume;audioRef.current.play().catch(()=>{});setIsPlaying(true);await sb.rpc('increment_plays',{track_id:track.id});}
-  };
-  const handleSeek=(e)=>{audioRef.current.currentTime=(e.target.value/100)*audioDuration;setAudioProgress(e.target.value);};
-  const handleVolumeChange=(e)=>{const v=parseFloat(e.target.value);setVolume(v);audioRef.current.volume=v;setIsMuted(v===0);};
-  const toggleMute=()=>{if(isMuted){audioRef.current.volume=volume||0.5;setIsMuted(false);}else{audioRef.current.volume=0;setIsMuted(true);}};
-  const formatTime=(s)=>{if(!s||!isFinite(s))return"0:00";return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;};
+const togglePlay=async(t)=>{
+if(!t.audio_url){toast("Pas d'audio","error");return;}
+if(cur?.id===t.id){if(playing){aRef.current.pause();setPlaying(false);}else{aRef.current.play().catch(()=>{});setPlaying(true);}}
+else{setCur(t);aRef.current.src=t.audio_url;aRef.current.volume=muted?0:vol;aRef.current.play().catch(()=>{});setPlaying(true);await sb.rpc('increment_plays',{track_id:t.id});}
+};
+const seek=e=>{aRef.current.currentTime=(e.target.value/100)*aDur;setAProg(e.target.value);};
+const volCh=e=>{const v=parseFloat(e.target.value);setVol(v);aRef.current.volume=v;setMuted(v===0);};
+const toggleMute=()=>{if(muted){aRef.current.volume=vol||0.5;setMuted(false);}else{aRef.current.volume=0;setMuted(true);}};
 
-  // ===== ACHAT : ouvre le modal de paiement =====
-  const openPayModal=(item)=>{
-    if(!session){toast("Connecte-toi d'abord !","error");return;}
-    setPendingItem(item);setOrderProof(null);setShowPayModal(true);
-  };
+const submitOrder=async()=>{
+if(!sel||!sess||!proof){toast("Ajoute la capture d'écran du paiement !","error");return;}
+setOLoad(true);
+try{
+const item=sel,l=item.type==='vst'?'vst':lic,amt=getPr(item,l),rate=getRate(item),sAmt=Math.floor(amt*(1-rate/100)),fee=amt-sAmt;
+let pu='';const pn=`${sess.user.id}-${Date.now()}-proof.${proof.name.split('.').pop()}`;
+const{error:pe}=await sb.storage.from('covers').upload(pn,proof);
+if(!pe)pu=sb.storage.from('covers').getPublicUrl(pn).data.publicUrl;
+const{error:oe}=await sb.from('orders').insert({buyer_id:sess.user.id,seller_id:item.producer_id,track_id:item.id,product_type:item.type,license_type:l,amount:amt,seller_amount:sAmt,platform_fee:fee,rate_percent:rate,proof_url:pu});
+if(oe)throw oe;
+toast("Commande envoyée ! L'admin validera sous 24h.");
+setSel(null);setProof(null);setSellerInfo(null);
+if(prof?.is_admin)loadOrders();
+}catch(err){toast(err.message,'error');}
+setOLoad(false);
+};
 
-  // ===== SOUMETTRE LA COMMANDE AVEC CAPTURE =====
-  const submitOrder=async()=>{
-    if(!pendingItem||!session)return;
-    if(!orderProof){toast("Ajoute la capture d'écran du paiement !","error");return;}
-    setOrderLoading(true);
-    try{
-      const item=pendingItem;
-      const lic=item.type==='vst'?'vst':licenseType;
-      const amount=getPrice(item,lic);
-      const rate=getRate(item);
-      const sellerAmt=Math.floor(amount*(1-rate/100));
-      const fee=amount-sellerAmt;
+const valOrder=async(id)=>{
+if(!confirm("Confirmer le paiement ?"))return;
+const{data,error}=await sb.rpc('validate_order',{p_order_id:id,p_admin_id:sess.user.id});
+if(error){toast(error.message,'error');return;}
+if(data.ok){toast(data.type==='vst'?`✅ Livrée ! Clé : ${data.key}`:'✅ Livrée !');loadOrders();loadTracks();loadPurch(sess.user.id);}
+};
+const refOrder=async(id)=>{
+const r=prompt("Raison du refus :");if(r===null)return;
+await sb.rpc('refuse_order',{p_order_id:id,p_reason:r||'Non vérifié'});toast("Refusée.");loadOrders();
+};
 
-      // Upload de la capture
-      let proofUrl='';
-      const pn=`${session.user.id}-${Date.now()}-proof.${orderProof.name.split('.').pop()}`;
-      const{error:pe}=await sb.storage.from('covers').upload(pn,orderProof);
-      if(!pe)proofUrl=sb.storage.from('covers').getPublicUrl(pn).data.publicUrl;
+const dlVst=async(p)=>{const path=p.track?.file_path;if(!path){toast("Fichier indisponible","error");return;}const{data,error}=await sb.storage.from('vst-files').createSignedUrl(path,120,{download:true});if(error){toast(error.message,'error');return;}window.open(data.signedUrl,'_blank');};
 
-      // Création de la commande
-      const{error:oe}=await sb.from('orders').insert({
-        buyer_id:session.user.id,seller_id:item.producer_id,track_id:item.id,
-        product_type:item.type,license_type:lic,amount,seller_amount:sellerAmt,
-        platform_fee:fee,rate_percent:rate,proof_url:proofUrl
-      });
-      if(oe)throw oe;
-      toast("Commande envoyée ! ⏳ L'admin vérifiera ton paiement et livrera ta commande sous 24h.","success");
-      setShowPayModal(false);setSelectedTrack(null);setPendingItem(null);
-      loadAdminOrders(session.user.id);
-    }catch(err){toast(err.message,'error');}
-    setOrderLoading(false);
-  };
+const doVerify=async(e)=>{
+e.preventDefault();if(!vKey.trim())return;
+setVLoad(true);setVResult(null);
+const{data,error}=await sb.rpc('verify_vst_key',{p_key:vKey.trim().toUpperCase(),p_machine_id:vMachine.trim()||null});
+if(error)setVResult({valid:false,reason:error.message});else setVResult(data);
+setVLoad(false);
+};
 
-  // ===== ADMIN : VALIDER UNE COMMANDE =====
-  const validateOrder=async(orderId)=>{
-    if(!confirm("Confirmer que le paiement est bien reçu ?"))return;
-    const{data,error}=await sb.rpc('validate_order',{p_order_id:orderId,p_admin_id:session.user.id});
-    if(error){toast(error.message,'error');return;}
-    if(data.ok){
-      toast(data.type==='vst'?`✅ Commande livrée ! Clé : ${data.key}`:"✅ Commande livrée !");
-      loadAdminOrders(session.user.id);loadTracks();loadMyPurchases(session.user.id);
-    }else{toast(data.msg||'Erreur','error');}
-  };
+const handleUpload=async(e)=>{
+e.preventDefault();if(!sess||!prof){toast("Connecte-toi !","error");return;}
+if(!uTitle.trim()||uTitle.length>100){toast("Titre invalide","error");return;}
+if(uType==='vst'&&!uAudio){toast("Ajoute le fichier du plugin","error");return;}
+if(uAudio&&uAudio.size>50*1024*1024){toast("Trop lourd (50MB max)","error");return;}
+setULoad(true);
+try{
+let cu=DC,au='',fp=null;
+if(uCover){const n=`${prof.id}-${Date.now()}-cover.${uCover.name.split('.').pop()}`;const{error}=await sb.storage.from('covers').upload(n,uCover);if(!error)cu=sb.storage.from('covers').getPublicUrl(n).data.publicUrl;}
+if(uAudio){
+const safe=uAudio.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+if(uType==='vst'){const path=`${prof.id}/${Date.now()}-${safe}`;const{error}=await sb.storage.from('vst-files').upload(path,uAudio);if(error)throw new Error("Upload échoué : "+error.message);fp=path;}
+else{const n=`${prof.id}-${Date.now()}-audio.${uAudio.name.split('.').pop()}`;const{error}=await sb.storage.from('audio').upload(n,uAudio);if(error)throw new Error("Upload échoué");au=sb.storage.from('audio').getPublicUrl(n).data.publicUrl;}
+}
+const row={title:uTitle.trim(),type:uType,genre:uGenre,bpm:parseInt(uBpm),key:uKey,producer_id:prof.id,producer_name:prof.name,cover_url:cu,audio_url:au,price_mp3:parseInt(uMp3),price_wav:parseInt(uWav),price_stems:parseInt(uStems),price_exclusive:parseInt(uExcl),description:uDesc.trim()||(uType==='vst'?'Plugin VST':'Beat '+uGenre)};
+if(fp)row.file_path=fp;
+const{error}=await sb.from('tracks').insert(row);if(error)throw error;
+toast("Publié !");setUTitle('');setUDesc('');setUCover(null);setUAudio(null);loadTracks();setView('dashboard');
+}catch(err){toast(err.message,'error');}
+setULoad(false);
+};
+const handleDelete=async(id)=>{
+if(!confirm("Supprimer ?"))return;
+const{error}=await sb.from('tracks').delete().eq('id',id);
+if(error){toast(error.code==='23503'?'Impossible : ce produit a des ventes.':'Erreur.','error');return;}
+toast("Supprimé.");loadTracks();
+};
 
-  // ===== ADMIN : REFUSER UNE COMMANDE =====
-  const refuseOrder=async(orderId)=>{
-    const reason=prompt("Raison du refus :");
-    if(reason===null)return;
-    await sb.rpc('refuse_order',{p_order_id:orderId,p_reason:reason||'Paiement non vérifié'});
-    toast("Commande refusée.");loadAdminOrders(session.user.id);
-  };
+const fBeats=tracks.filter(t=>{if(t.type!=='beat')return false;if(search){const q=search.toLowerCase();if(!(t.title||'').toLowerCase().includes(q)&&!(t.producer_name||'').toLowerCase().includes(q)&&!(t.genre||'').toLowerCase().includes(q))return false;}if(filterG!=='Tous'&&t.genre!==filterG)return false;return true;});
+const vstL=tracks.filter(t=>t.type==='vst');
+const myT=prof?tracks.filter(t=>t.producer_id===prof.id):[];
+const pendO=orders.filter(o=>o.status==='pending');
+const myVKeys=purch.filter(p=>p.license_type==='vst'&&p.vst_key);
 
-  const downloadVst=async(p)=>{
-    const path=p.track?.file_path;if(!path){toast("Fichier indisponible","error");return;}
-    const{data,error}=await sb.storage.from('vst-files').createSignedUrl(path,120,{download:true});
-    if(error){toast(error.message,'error');return;}
-    window.open(data.signedUrl,'_blank');
-  };
+if(loading)return<div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
 
-  const handleVerify=async(e)=>{
-    e.preventDefault();if(!verifyKey.trim())return;
-    setVerifyLoad(true);setVerifyResult(null);
-    const{data,error}=await sb.rpc('verify_vst_key',{p_key:verifyKey.trim().toUpperCase(),p_machine_id:'PC-TEST'});
-    if(error)setVerifyResult({valid:false,reason:error.message});else setVerifyResult(data);
-    setVerifyLoad(false);
-  };
+// ===== AUTH =====
+if(!sess){
+return(
+<div className="min-h-screen flex items-center justify-center p-4 relative">
+<Toasts items={toasts} onRemove={id=>setToasts(p=>p.filter(t=>t.id!==id))}/>
+<div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80')] bg-cover bg-center"></div>
+<div className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"></div>
+<div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in">
+<div className="text-center lg:text-left space-y-6">
+<div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent glow-gold">Y</div>
+<h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="text-gradient-gold">YANRECORDS</span></h1>
+<p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie. Beats, plugins VST et licences.</p>
+<div className="hidden lg:flex flex-col gap-4 mt-8">
+<div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-greenPro/20 text-greenPro"><I name="check" c="w-4 h-4"/></div>Vendez et achetez des instrumentales</div>
+<div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-cyanNeon/20 text-cyanNeon"><I name="check" c="w-4 h-4"/></div>Plugins VST avec clés uniques</div>
+<div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-pinkNeon/20 text-pinkNeon"><I name="check" c="w-4 h-4"/></div>Paiement BaridiMob, CCP & Edahabia</div>
+</div></div>
+<div className="glass-card p-8 rounded-[2rem] border-cyanNeon/20 shadow-2xl">
+<div className="flex bg-obsidian rounded-xl p-1 mb-8 border border-borderDark">
+<button onClick={()=>{setAMode('login');setAErr('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition ${aMode==='login'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white'}`}>Se connecter</button>
+<button onClick={()=>{setAMode('register');setAErr('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition ${aMode==='register'?'bg-goldAccent text-black':'text-gray-400 hover:text-white'}`}>Créer un compte</button></div>
+<form onSubmit={handleAuth} className="space-y-4">
+{aMode==='register'&&<div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label><input type="text" required maxLength="50" value={aName} onChange={e=>setAName(e.target.value)} placeholder="DJ Yanis" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>}
+<div><label className="text-xs font-bold text-gray-400 block mb-1">Email</label><input type="email" required value={aEmail} onChange={e=>setAEmail(e.target.value)} placeholder="contact@studio.com" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>
+<div><label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label><input type="password" required minLength="6" value={aPass} onChange={e=>setAPass(e.target.value)} placeholder="••••••••" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>
+{aMode==='register'&&<div className="flex items-start gap-3"><input type="checkbox" checked={cgu} onChange={e=>setCGU(e.target.checked)} className="mt-1 accent-goldAccent"/><label className="text-xs text-gray-400">J'accepte les <span onClick={()=>setShowCGU(true)} className="text-goldAccent cursor-pointer hover:underline font-bold">CGU</span>.</label></div>}
+{aErr&&<div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{aErr}</div>}
+<button type="submit" disabled={aLoad} className={`w-full font-black py-3.5 rounded-xl mt-4 transition disabled:opacity-50 ${aMode==='login'?'bg-cyanNeon text-black glow-cyan':'bg-goldAccent text-black glow-gold'}`}>{aLoad?'....':aMode==='login'?'CONNEXION':"S'INSCRIRE"}</button>
+</form>
+<div className="flex items-center gap-4 my-6"><div className="h-px bg-borderDark flex-1"/><span className="text-xs font-bold text-gray-500">OU</span><div className="h-px bg-borderDark flex-1"/></div>
+<button onClick={handleGoogle} className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-200 transition">
+<svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+Continuer avec Google</button></div></div>
+{showCGU&&<div className="fixed inset-0 z-[150] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"><div className="glass-card rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] flex flex-col"><h3 className="text-2xl font-black text-goldAccent mb-4">CGU YANrecords</h3><div className="flex-1 overflow-y-auto pr-4 space-y-4 text-sm text-gray-300"><p><strong>1.</strong> Marketplace pour beats et VSTs.</p><p><strong>2.</strong> Vous devez être l'auteur de vos uploads.</p><p><strong>3.</strong> Licence Exclusive = beat retiré du catalogue.</p><p><strong>4.</strong> Commission : 5% beats, 8% VST.</p><p><strong>5.</strong> Chaque clé VST est unique, 3 machines max.</p><p><strong>6.</strong> Paiement BaridiMob/CCP avec preuve à valider.</p></div><button onClick={()=>{setCGU(true);setShowCGU(false);}} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl mt-6">J'ACCEPTE</button></div></div>}
+</div>);
+}
 
-  const handleUpload=async(e)=>{
-    e.preventDefault();
-    if(!session||!profile){toast("Connecte-toi !","error");return;}
-    if(!upTitle.trim()||upTitle.length>100){toast("Titre invalide","error");return;}
-    if(upType==='vst'&&!upAudio){toast("Ajoute le fichier du plugin","error");return;}
-    if(upAudio&&upAudio.size>50*1024*1024){toast("Fichier trop lourd (max 50MB)","error");return;}
-    setUpLoad(true);
-    try{
-      let coverUrl=DEFAULT_COVER,audioUrl='',filePath=null;
-      if(upCover){const n=`${profile.id}-${Date.now()}-cover.${upCover.name.split('.').pop()}`;const{error}=await sb.storage.from('covers').upload(n,upCover);if(!error)coverUrl=sb.storage.from('covers').getPublicUrl(n).data.publicUrl;}
-      if(upAudio){
-        const safe=upAudio.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-        if(upType==='vst'){const path=`${profile.id}/${Date.now()}-${safe}`;const{error}=await sb.storage.from('vst-files').upload(path,upAudio);if(error)throw new Error("Upload échoué : "+error.message);filePath=path;}
-        else{const n=`${profile.id}-${Date.now()}-audio.${upAudio.name.split('.').pop()}`;const{error}=await sb.storage.from('audio').upload(n,upAudio);if(error)throw new Error("Upload échoué");audioUrl=sb.storage.from('audio').getPublicUrl(n).data.publicUrl;}
-      }
-      const row={title:upTitle.trim(),type:upType,genre:upGenre,bpm:parseInt(upBpm),key:upKey,producer_id:profile.id,producer_name:profile.name,cover_url:coverUrl,audio_url:audioUrl,price_mp3:parseInt(upMp3),price_wav:parseInt(upWav),price_stems:parseInt(upStems),price_exclusive:parseInt(upExcl),description:upDesc.trim()||(upType==='vst'?'Plugin VST':'Beat '+upGenre)};
-      if(filePath)row.file_path=filePath;
-      const{error}=await sb.from('tracks').insert(row);if(error)throw error;
-      toast("Publié avec succès ! 🎵");setUpTitle('');setUpDesc('');setUpCover(null);setUpAudio(null);loadTracks();setView('dashboard');
-    }catch(err){toast(err.message,'error');}
-    setUpLoad(false);
-  };
+// ===== MAIN =====
+return(
+<div className="relative">
+<Toasts items={toasts} onRemove={id=>setToasts(p=>p.filter(t=>t.id!==id))}/>
+{menu&&<div className="fixed inset-0 z-40" onClick={()=>setMenu(false)}/>}
 
-  const handleDelete=async(id)=>{if(!confirm("Supprimer ?"))return;await sb.from('tracks').delete().eq('id',id);toast("Supprimé.");loadTracks();};
+<nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between">
+<div className="flex items-center gap-3 cursor-pointer" onClick={()=>setView('home')}>
+<div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent glow-gold">Y</div>
+<h1 className="text-xl font-black tracking-widest text-white hidden sm:block">YAN<span className="text-gradient-gold">RECORDS</span></h1></div>
+<div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
+<button onClick={()=>setView('home')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='home'?'bg-white text-black':'text-gray-400 hover:text-white'}`}>Accueil</button>
+<button onClick={()=>setView('vsts')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='vsts'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white'}`}>VSTs</button>
+<button onClick={()=>setView('beats')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='beats'?'bg-goldAccent text-black':'text-gray-400 hover:text-white'}`}>Beats</button></div>
+<div className="flex items-center gap-3 relative z-50">
+<button onClick={()=>setView('upload')} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs glow-cyan"><I name="upload" c="w-4 h-4"/>Poster</button>
+<div className="relative">
+<button onClick={()=>setMenu(!menu)} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl hover:border-cyanNeon transition">
+<img src={prof?.avatar_url||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'} className="w-7 h-7 rounded-full object-cover"/>
+<span className="text-xs font-bold text-white hidden md:block max-w-[100px] truncate">{prof?.name||'User'}</span>
+<I name="chev" c="w-4 h-4 text-gray-400"/></button>
+{menu&&<div className="absolute right-0 top-12 mt-2 w-56 glass-card rounded-xl shadow-2xl p-2 dropdown-anim flex flex-col gap-1">
+<div className="px-3 py-2 border-b border-borderDark/50 mb-1"><p className="text-xs text-gray-400">Connecté</p><p className="text-sm font-bold text-white truncate">{prof?.name}</p><p className="text-[10px] text-gray-500 truncate">{sess.user.email}</p></div>
+<button onClick={()=>setView('dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="dash" c="w-4 h-4"/>Dashboard</button>
+<button onClick={()=>setView('purchases')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="key" c="w-4 h-4"/>Mes achats & clés</button>
+<button onClick={()=>setView('verify')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="shield" c="w-4 h-4"/>Vérifier une clé</button>
+{prof?.is_admin&&<button onClick={()=>{setView('admin');loadOrders();}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-pinkNeon hover:bg-pinkNeon/10"><I name="list" c="w-4 h-4"/>Commandes ({pendO.length})</button>}
+<button onClick={()=>setView('settings')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><I name="set" c="w-4 h-4"/>Paramètres</button>
+<button onClick={()=>setView('upload')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 md:hidden"><I name="upload" c="w-4 h-4"/>Poster</button>
+<div className="h-px bg-borderDark my-1"/>
+<button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10"><I name="logout" c="w-4 h-4"/>Déconnexion</button>
+</div>}</div></div></nav>
 
-  const filteredBeats=tracks.filter(t=>{if(t.type!=='beat')return false;if(search){const q=search.toLowerCase();if(!(t.title||'').toLowerCase().includes(q)&&!(t.producer_name||'').toLowerCase().includes(q)&&!(t.genre||'').toLowerCase().includes(q))return false;}if(filterGenre!=='Tous'&&t.genre!==filterGenre)return false;return true;});
-  const vstList=tracks.filter(t=>t.type==='vst');
-  const myTracks=profile?tracks.filter(t=>t.producer_id===profile.id):[];
-  const pendingOrders=adminOrders.filter(o=>o.status==='pending');
-  const myVstKeys=myPurchases.filter(p=>p.license_type==='vst'&&p.vst_key);
+<nav className={`md:hidden fixed ${cur?'bottom-[100px]':'bottom-0'} inset-x-0 z-40 glass border-t border-borderDark px-4 py-2 flex justify-around items-center safe-bottom`}>
+<button onClick={()=>setView('home')} className={`flex flex-col items-center gap-1 ${view==='home'?'text-cyanNeon':'text-gray-400'}`}><I name="home" c="w-6 h-6"/><span className="text-[10px] font-bold">Accueil</span></button>
+<button onClick={()=>setView('beats')} className={`flex flex-col items-center gap-1 ${view==='beats'?'text-goldAccent':'text-gray-400'}`}><I name="music" c="w-6 h-6"/><span className="text-[10px] font-bold">Beats</span></button>
+<button onClick={()=>setView('vsts')} className={`flex flex-col items-center gap-1 ${view==='vsts'?'text-cyanNeon':'text-gray-400'}`}><I name="cpu" c="w-6 h-6"/><span className="text-[10px] font-bold">VSTs</span></button>
+<button onClick={()=>setView('purchases')} className={`flex flex-col items-center gap-1 ${view==='purchases'?'text-greenPro':'text-gray-400'}`}><I name="key" c="w-6 h-6"/><span className="text-[10px] font-bold">Clés</span></button>
+<button onClick={()=>setView('upload')} className={`flex flex-col items-center gap-1 ${view==='upload'?'text-goldAccent':'text-gray-400'}`}><I name="upload" c="w-6 h-6"/><span className="text-[10px] font-bold">Poster</span></button>
+</nav>
 
-  if(loading)return<div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
+<div className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto">
+{view!=='home'&&<button onClick={()=>setView('home')} className="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition text-sm font-bold"><I name="back" c="w-4 h-4"/>Retour</button>}
 
-  if(!session){
-    return(
-      <div className="min-h-screen flex items-center justify-center p-4 relative">
-        <Toasts items={toasts} onRemove={(id)=>setToasts(p=>p.filter(t=>t.id!==id))}/>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80')] bg-cover bg-center"></div>
-        <div className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"></div>
-        <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in">
-          <div className="text-center lg:text-left space-y-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent glow-gold">Y</div>
-            <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="text-gradient-gold">YANRECORDS</span></h1>
-            <p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie. Beats, plugins VST et licences exclusives.</p>
-            <div className="hidden lg:flex flex-col gap-4 mt-8">
-              <div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-greenPro/20 text-greenPro"><Icon name="check" className="w-4 h-4"/></div>Vendez et achetez des instrumentales</div>
-              <div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-cyanNeon/20 text-cyanNeon"><Icon name="check" className="w-4 h-4"/></div>Plugins VST avec clés uniques</div>
-              <div className="flex items-center gap-3 text-sm font-bold text-white"><div className="p-1 rounded-full bg-pinkNeon/20 text-pinkNeon"><Icon name="check" className="w-4 h-4"/></div>Paiement BaridiMob, CCP & Edahabia</div>
-            </div>
-          </div>
-          <div className="glass-card p-8 rounded-[2rem] border-cyanNeon/20 shadow-2xl">
-            <div className="flex bg-obsidian rounded-xl p-1 mb-8 border border-borderDark">
-              <button onClick={()=>{setAuthMode('login');setAuthErr('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition ${authMode==='login'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white'}`}>Se connecter</button>
-              <button onClick={()=>{setAuthMode('register');setAuthErr('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition ${authMode==='register'?'bg-goldAccent text-black':'text-gray-400 hover:text-white'}`}>Créer un compte</button>
-            </div>
-            <form onSubmit={handleAuth} className="space-y-4">
-              {authMode==='register'&&<div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label><input type="text" required maxLength="50" value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="DJ Yanis" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>}
-              <div><label className="text-xs font-bold text-gray-400 block mb-1">Email</label><input type="email" required value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="contact@studio.com" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>
-              <div><label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label><input type="password" required minLength="6" value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="••••••••" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>
-              {authMode==='register'&&<div className="flex items-start gap-3"><input type="checkbox" checked={acceptCGU} onChange={e=>setAcceptCGU(e.target.checked)} className="mt-1 accent-goldAccent"/><label className="text-xs text-gray-400">J'accepte les <span onClick={()=>setShowCGU(true)} className="text-goldAccent cursor-pointer hover:underline font-bold">CGU</span>.</label></div>}
-              {authErr&&<div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{authErr}</div>}
-              <button type="submit" disabled={authLoad} className={`w-full font-black py-3.5 rounded-xl mt-4 transition disabled:opacity-50 ${authMode==='login'?'bg-cyanNeon text-black glow-cyan':'bg-goldAccent text-black glow-gold'}`}>{authLoad?'....':(authMode==='login'?'CONNEXION':"S'INSCRIRE")}</button>
-            </form>
-            <div className="flex items-center gap-4 my-6"><div className="h-px bg-borderDark flex-1"/><span className="text-xs font-bold text-gray-500">OU</span><div className="h-px bg-borderDark flex-1"/></div>
-            <button onClick={handleGoogle} className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-200 transition">
-              <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-              Continuer avec Google
-            </button>
-          </div>
-        </div>
-        {showCGU&&<div className="fixed inset-0 z-[150] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"><div className="glass-card rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] flex flex-col"><h3 className="text-2xl font-black text-goldAccent mb-4">CGU YANrecords</h3><div className="flex-1 overflow-y-auto pr-4 space-y-4 text-sm text-gray-300"><p><strong>1.</strong> YANrecords est une marketplace pour beats et VSTs.</p><p><strong>2.</strong> Vous devez être l'auteur original de vos uploads.</p><p><strong>3.</strong> Licence Exclusive = beat retiré du catalogue.</p><p><strong>4.</strong> Commission : 5% beats, 8% VST.</p><p><strong>5.</strong> Chaque clé VST est unique, 3 machines max.</p><p><strong>6.</strong> Paiement par BaridiMob/CCP avec preuve.</p></div><button onClick={()=>{setAcceptCGU(true);setShowCGU(false);}} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl mt-6">J'ACCEPTE</button></div></div>}
-      </div>
-    );
-  }
+{/* HOME */}
+{view==='home'&&<div className="space-y-12 fade-in">
+<div className="glass-card p-8 md:p-12 rounded-3xl border-goldAccent/50 relative overflow-hidden">
+<div className="absolute top-0 right-0 w-64 h-64 bg-goldAccent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"/>
+<div className="relative z-10">
+<div className="flex items-center gap-3 mb-4"><div className="w-12 h-12 rounded-xl bg-goldAccent/20 flex items-center justify-center"><I name="music" c="w-6 h-6 text-goldAccent"/></div><span className="text-xs font-bold text-goldAccent uppercase tracking-widest">Pour les Producteurs</span></div>
+<h3 className="text-3xl md:text-4xl font-black text-white mb-4">VOUS ÊTES BEATMAKER ?</h3>
+<p className="text-gray-300 mb-8 text-lg max-w-2xl">Publiez vos instrumentales et plugins VST sur la 1ère plateforme d'Algérie. Fixez vos prix et encaissez via BaridiMob, CCP & Edahabia.</p>
+<div className="flex flex-col sm:flex-row items-center gap-4">
+<button onClick={()=>setView('upload')} className="w-full sm:w-auto bg-goldAccent text-black font-black px-8 py-4 rounded-xl hover:scale-105 transition glow-gold text-lg">🎹 PUBLIER MES PRODS</button>
+<button onClick={()=>setView('vsts')} className="w-full sm:w-auto border-2 border-cyanNeon text-cyanNeon font-black px-8 py-4 rounded-xl hover:bg-cyanNeon/10 transition text-lg">⚡ VOIR LES VSTs</button></div>
+</div></div>
+<div className="glass-card p-8 md:p-12 rounded-3xl border-cyanNeon/50 relative overflow-hidden">
+<div className="absolute top-0 left-0 w-64 h-64 bg-cyanNeon/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2"/>
+<div className="relative z-10">
+<div className="flex items-center gap-3 mb-4"><div className="w-12 h-12 rounded-xl bg-cyanNeon/20 flex items-center justify-center"><I name="mic" c="w-6 h-6 text-cyanNeon"/></div><span className="text-xs font-bold text-cyanNeon uppercase tracking-widest">Pour les Artistes</span></div>
+<h3 className="text-3xl md:text-4xl font-black text-white mb-4">TU ES ARTISTE / RAPPEUR(SE) ?</h3>
+<p className="text-gray-300 mb-8 text-lg max-w-2xl">Déniche les meilleures instrumentales. Réserve des licences exclusives et démarque-toi avec des sons uniques.</p>
+<button onClick={()=>setView('beats')} className="w-full sm:w-auto bg-cyanNeon text-black font-black px-8 py-4 rounded-xl hover:scale-105 transition glow-cyan text-lg">🎧 EXPLORER LE BEATSTORE</button>
+</div></div>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div className="glass-card p-8 rounded-2xl border-cyanNeon/30 text-center hover:border-cyanNeon transition"><I name="cpu" c="w-12 h-12 text-cyanNeon mx-auto mb-4"/><h3 className="text-xl font-bold text-white mb-2">Plugins VST Pro</h3><p className="text-sm text-gray-400">Conçus pour FL Studio, Ableton et tous les DAWs majeurs.</p></div>
+<div className="glass-card p-8 rounded-2xl border-goldAccent/30 text-center hover:border-goldAccent transition"><I name="shield" c="w-12 h-12 text-goldAccent mx-auto mb-4"/><h3 className="text-xl font-bold text-white mb-2">Clés Uniques</h3><p className="text-sm text-gray-400">Chaque acheteur reçoit une clé unique, limitée à 3 machines.</p></div>
+<div className="glass-card p-8 rounded-2xl border-pinkNeon/30 text-center hover:border-pinkNeon transition"><I name="dollar" c="w-12 h-12 text-pinkNeon mx-auto mb-4"/><h3 className="text-xl font-bold text-white mb-2">Paiement Local</h3><p className="text-sm text-gray-400">BaridiMob, CCP et Edahabia sécurisés.</p></div>
+</div></div>}
 
-  return(
-    <div className="relative">
-      <Toasts items={toasts} onRemove={(id)=>setToasts(p=>p.filter(t=>t.id!==id))}/>
-      {showMenu&&<div className="fixed inset-0 z-40" onClick={()=>setShowMenu(false)}/>}
+{/* VSTS */}
+{view==='vsts'&&<section className="fade-in">
+<h3 className="text-3xl font-black mb-6 text-white border-l-4 border-cyanNeon pl-4">PLUGINS VST PROFESSIONNELS</h3>
+{vstL.length===0?<p className="text-gray-400 text-center py-12">Aucun VST. <button onClick={()=>{setUType('vst');setView('upload');}} className="text-cyanNeon underline">Publie le premier !</button></p>:
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6">{vstL.map(v=>{const owned=myVKeys.find(k=>k.track_id===v.id);return(
+<div key={v.id} className="glass-card rounded-2xl p-5 flex flex-col border-cyanNeon/30">
+<div className="relative"><img src={v.cover_url||DC} className="w-full h-44 object-cover rounded-xl mb-4"/>{owned&&<span className="absolute top-2 right-2 bg-greenPro text-black text-[10px] font-black px-2 py-1 rounded-lg">✓ POSSÉDÉ</span>}</div>
+<h4 className="text-xl font-black text-white">{v.title}</h4>
+<p className="text-xs text-goldAccent font-bold mt-1">Par {v.producer_name}</p>
+<p className="text-xs text-gray-400 my-3 flex-grow">{v.description}</p>
+<div className="flex items-center justify-between pt-4 border-t border-borderDark">
+<span className="text-lg font-black text-goldAccent">{fmt(v.price_mp3)} DZD</span>
+{owned?<button onClick={()=>setView('purchases')} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1"><I name="key" c="w-3 h-3"/>Ma clé</button>:<button onClick={()=>{setSel(v);setProof(null);setLic('vst');}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Acheter</button>}
+</div></div>);})}</div>}
+</section>}
 
-      <nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={()=>setView('home')}>
-          <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent glow-gold">Y</div>
-          <h1 className="text-xl font-black tracking-widest text-white hidden sm:block">YAN<span className="text-gradient-gold">RECORDS</span></h1>
-        </div>
-        <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
-          <button onClick={()=>setView('home')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='home'?'bg-white text-black':'text-gray-400 hover:text-white'}`}>Accueil</button>
-          <button onClick={()=>setView('vsts')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='vsts'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white'}`}>VSTs</button>
-          <button onClick={()=>setView('beats')} className={`px-5 py-2 rounded-full text-sm font-bold transition ${view==='beats'?'bg-goldAccent text-black':'text-gray-400 hover:text-white'}`}>Beats</button>
-        </div>
-        <div className="flex items-center gap-3 relative z-50">
-          <button onClick={()=>setView('upload')} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs glow-cyan"><Icon name="upload" className="w-4 h-4"/>Poster</button>
-          <div className="relative">
-            <button onClick={()=>setShowMenu(!showMenu)} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl hover:border-cyanNeon transition">
-              <img src={profile?.avatar_url||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'} className="w-7 h-7 rounded-full object-cover"/>
-              <span className="text-xs font-bold text-white hidden md:block max-w-[100px] truncate">{profile?.name||'User'}</span>
-              <Icon name="chevronDown" className="w-4 h-4 text-gray-400"/>
-            </button>
-            {showMenu&&<div className="absolute right-0 top-12 mt-2 w-56 glass-card rounded-xl shadow-2xl p-2 dropdown-anim flex flex-col gap-1">
-              <div className="px-3 py-2 border-b border-borderDark/50 mb-1"><p className="text-xs text-gray-400">Connecté</p><p className="text-sm font-bold text-white truncate">{profile?.name}</p><p className="text-[10px] text-gray-500 truncate">{session.user.email}</p></div>
-              <button onClick={()=>setView('dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon name="dashboard" className="w-4 h-4"/>Dashboard</button>
-              <button onClick={()=>setView('purchases')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon name="key" className="w-4 h-4"/>Mes achats & clés</button>
-              <button onClick={()=>setView('verify')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon name="shield" className="w-4 h-4"/>Vérifier une clé</button>
-              {isAdmin()&&<button onClick={()=>{setView('admin');loadAdminOrders(session.user.id);}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-pinkNeon hover:bg-pinkNeon/10"><Icon name="list" className="w-4 h-4"/>Commandes ({pendingOrders.length})</button>}
-              <button onClick={()=>setView('settings')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10"><Icon name="settings" className="w-4 h-4"/>Paramètres</button>
-              <button onClick={()=>setView('upload')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 md:hidden"><Icon name="upload" className="w-4 h-4"/>Poster</button>
-              <div className="h-px bg-borderDark my-1"/>
-             
+{/* BEATS */}
+{view==='beats'&&<section className="fade-in space-y-6">
+<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<h3 className="text-3xl font-black text-white border-l-4 border-goldAccent pl-4">BEATSTORE</h3>
+<div className="relative w-full md:w-64"><input type="text" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Rechercher..." className="w-full bg-cardDark border border-borderDark rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:border-goldAccent outline-none"/><div className="absolute left-3 top-2.5 text-gray-500"><I name="search" c="w-4 h-4"/></div></div>
+</div>
+<div className="flex items-center gap-2 overflow-x-auto pb-2">{GEN.map(g=><button key={g} onClick={()=>setFilterG(g)} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${filterG===g?'bg-goldAccent text-black':'bg-cardDark text-gray-400 hover:text-white border border-borderDark'}`}>{g}</button>)}</div>
+{fBeats.length===0?<p className="text-gray-400 text-center py-12">Aucun beat. <button onClick={()=>{setUType('beat');setView('upload');}} className="text-goldAccent underline">Poste le premier !</button></p>:
+<div className="glass-card rounded-2xl p-4 space-y-2">{fBeats.map(b=>(
+<div key={b.id} className={`grid grid-cols-1 md:grid-cols-12 gap-4 items-center p-3 rounded-xl transition ${b.is_sold?'opacity-50 bg-black/60':'hover:bg-white/5'}`}>
+<div className="col-span-5 flex items-center gap-4">
+<div className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer flex-shrink-0" onClick={()=>!b.is_sold&&b.audio_url&&togglePlay(b)}><img src={b.cover_url||DC} className="w-full h-full object-cover"/>{!b.is_sold&&b.audio_url&&<div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100"><I name={cur?.id===b.id&&playing?"pause":"play"} c="w-5 h-5 text-white"/></div>}</div>
+<div className="min-w-0"><h4 className="font-bold text-white flex items-center gap-2 truncate">{b.title}{b.is_sold&&<span className="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">SOLD</span>}</h4><p className="text-xs text-goldAccent font-bold truncate">{b.producer_name} • {b.genre}</p></div>
+</div>
+<div className="hidden md:block col-span-2 text-sm text-gray-400">{b.bpm} BPM • {b.key}</div>
+<div className="hidden md:block col-span-2 text-xs text-gray-500">{b.plays||0} écoutes</div>
+<div className="col-span-full md:col-span-3 flex justify-end">
+{b.is_sold?<span className="text-xs font-bold text-red-500 border border-red-800/50 px-4 py-2 rounded-xl">VENDU</span>:<button onClick={()=>{setSel(b);setLic('mp3');setProof(null);}} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">Acheter ({fmt(b.price_mp3)} DZD)</button>}
+</div></div>))}</div>}
+</section>}
+
+{/* PURCHASES */}
+{view==='purchases'&&<section className="fade-in space-y-6">
+<h3 className="text-3xl font-black text-white border-l-4 border-greenPro pl-4">MES ACHATS & CLÉS</h3>
+{purch.length===0?<p className="text-gray-400 text-center py-12">Aucun achat. <button onClick={()=>setView('vsts')} className="text-cyanNeon underline">Voir les VSTs</button></p>:
+<div className="space-y-3">{purch.map(p=>(
+<div key={p.id||p.track_id+'-'+p.created_at} className={`glass-card rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center gap-4 ${p.license_type==='vst'?'border-greenPro/30':''}`}>
+<div className="flex items-center gap-4 flex-1 min-w-0">
+<img src={p.track?.cover_url||DC} className="w-14 h-14 rounded-lg object-cover flex-shrink-0"/>
+<div className="min-w-0">
+<h4 className="font-bold text-white truncate">{p.track?.title||'Produit'}</h4>
+<p className="text-xs text-gray-400"><span className={p.license_type==='vst'?'text-cyanNeon font-bold':'text-goldAccent font-bold'}>{(p.license_type||'').toUpperCase()}</span> • {fmt(p.amount)} DZD{p.created_at?` • ${new Date(p.created_at).toLocaleDateString('fr-FR')}`:''}</p>
+</div></div>
+{p.license_type==='vst'&&p.vst_key&&<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+<code className="font-mono text-sm font-bold bg-obsidian border border-greenPro/50 text-greenPro px-3 py-2 rounded-lg text-center select-all">{p.vst_key}</code>
+<span className="text-[11px] text-gray-400 text-center whitespace-nowrap">{(p.activations||[]).length}/{p.max_activations||3} PC</span>
+<button onClick={()=>copyT(p.vst_key)} className="bg-cardDark border border-borderDark text-white font-bold px-3 py-2 rounded-lg text-xs hover:border-greenPro flex items-center justify-center gap-1"><I name="copy" c="w-3 h-3"/>Copier</button>
+<button onClick={()=>dlVst(p)} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1"><I name="dl" c="w-3 h-3"/>Télécharger</button>
+</div>}</div>))}</div>}
+</section>}
+
+{/* VERIFY */}
+{view==='verify'&&<div className="max-w-2xl mx-auto glass-card p-8 rounded-3xl fade-in border-cyanNeon/30">
+<div className="flex items-center gap-4 mb-6 border-b border-borderDark pb-6"><div className="w-16 h-16 rounded-full bg-cyanNeon/10 flex items-center justify-center"><I name="key" c="w-8 h-8 text-cyanNeon"/></div><div><h2 className="text-3xl font-black text-white">Vérifier une clé</h2><p className="text-sm text-gray-400">Simule la vérification du plugin.</p></div></div>
+<form onSubmit={doVerify} className="space-y-4">
+<div><label className="text-xs font-bold text-gray-400 block mb-1">Clé de licence</label><input type="text" value={vKey} onChange={e=>setVKey(e.target.value.toUpperCase())} maxLength="24" placeholder="YAN-XXXX-XXXX-XXXX" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-lg text-white focus:border-cyanNeon outline-none font-mono tracking-widest text-center"/></div>
+<div><label className="text-xs font-bold text-gray-400 block mb-1">ID Machine</label><div className="flex gap-2"><input type="text" value={vMachine} onChange={e=>setVMachine(e.target.value)} maxLength="32" className="flex-1 bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none font-mono"/><button type="button" onClick={()=>setVMachine('PC-'+Math.random().toString(36).substring(2,8).toUpperCase())} className="bg-cardDark border border-borderDark text-white font-bold px-4 rounded-xl text-xs hover:border-cyanNeon whitespace-nowrap">🖥️ Autre PC</button></div>
+<p className="text-[11px] text-gray-500 mt-1">Chaque ID différent compte comme une activation (3 machines max). Le même ID ne consomme rien.</p></div>
+<button type="submit" disabled={vLoad||!vKey.trim()} className="w-full bg-cyanNeon text-black font-black py-4 rounded-xl glow-cyan disabled:opacity-50">{vLoad?'VÉRIFICATION...':'🔍 VÉRIFIER LA CLÉ'}</button>
+</form>
+{vResult&&<div className={`mt-6 p-5 rounded-2xl border fade-in ${vResult.valid?'border-greenPro bg-greenPro/10':'border-red-500 bg-red-500/10'}`}>
+<div className="flex items-center gap-3 mb-3"><div className={`w-10 h-10 rounded-full flex items-center justify-center ${vResult.valid?'bg-greenPro/20 text-greenPro':'bg-red-500/20 text-red-400'}`}><I name={vResult.valid?'check':'x'} c="w-5 h-5"/></div>
+<h4 className={`font-black text-xl ${vResult.valid?'text-greenPro':'text-red-400'}`}>{vResult.valid?'✅ CLÉ VALIDE':'❌ CLÉ REFUSÉE'}</h4></div>
+{vResult.product&&<p className="text-sm text-gray-300">Produit : <strong>{vResult.product}</strong></p>}
+{vResult.reason&&<p className="text-sm text-red-300 mt-1">{vResult.reason}</p>}
+{vResult.max_activations!=null&&<p className="text-sm text-gray-300 mt-1">Activations : <strong>{vResult.activations}/{vResult.max_activations}</strong></p>}
+</div>}
+{myVKeys.length>0&&<div className="mt-8 pt-6 border-t border-borderDark"><p className="text-xs font-bold text-gray-400 mb-3">Tester avec mes clés :</p><div className="flex flex-wrap gap-2">
+{myVKeys.map(p=><button key={p.vst_key} onClick={()=>{setVKey(p.vst_key);setVResult(null);}} className="font-mono text-xs bg-obsidian border border-greenPro/40 text-greenPro px-3 py-1.5 rounded-lg hover:border-greenPro">{p.vst_key}</button>)}
+<button onClick={()=>{setVKey('YAN-FAKE-1234-ABCD');setVResult(null);}} className="font-mono text-xs bg-obsidian border border-red-500/40 text-red-400 px-3 py-1.5 rounded-lg hover:border-red-500">Fausse clé (test)</button>
+</div></div>}
+</div>}
+
+{/* DASHBOARD */}
+{view==='dashboard'&&prof&&<div className="space-y-8 fade-in">
+<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-cardDark border border-borderDark p-6 rounded-2xl">
+<div className="flex items-center gap-4"><img src={prof.avatar_url} className="w-16 h-16 rounded-full object-cover border-2 border-goldAccent"/><div><h2 className="text-2xl font-black text-white">{prof.name}</h2><p className="text-xs text-gray-400">{sess.user.email}</p></div></div>
+<div className="flex gap-3"><button onClick={()=>setView('purchases')} className="border border-greenPro text-greenPro font-black px-5 py-3 rounded-xl flex items-center gap-2 hover:bg-greenPro/10"><I name="key" c="w-4 h-4"/>Mes achats</button><button onClick={()=>setView('upload')} className="bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-black px-6 py-3 rounded-xl flex items-center gap-2 glow-cyan"><I name="upload" c="w-4 h-4"/>Uploader</button></div></div>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div className="glass-card p-6 rounded-2xl border-cyanNeon/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">REVENUS</span><I name="dollar" c="w-5 h-5 text-cyanNeon"/></div><span className="text-3xl font-black text-cyanNeon">{fmt(prof.balance)} DZD</span></div>
+<div className="glass-card p-6 rounded-2xl border-goldAccent/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">ÉCOUTES</span><I name="act" c="w-5 h-5 text-goldAccent"/></div><span className="text-3xl font-black text-goldAccent">{fmt(myT.reduce((s,t)=>s+(t.plays||0),0))}</span></div>
+<div className="glass-card p-6 rounded-2xl border-pinkNeon/30"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-gray-400">CRÉATIONS</span><I name="dash" c="w-5 h-5 text-pinkNeon"/></div><span className="text-3xl font-black text-pinkNeon">{myT.length}</span></div>
+</div>
+<div className="glass-card rounded-2xl p-6"><h3 className="text-lg font-bold text-white mb-4">Mes publications</h3>
+{myT.length===0?<p className="text-gray-400 text-sm text-center py-6">Aucune création. <button onClick={()=>setView('upload')} className="text-cyanNeon underline">Commence !</button></p>:
+<div className="space-y-3">{myT.map(t=>(
+<div key={t.id} className="flex justify-between items-center p-3 rounded-xl bg-obsidian/60 border border-borderDark">
+<div className="flex items-center gap-4"><img src={t.cover_url||DC} className="w-12 h-12 rounded-lg object-cover"/><div><h4 className="font-bold text-white text-sm">{t.title}{t.is_sold&&<span className="bg-red-600 text-white text-[9px] px-1 rounded ml-2">SOLD</span>}</h4><p className="text-xs text-gray-400">{(t.type||'').toUpperCase()} • {t.type==='vst'?(t.file_path?'Fichier privé ✓':'⚠️ Pas de fichier'):`${t.plays||0} écoutes`}</p></div></div>
+<div className="flex items-center gap-3"><span className="text-xs font-bold text-goldAccent">{fmt(t.price_mp3)} DZD</span><button onClick={()=>handleDelete(t.id)} className="p-2 bg-red-950/60 text-red-400 hover:bg-red-600 hover:text-white rounded-lg"><I name="trash" c="w-4 h-4"/></button></div>
+</div>))}</div>}</div>
+</div>}
+
+{/* UPLOAD */}
+{view==='upload'&&prof&&<div className="max-w-2xl mx-auto glass-card p-8 rounded-2xl border-goldAccent/40 fade-in">
+<h2 className="text-2xl font-black text-white mb-2">Nouvelle création</h2>
+<p className="text-xs text-gray-400 mb-6">Publié par : <span className="text-goldAccent font-bold">{prof.name}</span></p>
+<form onSubmit={handleUpload} className="space-y-4">
+<div><label className="text-xs font-bold text-gray-300 block mb-1">Titre (max 100)</label><input type="text" required maxLength="100" value={uTitle} onChange={e=>setUTitle(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>
+<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div><label className="text-xs font-bold text-gray-300 block mb-1">Type</label><select value={uType} onChange={e=>{setUType(e.target.value);setUAudio(null);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"><option value="beat">Beat</option><option value="vst">VST</option></select></div>
+{uType==='beat'&&<>
+<div><label className="text-xs font-bold text-gray-300 block mb-1">Genre</label><select value={uGenre} onChange={e=>setUGenre(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white">{GEN.slice(1).map(g=><option key={g}>{g}</option>)}</select></div>
+<div><label className="text-xs font-bold text-gray-300 block mb-1">BPM</label><input type="number" min="40" max="300" value={uBpm} onChange={e=>setUBpm(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
+<div><label className="text-xs font-bold text-gray-300 block mb-1">Gamme</label><input type="text" maxLength="10" value={uKey} onChange={e=>setUKey(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
+</>}</div>
+{uType==='beat'?<div className="p-4 rounded-xl bg-obsidian/60 border border-borderDark space-y-3"><span className="text-xs font-bold text-goldAccent block uppercase">Prix (DZD)</span><div className="grid grid-cols-2 gap-3">
+<div><label className="text-[11px] text-gray-400">MP3</label><input type="number" min="0" value={uMp3} onChange={e=>setUMp3(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+<div><label className="text-[11px] text-gray-400">WAV</label><input type="number" min="0" value={uWav} onChange={e=>setUWav(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+<div><label className="text-[11px] text-gray-400">Stems</label><input type="number" min="0" value={uStems} onChange={e=>setUStems(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+<div><label className="text-[11px] text-gray-400">Exclusif</label><input type="number" min="0" value={uExcl} onChange={e=>setUExcl(e.target.value)} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+</div></div>:<div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30 space-y-2">
+<label className="text-xs font-bold text-cyanNeon block">Prix VST (DZD)</label>
+<input type="number" min="0" value={uMp3} onChange={e=>setUMp3(e.target.value)} className="w-full bg-cardDark border border-cyanNeon/50 rounded-lg p-2 text-white"/>
+<p className="text-[11px] text-gray-400">🔑 Clé unique pour chaque acheteur (3 machines max). Fichier stocké en privé.</p></div>}
+<div><label className="text-xs font-bold text-gray-300 block mb-1">Description</label><textarea maxLength="300" rows="2" value={uDesc} onChange={e=>setUDesc(e.target.value)} placeholder={uType==='vst'?'Ex : Synthé analogique, 200 presets':'Ex : Drill sombre, piano + 808'} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none resize-none"/></div>
+<div><label className="text-xs font-bold text-gray-300 block mb-1">Pochette (max 5MB)</label><input type="file" accept="image/*" onChange={e=>setUCover(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/></div>
+<div><label className="text-xs font-bold text-gray-300 block mb-1">{uType==='vst'?'Fichier du plugin (ZIP/EXE...)':'Fichier audio (MP3/WAV)'} — max 50MB</label>
+<input key={uType} type="file" accept={uType==='vst'?'.zip,.rar,.7z,.exe,.msi,.dmg,.pkg':'.mp3,.wav,audio/mpeg,audio/wav'} onChange={e=>setUAudio(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-goldAccent file:text-black"/></div>
+<button type="submit" disabled={uLoad} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl glow-gold mt-4 disabled:opacity-50">{uLoad?'UPLOAD EN COURS...':'PUBLIER SUR YANRECORDS'}</button>
+</form></div>}
+
+{/* SETTINGS */}
+{view==='settings'&&prof&&<div className="max-w-2xl mx-auto glass-card p-8 rounded-3xl fade-in">
+<div className="flex items-center gap-4 mb-8 border-b border-borderDark pb-6"><div className="w-16 h-16 rounded-full bg-borderDark flex items-center justify-center"><I name="set" c="w-8 h-8 text-gray-400"/></div><div><h2 className="text-3xl font-black text-white">Paramètres</h2><p className="text-sm text-gray-400">Sauvegardé sur le serveur</p></div></div>
+<form onSubmit={handleSave} className="space-y-6">
+<div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-obsidian rounded-2xl border border-borderDark">
+<img src={eAvP||prof.avatar_url} className="w-24 h-24 rounded-full object-cover border-4 border-cyanNeon"/>
+<div className="flex-1 w-full"><label className="text-xs font-bold text-gray-400 block mb-2">Changer la photo</label><input type="file" accept="image/*" onChange={e=>{const f=e.target.files[0];if(f){setEAv(f);setEAvP(URL.createObjectURL(f));}}} className="w-full text-sm text-gray-400 file:bg-cyanNeon file:text-black file:border-0 file:rounded-xl file:px-4 file:py-2 file:mr-4 file:font-bold cursor-pointer"/></div></div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label><input type="text" required maxLength="50" value={eName} onChange={e=>setEName(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white focus:border-cyanNeon outline-none"/></div>
+<div><label className="text-xs font-bold text-gray-400 block mb-1">Email</label><input type="email" disabled value={sess.user.email} className="w-full bg-obsidian/50 border border-borderDark/50 rounded-xl p-3 text-sm text-gray-500"/></div></div>
+<div className="p-5 rounded-2xl bg-goldAccent/5 border border-goldAccent/30">
+<label className="text-xs font-bold text-goldAccent block mb-1 uppercase flex items-center gap-2"><I name="dollar" c="w-4 h-4"/>CCP / BaridiMob (pour recevoir vos ventes)</label>
+<input type="text" value={eRip} onChange={e=>setERip(e.target.value)} placeholder="00799999000000000012" className="w-full bg-obsidian border border-goldAccent/40 rounded-xl p-3 text-sm text-white focus:border-goldAccent outline-none font-mono"/></div>
+<button type="submit" disabled={saving} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 mt-4 shadow-lg disabled:opacity-50">{saving?'ENREGISTREMENT...':'✅ ENREGISTRER'}</button>
+</form></div>}
+
+{/* ADMIN */}
+{view==='admin'&&prof?.is_admin&&<section className="fade-in space-y-6">
+<h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">COMMANDES ADMIN</h3>
+{orders.length===0?<p className="text-gray-400 text-center py-12">Aucune commande.</p>:
+<div className="space-y-4">{orders.map(o=>(
+<div key={o.id} className={`glass-card rounded-2xl p-4 ${o.status==='pending'?'border-pinkNeon/50':o.status==='validated'?'border-greenPro/30':'border-red-500/30'}`}>
+<div className="flex flex-col lg:flex-row lg:items-center gap-4">
+<div className="flex items-center gap-3 flex-1 min-w-0">
+{o.proof_url&&<img src={o.proof_url} alt="preuve" className="w-16 h-16 rounded-lg object-cover cursor-pointer border border-borderDark" onClick={()=>window.open(o.proof_url,'_blank')} title="Cliquer pour agrandir"/>}
+<div className="min-w-0">
+<p className="font-bold text-white truncate">{o.buyer_name||'Client'}</p>
+<p className="text-xs text-gray-400">{o.product_type.toUpperCase()} • {(o.license_type||'').toUpperCase()} • {fmt(o.amount)} DZD • Commission {o.rate_percent}% : {fmt(o.platform_fee)} DZD</p>
+<p className="text-[10px] text-gray-500">{new Date(o.created_at).toLocaleString('fr-FR')}</p>
+{o.status==='validated'&&o.vst_key&&<code className="text-xs text-greenPro font-mono bg-obsidian px-2 py-1 rounded">{o.vst_key}</code>}
+{o.admin_note&&<p className="text-[11px] text-red-400 mt-1">Note : {o.admin_note}</p>}
+</div></div>
+<div className="flex gap-2 flex-shrink-0">
+{o.status==='pending'&&<><button onClick={()=>valOrder(o.id)} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">✅ Valider</button><button onClick={()=>refOrder(o.id)} className="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">❌ Refuser</button></>}
+{o.status==='validated'&&<span className="text-xs font-bold text-greenPro whitespace-nowrap">✅ Livrée</span>}
+{o.status==='refused'&&<span className="text-xs font-bold text-red-400 whitespace-nowrap">❌ Refusée</span>}
+</div></div></div>))}</div>}
+</section>}
+</div>
+
+{/* MODAL ACHAT */}
+{sel&&<div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+<div className="glass-card rounded-2xl max-w-lg w-full p-6 relative my-8">
+<button onClick={()=>{setSel(null);setProof(null);setSellerInfo(null);}} className="absolute top-4 right-4 text-gray-400 hover:text-white"><I name="x" c="w-5 h-5"/></button>
+<h3 className="text-xl font-black text-white mb-4">Achat : {sel.title}</h3>
+{sel.type==='beat'&&<div className="space-y-2 mb-6">
+{['mp3','wav','stems','exclusive'].map(l=>(
+<div key={l} onClick={()=>setLic(l)} className={`p-3 rounded-xl border cursor-pointer ${lic===l?(l==='exclusive'?'border-red-500 bg-red-500/10':'border-goldAccent bg-goldAccent/10'):'border-borderDark'}`}>
+<div className="flex justify-between font-bold text-white"><span className={l==='exclusive'?'text-red-400':''}>{l==='mp3'?'MP3 Lease':l==='wav'?'WAV Standard':l==='stems'?'Trackout Stems':'🔥 EXCLUSIVE'}</span><span className="text-goldAccent">{fmt(getPr(sel,l))} DZD</span></div>
+</div>))}
+</div>}
+<div className="p-4 rounded-xl bg-goldAccent/10 border border-goldAccent/30 mb-4">
+<div className="flex justify-between"><span className="font-bold text-white">Total à payer</span><span className="text-xl font-black text-goldAccent">{fmt(getPr(sel,sel.type==='vst'?'vst':lic))} DZD</span></div>
+</div>
+<div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30 mb-4">
+<h4 className="font-bold text-white text-sm mb-2">💳 Paiement par CCP / BaridiMob</h4>
+<p className="text-xs text-gray-400 mb-2">Envoyez le montant exact à l'un de ces comptes, puis ajoutez la capture d'écran du paiement :</p>
+{sellerInfo?.rip&&<p className="font-mono text-sm text-greenPro mb-1">CCP : {sellerInfo.rip}</p>}
+<p className="font-mono text-sm text-greenPro mb-1">BaridiMob : {sellerInfo?.rip||'Contactez le vendeur'}</p>
+<p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {getRate(sel)}% (prélevée au vendeur)</p>
+</div>
+<div className="mb-4"><label className="text-xs font-bold text-gray-300 block mb-1">Capture d'écran du paiement *</label>
+<input type="file" accept="image/*" onChange={e=>setProof(e.target.files[0])} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/></div>
+<button onClick={submitOrder} disabled={oLoad||!proof} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl glow-gold disabled:opacity-50">{oLoad?'ENVOI...':'📱 ENVOYER LA COMMANDE'}</button>
+<p className="text-[11px] text-gray-500 text-center mt-2">L'admin vérifiera ton paiement et livrera ta commande (clés VST incluses) sous 24h.</p>
+</div></div>}
+
+{/* PLAYER */}
+{cur&&<div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-4 md:px-6 py-3 flex flex-col gap-2 safe-bottom">
+<div className="w-full flex items-center gap-3 text-xs text-gray-400 font-mono">
+<span>{fmtTime(aTime)}</span>
+<input type="range" min="0" max="100" value={aProg} onChange={seek} className="flex-1 h-1 bg-borderDark rounded-lg appearance-none cursor-pointer" style={{background:`linear-gradient(to right,#00f0ff ${aProg}%,#222638 ${aProg}%)`}}/>
+<span>{fmtTime(aDur)}</span></div>
+<div className="flex items-center justify-between">
+<div className="flex items-center gap-3 w-1/3 min-w-0"><img src={cur.cover_url||DC} className="w-11 h-11 rounded-lg object-cover"/><div className="min-w-0 hidden md:block"><h4 className="font-bold text-sm text-white truncate">{cur.title}</h4><p className="text-xs text-goldAccent font-bold truncate">{cur.producer_name}</p></div></div>
+<div className="flex items-center gap-4">
+<button onClick={toggleMute} className="text-gray-400 hover:text-white"><I name={muted?"mute":"vol"} c="w-5 h-5"/></button>
+<input type="range" min="0" max="1" step="0.1" value={muted?0:vol} onChange={volCh} className="w-20 hidden md:block"/>
+<button onClick={()=>togglePlay(cur)} className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition"><I name={playing?"pause":"play"} c="w-5 h-5"/></button></div>
+<div className="w-1/3 flex justify-end"><button onClick={()=>{setSel(cur);setLic('mp3');setProof(null);}} className="bg-goldAccent text-black font-bold px-3 md:px-4 py-2 rounded-xl text-xs">Acheter</button></div>
+</div></div>}
+</div>
+);
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<ErrB><App/></ErrB>);
+</script>
+</body>
+</html>
