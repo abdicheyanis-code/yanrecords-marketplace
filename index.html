@@ -293,7 +293,8 @@ function NavBar(props){
             <button onClick={function(){go('verify');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="shield" c="w-4 h-4"/>Vérifier une clé</button>
             {(p&&p.is_admin)?<button onClick={function(){go('admin');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-pinkNeon hover:bg-pinkNeon/10 transition"><Icon n="list" c="w-4 h-4"/>Admin ({props.pending})</button>:null}
             <button onClick={function(){go('settings');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="gear" c="w-4 h-4"/>Paramètres</button>
-            <button onClick={function(){go('cgu');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="doc" c="w-4 h-4"/>CGU</button>
+           <a href="infos.html" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-cyanNeon hover:bg-cyanNeon/10 transition"><Icon n="doc" c="w-4 h-4"/>📘 Guide & Infos</a>
+<a href="infos.html#cgu" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="doc" c="w-4 h-4"/>CGU</a>
             <div className="h-px bg-borderDark my-1"></div>
             <button onClick={props.logout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10 transition"><Icon n="out" c="w-4 h-4"/>Déconnexion</button>
           </div>:null}
