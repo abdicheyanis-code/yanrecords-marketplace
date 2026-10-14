@@ -977,72 +977,149 @@ function BuyModal(props){
   const [proof,setProof]=React.useState(null),[seller,setSeller]=React.useState(null);
   const [accept,setAccept]=React.useState(false),[legal,setLegal]=React.useState('');
   const [busy,setBusy]=React.useState(false),[showL,setShowL]=React.useState(false);
-  React.useEffect(function(){sb.rpc('get_seller_payment',{p_track_id:item.id}).then(function(r){if(r.data)setSeller(r.data);});},[item.id]);
+
+  React.useEffect(function(){
+    sb.rpc('get_seller_payment',{p_track_id:item.id}).then(function(r){if(r.data)setSeller(r.data);});
+  },[item.id]);
+
   React.useEffect(function(){setAccept(false);},[license]);
+
+  React.useEffect(function(){
+    const prev=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    function onKey(e){ if(e.key==='Escape'&&!busy) props.close(); }
+    window.addEventListener('keydown',onKey);
+    return function(){ document.body.style.overflow=prev; window.removeEventListener('keydown',onKey); };
+  },[busy]);
+
   function price(l){
     if(item.type==='vst')return item.price_mp3||0;
     if(l==='wav')return item.price_wav||0;
     if(l==='stems')return item.price_stems||0;
     if(l==='exclusive')return item.price_exclusive||0;
-    return item.price_mp3||0;}
+    return item.price_mp3||0;
+  }
+
   const rate=item.type==='vst'?8:5;
   const L=(item.limits&&item.limits[license])?item.limits[license]:(DEFLIM[license]||null);
   const needLegal=license==='exclusive';
-  async function send(){setBusy(true);await props.submit(item,license,price(license),rate,proof,legal);setBusy(false);}
-  return <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
-    <div className="card rounded-2xl max-w-lg w-full p-6 relative my-8 pop">
-      <button onClick={props.close} className="absolute top-4 right-4 text-gray-400"><Icon n="x" c="w-5 h-5"/></button>
-      <h3 className="text-xl font-black text-white mb-4">Achat : {item.title}</h3>
-      {item.type==='beat'?<div className="space-y-2 mb-4">{LICS.map(function(l){
-        const on=license===l;
-        return <div key={l} onClick={function(){setLicense(l);}} className={'p-3 rounded-xl border cursor-pointer transition '+(on?(l==='exclusive'?'border-red-500 bg-red-500/10':'border-goldAccent bg-goldAccent/10'):'border-borderDark hover:border-gray-600')}>
-          <div className="flex justify-between font-bold text-white"><span className={l==='exclusive'?'text-red-400':''}>{l==='exclusive'?'🔥 ':''}{LNAME[l]}</span><span className="text-goldAccent">{fmt(price(l))} DZD</span></div></div>;})}
-      </div>:null}
 
-      {L?<div className="mb-4 rounded-xl border border-cyanNeon/25 bg-cyanNeon/5 overflow-hidden">
-        <button type="button" onClick={function(){setShowL(!showL);}} className="w-full flex items-center justify-between px-4 py-3 text-xs font-black text-cyanNeon">
-          <span>📋 CE QUE CETTE LICENCE AUTORISE</span><Icon n="chev" c={'w-4 h-4 transition '+(showL?'rotate-180':'')}/></button>
-        {showL?<div className="px-4 pb-4 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] fade">
-          <span className="text-gray-400">Streams</span><span className="text-white font-bold text-right">{inf(L.streams)}</span>
-          <span className="text-gray-400">Copies vendues</span><span className="text-white font-bold text-right">{inf(L.copies)}</span>
-          <span className="text-gray-400">Clips vidéo</span><span className="text-white font-bold text-right">{inf(L.videos)}</span>
-          <span className="text-gray-400">Concerts payants</span><span className="text-white font-bold text-right">{L.shows?'Oui':'Non'}</span>
-          <span className="text-gray-400">Tag producteur</span><span className="text-white font-bold text-right">{L.tag?'À conserver':'Retiré'}</span>
-          <span className="text-gray-400">Durée</span><span className="text-white font-bold text-right">{L.years===-1?'Illimitée':L.years+' ans'}</span>
-          <span className="text-gray-400">Crédit "Prod. by"</span><span className="text-white font-bold text-right">Obligatoire</span>
-          {license==='exclusive'?<React.Fragment><span className="text-gray-400">Exclusivité</span><span className="text-pinkNeon font-bold text-right">Beat retiré du site</span></React.Fragment>:null}
-        </div>:null}
-      </div>:null}
+  let block='';
+  if(!proof) block="Ajoute la capture d'écran du paiement";
+  else if(needLegal&&legal.trim().length<3) block="Renseigne ton nom légal complet";
+  else if(!accept) block="Coche la case d'acceptation de la licence";
 
-      {item.type==='vst'?<div className="mb-4 rounded-xl border border-cyanNeon/25 bg-cyanNeon/5 px-4 py-3 text-[11px] text-gray-300">
-        🔑 Clé unique · 3 machines maximum · partage interdit sous peine de révocation.</div>:null}
+  async function send(){
+    if(block)return;
+    setBusy(true);
+    await props.submit(item,license,price(license),rate,proof,legal);
+    setBusy(false);
+  }
 
-      <div className="p-4 rounded-xl bg-goldAccent/10 border border-goldAccent/30 mb-4 flex justify-between items-center">
-        <span className="font-bold text-white">Total à payer</span><span className="text-xl font-black text-goldAccent">{fmt(price(license))} DZD</span></div>
+  return <div className="fixed inset-0 z-[100] bg-black/92 overflow-y-auto overscroll-contain" onClick={function(){if(!busy)props.close();}}>
+    <div className="min-h-full md:py-8 md:px-4 md:flex md:justify-center">
+      <div onClick={function(e){e.stopPropagation();}} className="card w-full md:max-w-lg min-h-full md:min-h-0 md:rounded-2xl flex flex-col pop">
 
-      <div className="p-4 rounded-xl bg-obsidian/70 border border-borderDark mb-4">
-        <h4 className="font-bold text-white text-sm mb-2">Paiement CCP / BaridiMob</h4>
-        {(seller&&seller.rip)?<React.Fragment><p className="font-mono text-base text-greenPro font-bold select-all">{seller.rip}</p><p className="text-xs text-gray-400 mt-1">Bénéficiaire : {seller.name}</p></React.Fragment>
-        :<p className="text-sm text-yellow-400">Le vendeur n'a pas encore configuré son CCP.</p>}
-        <p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {rate}% (prélevée au vendeur)</p></div>
+        {/* HEADER FIXE */}
+        <div className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 border-b border-borderDark bg-cardDark md:rounded-t-2xl">
+          <button onClick={props.close} disabled={busy} className="w-9 h-9 rounded-xl bg-obsidian border border-borderDark flex items-center justify-center text-gray-300 hover:text-white hover:border-cyanNeon transition flex-shrink-0 disabled:opacity-40">
+            <Icon n="back" c="w-4 h-4"/>
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-black text-goldAccent uppercase tracking-widest">Achat</p>
+            <p className="text-sm font-bold text-white truncate">{item.title}</p>
+          </div>
+          <button onClick={props.close} disabled={busy} className="w-9 h-9 rounded-xl bg-obsidian border border-borderDark flex items-center justify-center text-gray-400 hover:text-white hover:border-red-500 transition flex-shrink-0 disabled:opacity-40">
+            <Icon n="x" c="w-4 h-4"/>
+          </button>
+        </div>
 
-      {needLegal?<div className="mb-4 p-4 rounded-xl bg-pinkNeon/5 border border-pinkNeon/30">
-        <label className="text-xs font-bold text-pinkNeon block mb-1 uppercase">Nom légal complet (obligatoire)</label>
-        <p className="text-[11px] text-gray-400 mb-2">Une licence exclusive est un transfert de droits : le contrat doit mentionner votre identité réelle.</p>
-        <input type="text" maxLength="80" value={legal} onChange={function(e){setLegal(e.target.value);}} placeholder="Nom et prénom de la carte d'identité" className="w-full bg-obsidian border border-pinkNeon/40 rounded-xl p-3 text-sm text-white outline-none"/>
-      </div>:null}
+        {/* CONTENU QUI DÉFILE */}
+        <div className="flex-1 px-4 py-4 space-y-4">
 
-      <div className="mb-4"><label className="text-xs font-bold text-gray-300 block mb-1">Capture d'écran du paiement (obligatoire)</label>
-        <input type="file" accept="image/*" onChange={function(e){setProof(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/></div>
+          {item.type==='beat'?<div className="space-y-2">
+            <p className="text-[11px] font-black text-gray-500 uppercase tracking-wider">Choisis ta licence</p>
+            {LICS.map(function(l){
+              const on=license===l;
+              return <div key={l} onClick={function(){setLicense(l);}} className={'p-3 rounded-xl border cursor-pointer transition '+(on?(l==='exclusive'?'border-red-500 bg-red-500/10':'border-goldAccent bg-goldAccent/10'):'border-borderDark hover:border-gray-600')}>
+                <div className="flex justify-between items-center font-bold text-white">
+                  <span className={'flex items-center gap-2 '+(l==='exclusive'?'text-red-400':'')}>
+                    <span className={'w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 '+(on?(l==='exclusive'?'border-red-500':'border-goldAccent'):'border-gray-600')}>
+                      {on?<span className={'w-2 h-2 rounded-full '+(l==='exclusive'?'bg-red-500':'bg-goldAccent')}></span>:null}
+                    </span>
+                    {l==='exclusive'?'🔥 ':''}{LNAME[l]}
+                  </span>
+                  <span className="text-goldAccent text-sm">{fmt(price(l))} DZD</span>
+                </div>
+              </div>;
+            })}
+          </div>:null}
 
-      <label className="flex items-start gap-3 mb-4 p-3 rounded-xl bg-obsidian/60 border border-borderDark cursor-pointer">
-        <input type="checkbox" checked={accept} onChange={function(e){setAccept(e.target.checked);}} className="mt-0.5 accent-goldAccent"/>
-        <span className="text-[11px] text-gray-300">J'ai lu et j'accepte les conditions de la licence <b className="text-white">{LNAME[license]}</b> ci-dessus ainsi que les <a href="infos.html#cgu" target="_blank" className="text-goldAccent underline">CGU</a>. Mon acceptation sera horodatée et figurera sur le contrat PDF.</span>
-      </label>
+          {L?<div className="rounded-xl border border-cyanNeon/25 bg-cyanNeon/5 overflow-hidden">
+            <button type="button" onClick={function(){setShowL(!showL);}} className="w-full flex items-center justify-between px-4 py-3 text-xs font-black text-cyanNeon">
+              <span>📋 CE QUE CETTE LICENCE AUTORISE</span>
+              <Icon n="chev" c={'w-4 h-4 transition '+(showL?'rotate-180':'')}/>
+            </button>
+            {showL?<div className="px-4 pb-4 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] fade">
+              <span className="text-gray-400">Streams</span><span className="text-white font-bold text-right">{inf(L.streams)}</span>
+              <span className="text-gray-400">Copies vendues</span><span className="text-white font-bold text-right">{inf(L.copies)}</span>
+              <span className="text-gray-400">Clips vidéo</span><span className="text-white font-bold text-right">{inf(L.videos)}</span>
+              <span className="text-gray-400">Concerts payants</span><span className="text-white font-bold text-right">{L.shows?'Oui':'Non'}</span>
+              <span className="text-gray-400">Tag producteur</span><span className="text-white font-bold text-right">{L.tag?'À conserver':'Retiré'}</span>
+              <span className="text-gray-400">Durée</span><span className="text-white font-bold text-right">{L.years===-1?'Illimitée':L.years+' ans'}</span>
+              <span className="text-gray-400">Crédit "Prod. by"</span><span className="text-white font-bold text-right">Obligatoire</span>
+              {license==='exclusive'?<React.Fragment><span className="text-gray-400">Exclusivité</span><span className="text-pinkNeon font-bold text-right">Beat retiré du site</span></React.Fragment>:null}
+            </div>:null}
+          </div>:null}
 
-      <button onClick={send} disabled={busy||!proof||!accept||(needLegal&&legal.trim().length<3)} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-40">{busy?'ENVOI...':'ENVOYER LA COMMANDE'}</button>
-      <p className="text-[11px] text-gray-500 text-center mt-2">Après validation, votre contrat PDF sera disponible dans « Mes commandes ».</p>
-    </div></div>;
+          {item.type==='vst'?<div className="rounded-xl border border-cyanNeon/25 bg-cyanNeon/5 px-4 py-3 text-[11px] text-gray-300">
+            🔑 Clé unique · 3 machines maximum · partage interdit sous peine de révocation.</div>:null}
+
+          <div className="p-4 rounded-xl bg-goldAccent/10 border border-goldAccent/30 flex justify-between items-center">
+            <span className="font-bold text-white">Total à payer</span>
+            <span className="text-xl font-black text-goldAccent">{fmt(price(license))} DZD</span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-obsidian/70 border border-borderDark">
+            <h4 className="font-bold text-white text-sm mb-2">Paiement CCP / BaridiMob</h4>
+            {(seller&&seller.rip)?<React.Fragment>
+              <p className="font-mono text-base text-greenPro font-bold select-all break-all">{seller.rip}</p>
+              <p className="text-xs text-gray-400 mt-1">Bénéficiaire : {seller.name}</p>
+            </React.Fragment>:<p className="text-sm text-yellow-400">Le vendeur n'a pas encore configuré son CCP.</p>}
+            <p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {rate}% (prélevée au vendeur)</p>
+          </div>
+
+          {needLegal?<div className="p-4 rounded-xl bg-pinkNeon/5 border border-pinkNeon/30">
+            <label className="text-xs font-bold text-pinkNeon block mb-1 uppercase">Nom légal complet (obligatoire)</label>
+            <p className="text-[11px] text-gray-400 mb-2">Une licence exclusive est un transfert de droits : le contrat doit mentionner votre identité réelle.</p>
+            <input type="text" maxLength="80" value={legal} onChange={function(e){setLegal(e.target.value);}} placeholder="Nom et prénom de la carte d'identité" className="w-full bg-obsidian border border-pinkNeon/40 rounded-xl p-3 text-sm text-white outline-none"/>
+          </div>:null}
+
+          <div>
+            <label className="text-xs font-bold text-gray-300 block mb-1">Capture d'écran du paiement {proof?<span className="text-greenPro">✓ ajoutée</span>:<span className="text-gray-500">(obligatoire)</span>}</label>
+            <input type="file" accept="image/*" onChange={function(e){setProof(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/>
+          </div>
+
+          <label className="flex items-start gap-3 p-3 rounded-xl bg-obsidian/60 border border-borderDark cursor-pointer">
+            <input type="checkbox" checked={accept} onChange={function(e){setAccept(e.target.checked);}} className="mt-0.5 accent-goldAccent flex-shrink-0"/>
+            <span className="text-[11px] text-gray-300">J'ai lu et j'accepte les conditions de la licence <b className="text-white">{LNAME[license]}</b> ci-dessus ainsi que les <a href="infos.html#cgu" target="_blank" className="text-goldAccent underline">CGU</a>. Mon acceptation sera horodatée et figurera sur le contrat PDF.</span>
+          </label>
+
+          <p className="text-[11px] text-gray-500 text-center pb-2">Après validation, votre contrat PDF sera disponible dans « Mes commandes ».</p>
+        </div>
+
+        {/* BOUTONS FIXES EN BAS */}
+        <div className="sticky bottom-0 z-20 px-4 pt-3 border-t border-borderDark bg-cardDark md:rounded-b-2xl" style={{paddingBottom:'calc(0.75rem + env(safe-area-inset-bottom))'}}>
+          {block?<p className="text-[11px] text-yellow-400 text-center mb-2">⚠️ {block}</p>:null}
+          <div className="flex gap-2">
+            <button onClick={props.close} disabled={busy} className="px-5 py-3.5 rounded-xl border border-borderDark text-gray-300 font-bold text-sm hover:bg-white/5 hover:text-white transition disabled:opacity-40">Annuler</button>
+            <button onClick={send} disabled={busy||!!block} className="flex-1 bg-goldAccent text-black font-black py-3.5 rounded-xl gg disabled:opacity-40 disabled:shadow-none">{busy?'ENVOI EN COURS...':'ENVOYER LA COMMANDE'}</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>;
 }
 
 /* ============ PLAYER ============ */
