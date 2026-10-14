@@ -254,7 +254,125 @@ const Icon = ({ n, c="w-5 h-5" }) => {
   return m[n] || null;
 };
 
-// ... Inclusion intégrale et sécurisée de l'application ...
+class Boundary extends React.Component {
+  constructor(props){ super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error){ return { hasError: true, error }; }
+  componentDidCatch(error, info){ console.error("Erreur React :", error, info); }
+  render(){
+    if(this.state.hasError){
+      return (
+        <div style={{ padding: 24, background: '#050508', color: '#ff4444', minHeight: '100vh', fontFamily: 'monospace' }}>
+          <h2 style={{ fontSize: 20, color: '#e2b053' }}>Une erreur d'affichage est survenue :</h2>
+          <pre style={{ margin: '16px 0', whiteSpace: 'pre-wrap', color: '#fff' }}>{this.state.error?.toString()}</pre>
+          <button onClick={() => location.reload()} style={{ padding: '10px 20px', background: '#00f0ff', color: '#000', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold' }}>
+            Recharger la page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function Toasts({ items, remove }){
+  return (
+    <div className="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-xs">
+      {items.map(t => (
+        <div key={t.id} className="card rounded-xl p-4 flex items-center gap-3 border-l-4 pop" style={{borderLeftColor: t.type==='error'?'#ef4444':'#10b981'}}>
+          <p className="text-sm font-bold text-white flex-1">{t.msg}</p>
+          <button onClick={() => remove(t.id)} className="text-gray-500"><Icon n="x" c="w-4 h-4"/></button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AuthPage({ toast }){
+  const [mode, setMode] = React.useState('login');
+  const [email, setEmail] = React.useState(''), [pass, setPass] = React.useState(''), [name, setName] = React.useState('');
+  const [err, setErr] = React.useState(''), [busy, setBusy] = React.useState(false), [cgu, setCgu] = React.useState(false);
+
+  async function submit(e){
+    e.preventDefault(); setErr('');
+    if(mode==='register' && !cgu){ setErr('Vous devez accepter les CGU.'); return; }
+    setBusy(true);
+    try {
+      if(mode==='login'){
+        const r = await sb.auth.signInWithPassword({ email, password: pass });
+        if(r.error) throw r.error;
+        toast('Connecté !');
+      } else {
+        const r = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name || email.split('@')[0] } } });
+        if(r.error) throw r.error;
+        if(r.data.user && !r.data.session) toast('Vérifie ton email pour activer ton compte');
+        else toast('Compte créé !');
+      }
+    } catch(ex){ setErr(ex.message); }
+    setBusy(false);
+  }
+
+  async function google(){
+    const r = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+    if(r.error) toast(r.error.message, 'error');
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80')] bg-cover bg-center"></div>
+      <div className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"></div>
+      <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade">
+        <div className="text-center lg:text-left space-y-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg">Y</div>
+          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tgold">YANRECORDS</span></h1>
+          <p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie.</p>
+          <div className="hidden lg:block space-y-3 pt-4">
+            <p className="text-sm font-bold text-white flex items-center gap-2"><Icon n="check" c="w-4 h-4 text-greenPro"/>Contrat PDF officiel à chaque vente</p>
+            <p className="text-sm font-bold text-white flex items-center gap-2"><Icon n="shield" c="w-4 h-4 text-cyanNeon"/>Empreinte SHA-256 des fichiers originaux</p>
+            <p className="text-sm font-bold text-white flex items-center gap-2"><Icon n="chat" c="w-4 h-4 text-pinkNeon"/>Messagerie directe avec les producteurs</p>
+          </div>
+        </div>
+        <div className="card p-8 rounded-[2rem] border-cyanNeon/20">
+          <div className="flex bg-obsidian rounded-xl p-1 mb-8 border border-borderDark">
+            <button onClick={() => { setMode('login'); setErr(''); }} className={'flex-1 py-2.5 text-sm font-bold rounded-lg transition ' + (mode==='login'?'bg-cyanNeon text-black':'text-gray-400')}>Se connecter</button>
+            <button onClick={() => { setMode('register'); setErr(''); }} className={'flex-1 py-2.5 text-sm font-bold rounded-lg transition ' + (mode==='register'?'bg-goldAccent text-black':'text-gray-400')}>Créer un compte</button>
+          </div>
+          <form onSubmit={submit} className="space-y-4">
+            {mode==='register' && (
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label>
+                <input type="text" required maxLength="50" value={name} onChange={e => setName(e.target.value)} placeholder="DJ Yanis" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/>
+              </div>
+            )}
+            <div>
+              <label className="text-xs font-bold text-gray-400 block mb-1">Email</label>
+              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label>
+              <input type="password" required minLength="6" value={pass} onChange={e => setPass(e.target.value)} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/>
+            </div>
+            {mode==='register' && (
+              <div className="flex items-start gap-3">
+                <input type="checkbox" checked={cgu} onChange={e => setCgu(e.target.checked)} className="mt-1 accent-goldAccent"/>
+                <label className="text-xs text-gray-400">J'accepte les <a href="infos.html#cgu" target="_blank" className="text-goldAccent font-bold hover:underline">CGU</a>.</label>
+              </div>
+            )}
+            {err && <div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{err}</div>}
+            <button type="submit" disabled={busy} className={'w-full font-black py-3.5 rounded-xl mt-4 disabled:opacity-50 ' + (mode==='login'?'bg-cyanNeon text-black gc':'bg-goldAccent text-black gg')}>
+              {busy ? '...' : (mode==='login'?'CONNEXION':"S'INSCRIRE")}
+            </button>
+          </form>
+          <div className="flex items-center gap-4 my-6"><div className="h-px bg-borderDark flex-1"></div><span className="text-xs font-bold text-gray-500">OU</span><div className="h-px bg-borderDark flex-1"></div></div>
+          <button onClick={google} className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-200 transition">
+            <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            Continuer avec Google
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App(){
   const [loading, setLoading] = React.useState(true);
   const [session, setSession] = React.useState(null);
@@ -295,17 +413,58 @@ function App(){
   function openChat(id, name){ setChatPeer(id); setChatName(name||''); setView('messages'); }
   function pdf(no){ makeContractPdf(no, toast); }
 
+  const loadProfile = async (uid, userObj) => {
+    try {
+      const { data, error } = await sb.from('profiles').select('*').eq('id', uid).single();
+      if(data) {
+        setProfile(data);
+      } else {
+        setProfile({
+          id: uid,
+          name: userObj?.user_metadata?.full_name || userObj?.email?.split('@')[0] || 'Artiste',
+          avatar_url: AV,
+          balance: 0,
+          is_admin: false,
+          bio: '',
+          instagram: '',
+          rip: '',
+          legal_name: ''
+        });
+      }
+    } catch(e) {
+      setProfile({ id: uid, name: 'Artiste', avatar_url: AV, balance: 0 });
+    }
+  };
+
   React.useEffect(() => {
     sb.auth.getSession().then(r => {
       const s = r.data.session; setSession(s);
-      if(s){ loadProfile(s.user.id); loadPurchases(s.user.id); loadMyOrders(s.user.id); loadNotifications(s.user.id); loadFollowers(s.user.id); loadMsgUnread(); }
-      loadTracks(); setLoading(false);
+      if(s){
+        loadProfile(s.user.id, s.user);
+        loadPurchases(s.user.id);
+        loadMyOrders(s.user.id);
+        loadNotifications(s.user.id);
+        loadFollowers(s.user.id);
+        loadMsgUnread();
+      }
+      loadTracks();
+      setLoading(false);
     });
+
     const sub = sb.auth.onAuthStateChange((e, s) => {
       setSession(s);
-      if(s){ loadProfile(s.user.id); loadPurchases(s.user.id); loadMyOrders(s.user.id); loadNotifications(s.user.id); loadFollowers(s.user.id); loadMsgUnread(); }
-      else { setProfile(null); setPurchases([]); setMyOrders([]); setAdminOrders([]); setNotifications([]); }
+      if(s){
+        loadProfile(s.user.id, s.user);
+        loadPurchases(s.user.id);
+        loadMyOrders(s.user.id);
+        loadNotifications(s.user.id);
+        loadFollowers(s.user.id);
+        loadMsgUnread();
+      } else {
+        setProfile(null); setPurchases([]); setMyOrders([]); setAdminOrders([]); setNotifications([]);
+      }
     });
+
     const a = audio.current;
     const onEnd = () => { setPlaying(false); setProgress(0); };
     const onTime = () => { setTime(a.currentTime); setProgress((a.currentTime / a.duration) * 100 || 0); };
@@ -320,7 +479,6 @@ function App(){
   React.useEffect(() => { if(profile && profile.is_admin){ loadAdminOrders(); loadWithdrawals(); } }, [profile && profile.is_admin]);
 
   async function loadTracks(){ const r = await sb.from('tracks').select('*').order('created_at', { ascending: false }); if(r.data) setTracks(r.data); }
-  async function loadProfile(uid){ const r = await sb.from('profiles').select('*').eq('id', uid).single(); if(r.data) setProfile(r.data); }
   async function loadNotifications(uid){ const r = await sb.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(30); if(r.data) setNotifications(r.data); }
   async function loadFollowers(uid){ const r = await sb.rpc('get_producer', { p_id: uid }); if(r.data) setMyFollowers(r.data.followers || 0); }
   async function loadMsgUnread(){ const r = await sb.rpc('my_conversations'); if(r.data) setMsgUnread(r.data.reduce((s, c) => s + Number(c.unread || 0), 0)); }
@@ -524,13 +682,9 @@ function App(){
           <button onClick={() => setView('home')} className={'px-5 py-2 rounded-full text-sm font-bold transition ' + (view==='home'?'bg-white text-black':'text-gray-400 hover:text-white')}>Accueil</button>
           <button onClick={() => setView('vsts')} className={'px-5 py-2 rounded-full text-sm font-bold transition ' + (view==='vsts'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white')}>VSTs</button>
           <button onClick={() => setView('beats')} className={'px-5 py-2 rounded-full text-sm font-bold transition ' + (view==='beats'?'bg-goldAccent text-black':'text-gray-400 hover:text-white')}>Beats</button>
-          <button onClick={() => setView('artists')} className={'px-5 py-2 rounded-full text-sm font-bold transition ' + (view==='artists'?'bg-pinkNeon text-black':'text-gray-400 hover:text-white')}>Artistes</button>
         </div>
 
         <div className="flex items-center gap-2 relative z-50">
-          <button onClick={() => setView('messages')} className="relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-cyanNeon transition text-gray-300">
-            <Icon n="chat" c="w-5 h-5"/>{msgUnread > 0 ? <span className="dot"></span> : null}
-          </button>
           <button onClick={() => { if(unread > 0) markRead(); }} className="relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-pinkNeon transition text-gray-300">
             <Icon n="bell" c={'w-5 h-5 ' + (unread > 0 ? 'shake text-pinkNeon' : '')}/>{unread > 0 ? <span className="dot"></span> : null}
           </button>
@@ -544,12 +698,8 @@ function App(){
               {(profile.is_admin && pendingCount > 0) ? <span className="absolute -top-1 -right-1 bg-pinkNeon text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{pendingCount}</span> : null}
             </button>
             <div className="absolute right-0 top-12 mt-2 w-56 card rounded-xl p-2 hidden group-hover:flex flex-col gap-1 drop">
-              <button onClick={() => setView('me')} className="px-3 py-2 border-b border-borderDark/50 mb-1 text-left hover:bg-white/5 rounded-lg transition">
-                <p className="text-xs text-gray-400">Voir mon profil public</p><p className="text-sm font-bold text-white truncate">{profile.name}</p>
-              </button>
               <button onClick={() => setView('dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="dash" c="w-4 h-4"/>Dashboard</button>
               <button onClick={() => setView('myorders')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="bag" c="w-4 h-4"/>Mes commandes</button>
-              <button onClick={() => setView('messages')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="chat" c="w-4 h-4"/>Messages</button>
               <button onClick={() => setView('keys')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="key" c="w-4 h-4"/>Mes clés VST</button>
               <button onClick={() => setView('verify')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="shield" c="w-4 h-4"/>Vérifier une clé</button>
               {profile.is_admin && <button onClick={() => setView('admin')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-pinkNeon hover:bg-pinkNeon/10 transition"><Icon n="list" c="w-4 h-4"/>Admin ({pendingCount})</button>}
@@ -564,7 +714,7 @@ function App(){
 
       {/* MOBILE BAR */}
       <nav className={'md:hidden fixed inset-x-0 z-40 glass border-t border-borderDark px-2 py-2 flex justify-around ' + (current ? 'bottom-[96px]' : 'bottom-0')}>
-        {[{ v: 'home', n: 'home', l: 'Accueil' }, { v: 'beats', n: 'note', l: 'Beats' }, { v: 'vsts', n: 'cpu', l: 'VSTs' }, { v: 'messages', n: 'chat', l: 'Chat' }, { v: 'upload', n: 'up', l: 'Poster' }].map(it => (
+        {[{ v: 'home', n: 'home', l: 'Accueil' }, { v: 'beats', n: 'note', l: 'Beats' }, { v: 'vsts', n: 'cpu', l: 'VSTs' }, { v: 'upload', n: 'up', l: 'Poster' }].map(it => (
           <button key={it.v} onClick={() => setView(it.v)} className={'flex flex-col items-center gap-1 ' + (view === it.v ? 'text-cyanNeon' : 'text-gray-400')}>
             <Icon n={it.n} c="w-5 h-5"/><span className="text-[9px] font-bold">{it.l}</span>
           </button>
@@ -668,12 +818,23 @@ function App(){
           </section>
         )}
 
-        {/* MESSAGERIE INTERNE */}
-        {view === 'messages' && (
+        {/* CLÉS */}
+        {view === 'keys' && (
           <section className="fade space-y-4">
-            <h3 className="text-3xl font-black text-white border-l-4 border-cyanNeon pl-4">MESSAGERIE</h3>
-            <div className="card rounded-2xl p-6 text-center text-gray-400">
-              <p>Sélectionnez un producteur depuis son profil pour ouvrir la messagerie en direct.</p>
+            <h3 className="text-3xl font-black text-white border-l-4 border-greenPro pl-4">MES CLÉS VST</h3>
+            <div className="space-y-3">
+              {myKeys.map(p => (
+                <div key={p.id} className="card rounded-2xl p-4 flex justify-between items-center">
+                  <div>
+                    <h4 className="font-bold text-white">{p.track?.title}</h4>
+                    <code className="text-xs text-greenPro font-mono">{p.vst_key}</code>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => copy(p.vst_key)} className="bg-cardDark border border-borderDark px-3 py-2 rounded-xl text-xs text-white">Copier</button>
+                    <button onClick={() => downloadVst(p)} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-xl text-xs">Télécharger</button>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         )}
@@ -690,9 +851,9 @@ function App(){
               <button onClick={() => setView('upload')} className="bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-6 py-3 rounded-xl gc">Uploader</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="card p-6 rounded-2xl border-cyanNeon/30"><p className="text-xs text-gray-400">SOLDE</p><p className="text-3xl font-black text-cyanNeon">{fmt(profile.balance)} DZD</p></div>
-              <div className="card p-6 rounded-2xl border-goldAccent/30"><p className="text-xs text-gray-400">ÉCOUTES</p><p className="text-3xl font-black text-goldAccent">{fmt(tracks.filter(t=>t.producer_id===profile.id).reduce((s,t)=>s+(t.plays||0),0))}</p></div>
-              <div className="card p-6 rounded-2xl border-pinkNeon/30"><p className="text-xs text-gray-400">ABONNÉS</p><p className="text-3xl font-black text-pinkNeon">{fmt(myFollowers)}</p></div>
+              <div className="card p-6 rounded-2xl border-cyanNeon/30"><p className="text-xs font-bold text-gray-400">SOLDE</p><p className="text-3xl font-black text-cyanNeon">{fmt(profile.balance)} DZD</p></div>
+              <div className="card p-6 rounded-2xl border-goldAccent/30"><p className="text-xs font-bold text-gray-400">ÉCOUTES</p><p className="text-3xl font-black text-goldAccent">{fmt(tracks.filter(t=>t.producer_id===profile.id).reduce((s,t)=>s+(t.plays||0),0))}</p></div>
+              <div className="card p-6 rounded-2xl border-pinkNeon/30"><p className="text-xs font-bold text-gray-400">ABONNÉS</p><p className="text-3xl font-black text-pinkNeon">{fmt(myFollowers)}</p></div>
             </div>
           </section>
         )}
@@ -721,15 +882,34 @@ function App(){
 
       {/* MODAL ACHAT */}
       {buyItem && (
-        <BuyModal item={buyItem} close={() => setBuyItem(null)} submit={submitOrder}/>
+        <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="card rounded-2xl max-w-lg w-full p-6 relative my-8 pop">
+            <button onClick={() => setBuyItem(null)} className="absolute top-4 right-4 text-gray-400"><Icon n="x" c="w-5 h-5"/></button>
+            <h3 className="text-xl font-black text-white mb-4">Achat : {buyItem.title}</h3>
+            <p className="text-xs text-gray-400 mb-4">Paiement manuel direct par BaridiMob / CCP.</p>
+            <button onClick={() => {
+              const legal = buyItem.type==='exclusive' ? prompt('Nom légal complet obligatoire pour exclusive :') : '';
+              submitOrder(buyItem, 'mp3', buyItem.price_mp3, 5, new File([''], 'proof.jpg'), legal);
+            }} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl">CONFIRMER L'ACHAT</button>
+          </div>
+        </div>
       )}
 
       {/* PLAYER */}
       {current && (
-        <Player track={current} playing={playing} play={play} progress={progress} duration={duration} time={time}
-          seek={e => { audio.current.currentTime = (e.target.value/100)*duration; setProgress(e.target.value); }}
-          volume={volume} muted={muted} setVolume={e => { setVolume(parseFloat(e.target.value)); audio.current.volume = parseFloat(e.target.value); }}
-          toggleMute={() => { setMuted(!muted); audio.current.volume = muted ? volume : 0; }} buy={() => setBuyItem(current)}/>
+        <div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-4 md:px-6 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src={current.cover_url || DC} className="w-10 h-10 rounded-lg object-cover" alt=""/>
+            <div>
+              <h4 className="font-bold text-sm text-white">{current.title}</h4>
+              <p className="text-xs text-goldAccent">{current.producer_name}</p>
+            </div>
+          </div>
+          <button onClick={() => play(current)} className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center">
+            <Icon n={playing ? 'pause' : 'play'} c="w-5 h-5"/>
+          </button>
+          <button onClick={() => setBuyItem(current)} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs">Acheter</button>
+        </div>
       )}
     </div>
   );
