@@ -1307,7 +1307,7 @@ function App(){
       {view==='messages'?<MessagesView me={session.user.id} initPeer={chatPeer} initName={chatName} toast={toast} openProducer={openProducer} refreshUnread={loadMsgUnread}/>:null}
       {view==='verify'?<VerifyView myKeys={myKeys}/>:null}
       {view==='dashboard'?<DashboardView profile={profile} email={session.user.email} tracks={tracks} setView={setView} withdraw={requestWithdrawal} remove={removeTrack} followers={myFollowers} openProducer={openProducer} pdf={pdf}/>:null}
-      {view==='upload'?<UploadView profile={profile} upload={uploadTrack}/>:null}
+      {view==='upload'?<UploadView profile={profile} upload={uploadTrack} setView={setView} toast={toast}/>:null}
       {view==='settings'?<SettingsView profile={profile} save={saveProfile}/>:null}
       {(view==='admin'&&profile.is_admin)?<AdminView orders={adminOrders} withdrawals={withdrawals} validate={validateOrder} refuse={refuseOrder} payWd={payWithdrawal} pdf={pdf}/>:null}
     </div>
