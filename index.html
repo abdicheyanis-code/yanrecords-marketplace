@@ -3,33 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>YANrecords | VST & Beatstore 🇩🇿</title>
+<title>213WAVE | Beatstore & VST 🇩🇿</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={
+  darkMode:'class',
+  theme:{extend:{colors:{
+    obsidian:'#050508',cardDark:'#131520',borderDark:'#222638',
+    cyanNeon:'#00f0ff',goldAccent:'#e2b053',pinkNeon:'#ff007f',greenPro:'#10b981'
+  }}}
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-
-<script>
-tailwind.config={
-  darkMode:'class',
-  theme:{
-    extend:{
-      colors:{
-        obsidian:'#050508',
-        cardDark:'#131520',
-        borderDark:'#222638',
-        cyanNeon:'#00f0ff',
-        goldAccent:'#e2b053',
-        pinkNeon:'#ff007f',
-        greenPro:'#10b981'
-      }
-    }
-  }
-}
-</script>
 
 <style>
 *{font-family:'Inter',system-ui,sans-serif;box-sizing:border-box}
@@ -54,19 +45,21 @@ body{background:#050508;color:#f8fafc;overflow-x:hidden}
 .gg{box-shadow:0 0 22px rgba(226,176,83,.28)}
 .lift{transition:transform .22s,box-shadow .22s,border-color .22s}
 .lift:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(0,0,0,.5)}
+.ringg{background:linear-gradient(135deg,#e2b053,#ff007f,#00f0ff);padding:3px;border-radius:9999px}
+.banner{background:radial-gradient(850px 280px at 15% -40%,rgba(226,176,83,.3),transparent),radial-gradient(700px 260px at 85% -35%,rgba(0,240,255,.22),transparent),linear-gradient(145deg,#101320,#070910)}
 .loader{border:3px solid #222638;border-top:3px solid #00f0ff;border-radius:50%;width:40px;height:40px;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .toast{animation:ti .28s ease-out both}
 @keyframes ti{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-.ringg{background:linear-gradient(135deg,#e2b053,#ff007f,#00f0ff);padding:3px;border-radius:9999px}
-.banner{background:radial-gradient(850px 280px at 15% -40%,rgba(226,176,83,.3),transparent),radial-gradient(700px 260px at 85% -35%,rgba(0,240,255,.22),transparent),linear-gradient(145deg,#101320,#070910)}
 .tab{position:relative}
 .tab:after{content:'';position:absolute;left:0;bottom:-2px;height:2px;width:0;background:#e2b053;transition:width .2s}
 .tab.on:after{width:100%}
+.dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:#ff007f}
 .bubble{max-width:80%;padding:10px 14px;border-radius:17px;font-size:14px;line-height:1.5;word-break:break-word}
 .bubble-me{background:linear-gradient(135deg,#e2b053,#c99a3f);color:#050508;border-bottom-right-radius:4px;margin-left:auto}
 .bubble-peer{background:#1b1f31;color:#e8eaf2;border:1px solid #2a3047;border-bottom-left-radius:4px}
-.dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:#ff007f}
+.menu-btn{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:#d1d5db;font-size:13px;font-weight:700;text-align:left}
+.menu-btn:hover{background:rgba(255,255,255,.08)}
 input[type=range]{-webkit-appearance:none;background:transparent}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:14px;width:14px;border-radius:50%;background:#00f0ff;margin-top:-5px;cursor:pointer}
 input[type=range]::-webkit-slider-runnable-track{height:4px;background:#222638;border-radius:2px}
@@ -82,11 +75,17 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;background:#222638;b
 <div id="root"></div>
 
 <script type="text/babel">
+/*
+  Clé ANON restaurée depuis ton premier fichier.
+  C'est une clé publique Supabase : ne remplace jamais cette valeur
+  par la service_role key.
+*/
 const SB_URL='https://ryhnnlphdeuxrvpxyfgc.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG5ubHBoZGV1eHJ2cHh5ZmdjIiwiaWF0IjoxNzkxODE3NTAyLCJleHAiOjIxMDczOTM1MDJ9.YqjmUuWJK38qjTCB9hCK_N20BFEpUUsOnt77_iDWMCA';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG5ubHBoZGV1eHJ2cHh5ZmdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MTc1MDIsImV4cCI6MjEwNzM5MzUwMn0.YqjmUuWJK38qjTCB9hCK_N20BFEpUUsOnt77_iDWMCA';
 const sb=window.supabase.createClient(SB_URL,SB_KEY);
-const DC='https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80';
-const AV='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
+const DEFAULT_COVER='https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80';
+const DEFAULT_AVATAR='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
 const GENRES=['Tous','Drill','Trap','Jul Type','Afrobeat','Boom Bap','Raï','Pop','RnB'];
 const LICENSES=['mp3','wav','stems','exclusive'];
 const LICENSE_NAMES={mp3:'MP3 Lease',wav:'WAV Standard',stems:'Trackout / Stems',exclusive:'Exclusive',vst:'Licence VST'};
@@ -99,12 +98,12 @@ const DEFAULT_LIMITS={
 function fmt(n){return (Number(n)||0).toLocaleString('fr-FR');}
 function unlimited(n){return n===-1||n===null||n===undefined?'Illimité':fmt(n);}
 function formatTime(s){if(!s||!isFinite(s))return '0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
-function timeAgo(d){
-  const s=Math.floor((Date.now()-new Date(d).getTime())/1000);
-  if(s<60)return "à l'instant";
-  if(s<3600)return Math.floor(s/60)+' min';
-  if(s<86400)return Math.floor(s/3600)+' h';
-  return Math.floor(s/86400)+' j';
+function timeAgo(value){
+  const seconds=Math.floor((Date.now()-new Date(value).getTime())/1000);
+  if(seconds<60)return "à l'instant";
+  if(seconds<3600)return Math.floor(seconds/60)+' min';
+  if(seconds<86400)return Math.floor(seconds/3600)+' h';
+  return Math.floor(seconds/86400)+' j';
 }
 async function hashFile(file){
   try{
@@ -113,215 +112,88 @@ async function hashFile(file){
     return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
   }catch(e){return null;}
 }
-
-const ICONS={
-  play:<svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>,
-  pause:<svg fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>,
-  upload:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
-  logout:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>,
-  dashboard:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
-  back:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
-  close:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
-  trash:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>,
-  money:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
-  cpu:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg>,
-  shield:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>,
-  settings:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
-  chevron:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>,
-  check:<svg fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>,
-  search:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-  mic:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>,
-  music:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
-  home:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-  volume:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
-  mute:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>,
-  key:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>,
-  copy:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
-  list:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>,
-  bag:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
-  file:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
-  bell:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>,
-  bellOff:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8.7 3A6 6 0 0 1 18 8c0 2.4.4 4.2.9 5.5"/><path d="M17 17H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>,
-  users:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>,
-  plus:<svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-  share:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>,
-  instagram:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>,
-  chat:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
-  send:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
-  pdf:<svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-};
-function Icon(props){
-  const style={width:props.size||20,height:props.size||20,flexShrink:0};
-  return <svg className={props.className||''} style={style} viewBox="0 0 24 24" aria-hidden="true">{ICONS[props.name]?React.cloneElement(ICONS[props.name],{className:'',style:style}):null}</svg>;
-}
-
-/* ---------- CONTRAT PDF ---------- */
 function pdfSafe(value){
   return String(value===null||value===undefined?'':value)
-    .replace(/[’‘]/g,"'")
-    .replace(/[“”]/g,'"')
-    .replace(/[–—]/g,'-')
-    .replace(/•/g,'-')
-    .replace(/·/g,'-');
-}
-function addContractPage(doc,pageNo,total){
-  doc.setFillColor(5,5,8);doc.rect(0,0,210,27,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.setTextColor(226,176,83);
-  doc.text('213WAVE',16,13);
-  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(190,190,190);
-  doc.text('CONTRAT DE LICENCE MUSICALE',16,20);
-  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,120,120);
-  doc.text('YANrecords',178,20);
-  doc.setDrawColor(226,176,83);doc.line(16,28,194,28);
-}
-async function downloadContract(contractNo,toast){
-  try{
-    if(!window.jspdf||!window.jspdf.jsPDF){toast('La bibliothèque PDF ne se charge pas. Recharge la page.','error');return;}
-    const result=await sb.rpc('get_contract',{p_no:contractNo});
-    if(result.error)throw result.error;
-    const d=result.data;
-    if(!d)throw new Error('Contrat introuvable');
-    const PDF=window.jspdf.jsPDF;
-    const doc=new PDF({unit:'mm',format:'a4'});
-    let y=38,page=1;
-
-    function newPage(){
-      doc.addPage();page++;addContractPage(doc,page,1);y=38;
-    }
-    function ensure(h){
-      if(y+h>270)newPage();
-    }
-    function title(text){
-      ensure(12);
-      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(20,20,20);
-      doc.text(pdfSafe(text),16,y);y+=4;
-      doc.setDrawColor(220,220,220);doc.line(16,y,194,y);y+=6;
-    }
-    function para(text,size){
-      const fs=size||9;
-      doc.setFont('helvetica','normal');doc.setFontSize(fs);doc.setTextColor(55,55,55);
-      const lines=doc.splitTextToSize(pdfSafe(text),174);
-      const h=lines.length*4.2;
-      ensure(h+2);
-      doc.text(lines,18,y);
-      y+=h+2;
-    }
-    function row(label,value){
-      ensure(7);
-      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90,90,90);
-      doc.text(pdfSafe(label),18,y);
-      doc.setFont('helvetica','bold');doc.setTextColor(25,25,25);
-      const v=doc.splitTextToSize(pdfSafe(value),105);
-      doc.text(v,80,y);
-      y+=Math.max(5,v.length*4)+1;
-    }
-
-    addContractPage(doc,1,1);
-    doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(20,20,20);
-    doc.text('REFERENCE : '+pdfSafe(d.no),16,y);y+=8;
-    para('Genere automatiquement le '+new Date().toLocaleString('fr-FR')+'.',8);
-
-    title('1. PARTIES');
-    row('Producteur / concedant',d.seller_name||'-');
-    if(d.license==='exclusive')row('Nom legal du producteur',d.seller_legal||'-');
-    row('Acheteur / licencie',d.buyer_name||'-');
-    if(d.license==='exclusive')row('Nom legal de l acheteur',d.buyer_legal||'-');
-    y+=2;
-
-    title('2. OEUVRE CONCERNEE');
-    row('Titre',d.title||'-');
-    row('Type',d.type==='vst'?'Plugin VST':'Beat');
-    if(d.type!=='vst'){
-      row('Genre / BPM / gamme',(d.genre||'-')+' / '+(d.bpm||'-')+' / '+(d.musickey||'-'));
-    }
-    row('Date de publication',d.created?new Date(d.created).toLocaleString('fr-FR'):'-');
-    if(d.hash){
-      row('Empreinte SHA-256',d.hash);
-    }
-
-    title('3. LICENCE ACCORDEE');
-    row('Type de licence',LICENSE_NAMES[d.license]||d.license||'-');
-    const limits=d.limits||{};
-    if(d.type==='vst'){
-      row('Nombre d activations','3 machines maximum');
-      row('Partage de cle','Interdit');
-    }else{
-      row('Streams autorises',unlimited(limits.streams));
-      row('Copies vendues',unlimited(limits.copies));
-      row('Clips video',unlimited(limits.videos));
-      row('Diffusion radio',limits.radio===-1?'Illimitee':(Number(limits.radio)>0?limits.radio+' stations':'Non autorisee'));
-      row('Concerts payants',limits.shows?'Autorises':'Non autorises');
-      row('Tag producteur',limits.tag?'A conserver':'Retire');
-      row('Credit Prod. by','Obligatoire');
-      row('Duree',limits.years===-1?'Illimitee':(limits.years||'-')+' ans');
-      row('Exclusivite',d.license==='exclusive'?'Oui - beat retire du catalogue':'Non - licence non exclusive');
-    }
-
-    title('4. CONDITIONS FINANCIERES');
-    row('Prix paye',fmt(d.amount)+' DZD');
-    row('Part producteur',fmt(d.seller_amount)+' DZD');
-    row('Commission plateforme ('+d.rate+'%)',fmt(d.fee)+' DZD');
-    row('Paiement','Virement CCP / BaridiMob, preuve conservee');
-
-    if(d.vst_key){
-      title('5. CLE VST');
-      row('Cle d activation',d.vst_key);
-    }
-
-    title((d.vst_key?'6.':'5.')+' ENGAGEMENTS DES PARTIES');
-    para('Le Producteur declare etre l auteur original de l oeuvre et garantir qu elle ne porte atteinte a aucun droit de tiers.');
-    para('L Acheteur s engage a respecter les limites de la licence, a ne pas revendre ni redistribuer le fichier source, et a mentionner le Producteur lorsque le credit est requis.');
-    para('La licence ne transfere pas la propriete de l oeuvre. Elle accorde uniquement les droits d utilisation enumeres dans le present document.');
-    para('Sauf accord ecrit distinct, le publishing est partage a 50% pour le Producteur et 50% pour le beneficiaire.');
-    para('Le present contrat est soumis au droit algerien. YANrecords agit comme intermediaire technique et n est pas partie a la licence.');
-
-    title((d.vst_key?'7.':'6.')+' ACCEPTATION ET LIVRAISON');
-    row('Acceptation electronique',d.accepted_at?new Date(d.accepted_at).toLocaleString('fr-FR'):'-');
-    row('Validation / livraison',d.date?new Date(d.date).toLocaleString('fr-FR'):'-');
-    if(d.terms_version)row('Version des conditions',d.terms_version);
-
-    ensure(16);
-    doc.setFillColor(248,243,228);doc.rect(16,y,178,12,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(110,80,20);
-    doc.text('L acceptation electronique horodatee et le present PDF constituent la trace de la licence.',19,y+7);
-    y+=18;
-    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(110,110,110);
-    doc.text('Document genere automatiquement par 213WAVE / YANrecords - reference '+pdfSafe(d.no),16,280);
-
-    const pages=doc.getNumberOfPages();
-    for(let i=1;i<=pages;i++){
-      doc.setPage(i);
-      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,120,120);
-      doc.text('213WAVE - Document de licence - '+i+'/'+pages,16,289);
-    }
-    doc.save('Contrat-'+pdfSafe(d.no)+'.pdf');
-    toast('Contrat PDF téléchargé');
-  }catch(error){
-    toast(error.message||'Impossible de générer le PDF','error');
-  }
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[’‘]/g,"'").replace(/[“”]/g,'"')
+    .replace(/[–—]/g,'-').replace(/[•·]/g,'-');
 }
 
-/* ---------- ERROR BOUNDARY ---------- */
+/* ---------- LOGO 213WAVE ---------- */
+function BrandLogo(props){
+  const small=props.small||false;
+  return <div className="flex items-center gap-1.5 select-none" aria-label="213WAVE">
+    <span className={'font-black tracking-tight text-goldAccent '+(small?'text-lg':'text-3xl')}>213</span>
+    <svg width={small?16:24} height={small?22:32} viewBox="0 0 24 32" fill="none" aria-hidden="true">
+      <path d="M1 16h4l3-8 4 16 4-16 3 8h4" stroke="#00f0ff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+    <span className={'font-black tracking-[.12em] text-white '+(small?'text-lg':'text-3xl')}>WAVE</span>
+  </div>;
+}
+
+/* ---------- ICONES ---------- */
+const ICONS={
+  play:<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>,
+  pause:<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor" stroke="none"/>,
+  upload:<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></>,
+  logout:<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></>,
+  dashboard:<><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></>,
+  back:<><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></>,
+  close:<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>,
+  trash:<><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></>,
+  money:<><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>,
+  cpu:<><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/></>,
+  shield:<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>,
+  settings:<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></>,
+  chevron:<polyline points="6 9 12 15 18 9"/>,
+  check:<polyline points="20 6 9 17 4 12"/>,
+  search:<><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></>,
+  mic:<><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></>,
+  music:<><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></>,
+  home:<><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
+  volume:<><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></>,
+  mute:<><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></>,
+  key:<><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></>,
+  copy:<><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></>,
+  list:<><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></>,
+  bag:<><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></>,
+  file:<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></>,
+  bell:<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>,
+  bellOff:<><path d="M8.7 3A6 6 0 0 1 18 8c0 2.4.4 4.2.9 5.5"/><path d="M17 17H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></>,
+  users:<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></>,
+  plus:<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
+  share:<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></>,
+  instagram:<><rect width="20" height="20" x="2" y="2" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></>,
+  chat:<><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>,
+  send:<><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>,
+  pdf:<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></>
+};
+function Icon(props){
+  const size=props.size||20;
+  const filled=props.name==='play'||props.name==='pause';
+  return <svg className={props.className||''} width={size} height={size} viewBox="0 0 24 24"
+    fill={filled?'currentColor':'none'} stroke={filled?'none':'currentColor'} strokeWidth="2"
+    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS[props.name]||null}</svg>;
+}
+
 class ErrorBoundary extends React.Component{
   constructor(p){super(p);this.state={error:null};}
-  static getDerivedStateFromError(error){return{error:error};}
+  static getDerivedStateFromError(error){return {error:error};}
   render(){
-    if(this.state.error){
-      return <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="card p-8 rounded-2xl text-center max-w-md">
-          <h2 className="text-2xl font-black text-white mb-2">Erreur d'affichage</h2>
-          <p className="text-xs text-gray-400 mb-4">{String(this.state.error.message||this.state.error)}</p>
-          <button onClick={function(){location.reload();}} className="bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Recharger</button>
-        </div></div>;
-    }
+    if(this.state.error)return <div className="min-h-screen flex items-center justify-center p-5"><div className="card max-w-md p-8 rounded-2xl text-center">
+      <h2 className="text-2xl font-black text-white mb-3">Le site a rencontré une erreur</h2>
+      <p className="text-sm text-gray-400 mb-5">{String(this.state.error.message||this.state.error)}</p>
+      <button onClick={function(){location.reload();}} className="bg-cyanNeon text-black font-black px-6 py-3 rounded-xl">Recharger</button>
+    </div></div>;
     return this.props.children;
   }
 }
 
 function Toasts(props){
-  return <div className="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-xs">
+  return <div className="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-sm">
     {props.items.map(function(t){
-      return <div key={t.id} className="toast card rounded-xl p-4 flex items-center gap-3 border-l-4" style={{borderLeftColor:t.type==='error'?'#ef4444':'#10b981'}}>
+      return <div key={t.id} className="toast card rounded-xl p-4 flex items-center gap-3 border-l-4"
+        style={{borderLeftColor:t.type==='error'?'#ef4444':'#10b981'}}>
         <p className="text-sm font-bold text-white flex-1">{t.message}</p>
         <button onClick={function(){props.remove(t.id);}} className="text-gray-500"><Icon name="close" size={16}/></button>
       </div>;
@@ -329,37 +201,31 @@ function Toasts(props){
   </div>;
 }
 
-/* ---------- CGU courtes inscription ---------- */
 function AuthPage(props){
   const [mode,setMode]=React.useState('login');
   const [email,setEmail]=React.useState('');
-  const [pass,setPass]=React.useState('');
-  const [name,setName]=React.useState('');
-  const [err,setErr]=React.useState('');
+  const [password,setPassword]=React.useState('');
+  const [artistName,setArtistName]=React.useState('');
+  const [error,setError]=React.useState('');
   const [busy,setBusy]=React.useState(false);
   const [accepted,setAccepted]=React.useState(false);
 
   async function submit(e){
-    e.preventDefault();
-    setErr('');
-    if(mode==='register'&&!accepted){setErr('Accepte les CGU pour continuer.');return;}
+    e.preventDefault();setError('');
+    if(mode==='register'&&!accepted){setError('Accepte les CGU pour continuer.');return;}
     setBusy(true);
     try{
       if(mode==='login'){
-        const r=await sb.auth.signInWithPassword({email:email,password:pass});
+        const r=await sb.auth.signInWithPassword({email:email,password:password});
         if(r.error)throw r.error;
         props.toast('Connecté !');
       }else{
-        const r=await sb.auth.signUp({
-          email:email,
-          password:pass,
-          options:{data:{full_name:name||email.split('@')[0]}}
-        });
+        const r=await sb.auth.signUp({email:email,password:password,options:{data:{full_name:artistName||email.split('@')[0]}}});
         if(r.error)throw r.error;
-        if(r.data.user&&!r.data.session)props.toast('Vérifie ton email pour activer ton compte');
+        if(r.data.user&&!r.data.session)props.toast('Vérifie ton email pour activer ton compte.');
         else props.toast('Compte créé !');
       }
-    }catch(ex){setErr(ex.message);}
+    }catch(ex){setError(ex.message);}
     setBusy(false);
   }
 
@@ -371,102 +237,76 @@ function AuthPage(props){
   return <div className="min-h-screen flex items-center justify-center p-4 relative">
     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80')] bg-cover bg-center"></div>
     <div className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"></div>
-    <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center fade">
-      <div className="text-center lg:text-left space-y-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg">Y</div>
-        <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tgold">YANRECORDS</span></h1>
-        <p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie.</p>
-        <div className="hidden lg:block space-y-3 pt-4 text-sm font-bold text-white">
-          <p>📄 Contrat PDF à chaque vente validée</p>
-          <p>🔑 Clés VST uniques</p>
-          <p>💬 Messagerie directe entre membres</p>
-        </div>
+    <div className="relative z-10 w-full max-w-5xl grid lg:grid-cols-2 gap-10 items-center fade">
+      <div className="space-y-6 text-center lg:text-left">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 text-3xl font-black text-goldAccent">W</div>
+        <h1 className="text-4xl md:text-5xl font-black leading-tight"><BrandLogo/><span className="sr-only">213WAVE</span></h1>
+        <p className="text-gray-400 text-lg">Le marché du son algérien.</p>
+        <p className="hidden lg:block text-sm text-gray-300">Beats · Plugins VST · Licences · Contrats PDF</p>
       </div>
-
-      <div className="card p-8 rounded-[2rem] border-cyanNeon/20">
-        <div className="flex bg-obsidian rounded-xl p-1 mb-8 border border-borderDark">
-          <button onClick={function(){setMode('login');setErr('');}} className={'flex-1 py-2.5 text-sm font-bold rounded-lg '+(mode==='login'?'bg-cyanNeon text-black':'text-gray-400')}>Se connecter</button>
-          <button onClick={function(){setMode('register');setErr('');}} className={'flex-1 py-2.5 text-sm font-bold rounded-lg '+(mode==='register'?'bg-goldAccent text-black':'text-gray-400')}>Créer un compte</button>
+      <div className="card p-8 rounded-[2rem]">
+        <div className="flex bg-obsidian rounded-xl p-1 mb-7 border border-borderDark">
+          <button onClick={function(){setMode('login');setError('');}} className={'flex-1 py-3 rounded-lg text-sm font-bold '+(mode==='login'?'bg-cyanNeon text-black':'text-gray-400')}>Connexion</button>
+          <button onClick={function(){setMode('register');setError('');}} className={'flex-1 py-3 rounded-lg text-sm font-bold '+(mode==='register'?'bg-goldAccent text-black':'text-gray-400')}>Créer un compte</button>
         </div>
-
         <form onSubmit={submit} className="space-y-4">
-          {mode==='register'?<div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'artiste</label>
-            <input type="text" required maxLength="50" value={name} onChange={function(e){setName(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/></div>:null}
-          <div><label className="text-xs font-bold text-gray-400 block mb-1">Email</label>
-            <input type="email" required value={email} onChange={function(e){setEmail(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/></div>
-          <div><label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label>
-            <input type="password" required minLength="6" value={pass} onChange={function(e){setPass(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/></div>
-          {mode==='register'?<div className="flex items-start gap-3">
-            <input type="checkbox" checked={accepted} onChange={function(e){setAccepted(e.target.checked);}} className="mt-1 accent-goldAccent"/>
-            <label className="text-xs text-gray-400">J'accepte les <a href="infos.html#cgu" target="_blank" className="text-goldAccent font-bold underline">CGU</a>.</label>
-          </div>:null}
-          {err?<div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{err}</div>:null}
-          <button type="submit" disabled={busy} className={'w-full font-black py-3.5 rounded-xl disabled:opacity-50 '+(mode==='login'?'bg-cyanNeon text-black gc':'bg-goldAccent text-black gg')}>
-            {busy?'...':mode==='login'?'CONNEXION':"S'INSCRIRE"}
-          </button>
+          {mode==='register'?<div><label className="text-xs text-gray-400 block mb-1">Nom d'artiste</label><input required maxLength="50" value={artistName} onChange={function(e){setArtistName(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>:null}
+          <div><label className="text-xs text-gray-400 block mb-1">Email</label><input type="email" required value={email} onChange={function(e){setEmail(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
+          <div><label className="text-xs text-gray-400 block mb-1">Mot de passe (6+)</label><input type="password" required minLength="6" value={password} onChange={function(e){setPassword(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
+          {mode==='register'?<label className="flex items-start gap-3 text-xs text-gray-400"><input type="checkbox" checked={accepted} onChange={function(e){setAccepted(e.target.checked);}} className="mt-1 accent-goldAccent"/>J'accepte les <a href="infos.html#cgu" target="_blank" className="text-goldAccent underline">CGU</a>.</label>:null}
+          {error?<p className="text-sm text-red-400">{error}</p>:null}
+          <button disabled={busy} className={'w-full py-4 rounded-xl font-black disabled:opacity-50 '+(mode==='login'?'bg-cyanNeon text-black':'bg-goldAccent text-black')}>{busy?'...':mode==='login'?'SE CONNECTER':"S'INSCRIRE"}</button>
         </form>
-
-        <div className="flex items-center gap-4 my-6"><div className="h-px bg-borderDark flex-1"></div><span className="text-xs text-gray-500">OU</span><div className="h-px bg-borderDark flex-1"></div></div>
-        <button onClick={google} className="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-gray-200 transition">Continuer avec Google</button>
+        <div className="flex items-center gap-3 my-5 text-xs text-gray-500"><div className="h-px bg-borderDark flex-1"></div>OU<div className="h-px bg-borderDark flex-1"></div></div>
+        <button onClick={google} className="w-full bg-white text-black font-bold py-3 rounded-xl">Continuer avec Google</button>
       </div>
     </div>
   </div>;
 }
 
-/* ---------- NAVBAR ---------- */
 function NavBar(props){
   const [menu,setMenu]=React.useState(false);
   const [bell,setBell]=React.useState(false);
   function go(view){setMenu(false);setBell(false);props.setView(view);}
   return <React.Fragment>
     {(menu||bell)?<div className="fixed inset-0 z-40" onClick={function(){setMenu(false);setBell(false);}}></div>:null}
-    <nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between">
-      <div className="flex items-center gap-3 cursor-pointer" onClick={function(){go('home');}}>
-        <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent gg">Y</div>
-        <h1 className="text-lg font-black tracking-widest text-white hidden sm:block">YAN<span className="tgold">RECORDS</span></h1>
-      </div>
-      <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
-        <button onClick={function(){go('home');}} className={'px-4 py-2 rounded-full text-sm font-bold '+(props.view==='home'?'bg-white text-black':'text-gray-400')}>Accueil</button>
-        <button onClick={function(){go('vsts');}} className={'px-4 py-2 rounded-full text-sm font-bold '+(props.view==='vsts'?'bg-cyanNeon text-black':'text-gray-400')}>VSTs</button>
-        <button onClick={function(){go('beats');}} className={'px-4 py-2 rounded-full text-sm font-bold '+(props.view==='beats'?'bg-goldAccent text-black':'text-gray-400')}>Beats</button>
-        <button onClick={function(){go('artists');}} className={'px-4 py-2 rounded-full text-sm font-bold '+(props.view==='artists'?'bg-pinkNeon text-black':'text-gray-400')}>Artistes</button>
+    <nav className="glass fixed top-0 inset-x-0 z-50 px-4 md:px-6 py-3 flex items-center justify-between">
+      <button onClick={function(){go('home');}} className="text-left"><BrandLogo small={true}/></button>
+      <div className="hidden md:flex gap-1 bg-black/40 border border-borderDark rounded-full p-1">
+        {[
+          ['home','Accueil'],['beats','Beats'],['vsts','VST'],['artists','Artistes']
+        ].map(function(x){return <button key={x[0]} onClick={function(){go(x[0]);}} className={'px-4 py-2 rounded-full text-xs font-bold '+(props.view===x[0]?'bg-goldAccent text-black':'text-gray-400')}>{x[1]}</button>;})}
       </div>
       <div className="flex items-center gap-2 relative z-50">
-        <button onClick={function(){go('messages');}} className="relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-cyanNeon text-gray-300">
-          <Icon name="chat"/>{props.msgUnread>0?<span className="dot"></span>:null}
+        <button onClick={function(){setMenu(false);setBell(!bell);if(!bell&&props.unread)props.markRead();}} className="relative w-10 h-10 bg-cardDark border border-borderDark rounded-xl flex items-center justify-center">
+          <Icon name="bell" size={18}/>{props.unread>0?<span className="dot"></span>:null}
+        </button>
+        {bell?<div className="absolute right-12 top-12 w-80 max-h-96 overflow-y-auto card rounded-2xl p-2 drop">
+          <p className="px-3 py-2 text-xs font-black text-gray-400 uppercase">Notifications</p>
+          {props.notifications.length===0?<p className="text-center text-xs text-gray-500 py-6">Aucune notification.</p>:
+          props.notifications.map(function(n){return <button key={n.id} onClick={function(){setBell(false);props.openProducer(n.producer_id);}} className="w-full text-left p-3 rounded-xl hover:bg-white/5">
+            <p className="text-sm font-bold text-white">{n.title}</p><p className="text-xs text-gray-400">{n.body}</p><p className="text-[10px] text-gray-600">{timeAgo(n.created_at)}</p>
+          </button>;})}
+        </div>:null}
+        <button onClick={function(){go('messages');}} className="relative w-10 h-10 bg-cardDark border border-borderDark rounded-xl flex items-center justify-center">
+          <Icon name="chat" size={18}/>{props.msgUnread>0?<span className="dot"></span>:null}
         </button>
         <div className="relative">
-          <button onClick={function(){setBell(!bell);setMenu(false);if(!bell&&props.unread>0)props.markRead();}} className="relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-pinkNeon text-gray-300">
-            <Icon name="bell"/>{props.unread>0?<span className="dot"></span>:null}
+          <button onClick={function(){setMenu(!menu);setBell(false);}} className="flex items-center gap-2 bg-cardDark border border-borderDark rounded-xl px-2 py-1.5">
+            <img src={props.profile.avatar_url||DEFAULT_AVATAR} className="w-7 h-7 object-cover rounded-full" alt=""/>
+            <span className="hidden md:block text-xs font-bold max-w-24 truncate">{props.profile.name||'Membre'}</span>
+            <Icon name="chevron" size={15}/>
           </button>
-          {bell?<div className="absolute right-0 top-12 mt-2 w-80 card rounded-2xl p-2 drop max-h-96 overflow-y-auto">
-            <p className="px-3 py-2 text-xs font-black text-gray-400 uppercase">Notifications</p>
-            {props.notifications.length===0?<p className="px-3 py-6 text-center text-sm text-gray-500">Aucune notification.</p>:
-            props.notifications.map(function(n){
-              return <button key={n.id} onClick={function(){setBell(false);props.openProducer(n.producer_id);}} className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/5 flex gap-3">
-                <div className="w-8 h-8 rounded-lg bg-goldAccent/20 text-goldAccent flex items-center justify-center"><Icon name="music" size={16}/></div>
-                <div className="min-w-0"><p className="text-sm font-bold text-white truncate">{n.title}</p><p className="text-xs text-gray-400 truncate">{n.body}</p><p className="text-[10px] text-gray-600">{timeAgo(n.created_at)}</p></div>
-              </button>;
-            })}
-          </div>:null}
-        </div>
-        <button onClick={function(){go('upload');}} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs"><Icon name="upload" size={16}/>Poster</button>
-        <div className="relative">
-          <button onClick={function(){setMenu(!menu);setBell(false);}} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl">
-            <img src={props.profile.avatar_url||AV} className="w-7 h-7 rounded-full object-cover" alt=""/>
-            <span className="text-xs font-bold text-white hidden md:block max-w-[90px] truncate">{props.profile.name||'User'}</span>
-            <Icon name="chevron" size={16}/>
-          </button>
-          {menu?<div className="absolute right-0 top-12 mt-2 w-60 card rounded-xl p-2 flex flex-col gap-1 drop">
-            <button onClick={function(){go('me');}} className="px-3 py-2 border-b border-borderDark mb-1 text-left">
-              <p className="text-xs text-gray-400">Mon profil public</p><p className="text-sm font-bold text-white">{props.profile.name}</p>
+          {menu?<div className="absolute right-0 top-12 w-60 card rounded-xl p-2 drop flex flex-col">
+            <button onClick={function(){go('me');}} className="menu-btn border-b border-borderDark rounded-b-none mb-1">
+              <span><span className="block text-[10px] text-gray-500">PROFIL PUBLIC</span><b>{props.profile.name}</b></span>
             </button>
             <button onClick={function(){go('dashboard');}} className="menu-btn"><Icon name="dashboard" size={16}/>Dashboard</button>
             <button onClick={function(){go('myorders');}} className="menu-btn"><Icon name="bag" size={16}/>Mes commandes</button>
-            <button onClick={function(){go('messages');}} className="menu-btn"><Icon name="chat" size={16}/>Messages {props.msgUnread>0?'('+props.msgUnread+')':''}</button>
             <button onClick={function(){go('keys');}} className="menu-btn"><Icon name="key" size={16}/>Mes clés VST</button>
-            <button onClick={function(){go('verify');}} className="menu-btn"><Icon name="shield" size={16}/>Vérifier une clé</button>
-            {props.profile.is_admin?<button onClick={function(){go('admin');}} className="menu-btn text-pinkNeon"><Icon name="list" size={16}/>Admin ({props.pending})</button>:null}
+            <button onClick={function(){go('messages');}} className="menu-btn"><Icon name="chat" size={16}/>Messages ({props.msgUnread})</button>
+            <button onClick={function(){go('verify');}} className="menu-btn"><Icon name="shield" size={16}/>Tester une clé</button>
+            {props.profile.is_admin?<button onClick={function(){go('admin');}} className="menu-btn text-pinkNeon"><Icon name="list" size={16}/>Administration ({props.pending})</button>:null}
             <button onClick={function(){go('settings');}} className="menu-btn"><Icon name="settings" size={16}/>Paramètres</button>
             <a href="infos.html" className="menu-btn text-cyanNeon"><Icon name="file" size={16}/>Guide & Infos</a>
             <button onClick={props.logout} className="menu-btn text-red-400"><Icon name="logout" size={16}/>Déconnexion</button>
@@ -477,158 +317,151 @@ function NavBar(props){
   </React.Fragment>;
 }
 
-/* ---------- NAVIGATION MOBILE ---------- */
 function MobileNav(props){
-  const entries=[
-    {view:'home',icon:'home',label:'Accueil'},
-    {view:'beats',icon:'music',label:'Beats'},
-    {view:'vsts',icon:'cpu',label:'VSTs'},
-    {view:'messages',icon:'chat',label:'Chat'},
-    {view:'upload',icon:'upload',label:'Poster'}
-  ];
-  return <nav className={'md:hidden fixed inset-x-0 z-40 glass border-t border-borderDark px-2 py-2 flex justify-around '+(props.player?'bottom-[94px]':'bottom-0')}>
-    {entries.map(function(e){
-      return <button key={e.view} onClick={function(){props.setView(e.view);}} className={'flex flex-col items-center gap-1 '+(props.view===e.view?'text-cyanNeon':'text-gray-400')}>
-        <Icon name={e.icon} size={19}/><span className="text-[9px] font-bold">{e.label}</span>
-      </button>;
-    })}
+  const items=[['home','home','Accueil'],['beats','music','Beats'],['vsts','cpu','VST'],['messages','chat','Chat'],['upload','upload','Poster']];
+  return <nav className={'md:hidden fixed inset-x-0 z-40 glass border-t border-borderDark flex justify-around py-2 '+(props.hasPlayer?'bottom-[96px]':'bottom-0')}>
+    {items.map(function(x){return <button key={x[0]} onClick={function(){props.setView(x[0]);}} className={'flex flex-col items-center gap-1 '+(props.view===x[0]?'text-cyanNeon':'text-gray-400')}><Icon name={x[1]} size={19}/><span className="text-[9px] font-bold">{x[2]}</span></button>;})}
   </nav>;
 }
 
-/* ---------- ACCUEIL ---------- */
 function HomeView(props){
-  return <div className="space-y-10 fade">
-    <div className="card p-8 md:p-12 rounded-3xl border border-goldAccent/30 lift">
-      <span className="text-xs font-bold text-goldAccent uppercase tracking-widest">Pour les producteurs</span>
-      <h2 className="text-3xl md:text-4xl font-black text-white mt-3 mb-4">VENDS TES PRODS AVEC UN CONTRAT</h2>
-      <p className="text-gray-300 mb-7 max-w-2xl">Publie beats et plugins, choisis tes licences et tes limites. Chaque vente validée reçoit une référence de contrat unique et un PDF à télécharger.</p>
-      <div className="flex flex-col sm:flex-row gap-3">
-        <button onClick={function(){props.setView('upload');}} className="bg-goldAccent text-black font-black px-7 py-4 rounded-xl gg hover:scale-105 transition">🎹 PUBLIER MES PRODS</button>
-        <a href="infos.html" className="border border-cyanNeon text-cyanNeon font-black px-7 py-4 rounded-xl text-center hover:bg-cyanNeon/10">📘 LIRE LE GUIDE</a>
+  const top=props.producers.slice(0,6);
+  return <div className="space-y-8 fade">
+    <div className="card rounded-3xl p-8 md:p-12 border border-goldAccent/30 lift">
+      <p className="text-xs font-black text-goldAccent uppercase tracking-widest">213WAVE · Le marché du son algérien</p>
+      <h2 className="text-3xl md:text-5xl font-black mt-4 mb-4">TON SON.<br/><span className="tgold">TES DROITS.</span></h2>
+      <p className="text-gray-300 max-w-2xl mb-7">Beats, plugins VST, licences personnalisables, contrats PDF numérotés et messagerie directe.</p>
+      <div className="flex flex-wrap gap-3">
+        <button onClick={function(){props.setView('beats');}} className="bg-goldAccent text-black font-black px-6 py-4 rounded-xl">Explorer le Beatstore</button>
+        <button onClick={function(){props.setView('upload');}} className="bg-cyanNeon text-black font-black px-6 py-4 rounded-xl">Publier mes prods</button>
+        <a href="infos.html" className="border border-borderDark text-white font-bold px-6 py-4 rounded-xl">Guide & Infos</a>
       </div>
     </div>
-    <div className="card p-8 md:p-12 rounded-3xl border border-cyanNeon/30 lift">
-      <span className="text-xs font-bold text-cyanNeon uppercase tracking-widest">Pour les artistes</span>
-      <h2 className="text-3xl md:text-4xl font-black text-white mt-3 mb-4">TROUVE TON PROCHAIN SON</h2>
-      <p className="text-gray-300 mb-7 max-w-2xl">Explore les beats, choisis ta licence, discute avec le producteur et garde ton contrat dans Mes commandes.</p>
-      <button onClick={function(){props.setView('beats');}} className="bg-cyanNeon text-black font-black px-7 py-4 rounded-xl gc hover:scale-105 transition">🎧 EXPLORER LE BEATSTORE</button>
-    </div>
-    <div className="grid md:grid-cols-3 gap-5">
-      <div className="card p-7 rounded-2xl text-center border-cyanNeon/20 lift"><Icon name="cpu" size={44} className="mx-auto text-cyanNeon"/><h3 className="font-black mt-4">VST sécurisés</h3><p className="text-xs text-gray-400 mt-2">Clés uniques, fichiers privés et activation contrôlée.</p></div>
-      <div className="card p-7 rounded-2xl text-center border-goldAccent/20 lift"><Icon name="pdf" size={44} className="mx-auto text-goldAccent"/><h3 className="font-black mt-4">Contrats PDF</h3><p className="text-xs text-gray-400 mt-2">Une licence décrite et horodatée après validation.</p></div>
-      <div className="card p-7 rounded-2xl text-center border-pinkNeon/20 lift"><Icon name="chat" size={44} className="mx-auto text-pinkNeon"/><h3 className="font-black mt-4">Contact direct</h3><p className="text-xs text-gray-400 mt-2">Messagerie privée avec les producteurs.</p></div>
+    {top.length>0?<div>
+      <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-black">Producteurs à suivre</h3><button onClick={function(){props.setView('artists');}} className="text-xs text-cyanNeon">Tous les artistes →</button></div>
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">{top.map(function(p){
+        return <button key={p.id} onClick={function(){props.openProducer(p.id);}} className="card p-4 rounded-2xl text-center lift">
+          <div className="ringg w-14 h-14 mx-auto mb-2"><img src={p.avatar_url||DEFAULT_AVATAR} className="w-full h-full rounded-full object-cover" alt=""/></div>
+          <p className="text-sm font-bold truncate">{p.name}</p><p className="text-[10px] text-gray-500">{p.count} créations</p>
+        </button>;
+      })}</div>
+    </div>:null}
+    <div className="grid md:grid-cols-3 gap-4">
+      <div className="card rounded-2xl p-6 text-center"><Icon name="pdf" size={38} className="mx-auto text-goldAccent"/><h3 className="font-black mt-3">Contrat PDF</h3><p className="text-xs text-gray-400 mt-2">Un numéro et les limites convenues pour chaque vente validée.</p></div>
+      <div className="card rounded-2xl p-6 text-center"><Icon name="shield" size={38} className="mx-auto text-cyanNeon"/><h3 className="font-black mt-3">Empreinte SHA-256</h3><p className="text-xs text-gray-400 mt-2">Une empreinte permet d'identifier le fichier publié.</p></div>
+      <div className="card rounded-2xl p-6 text-center"><Icon name="chat" size={38} className="mx-auto text-pinkNeon"/><h3 className="font-black mt-3">Messagerie directe</h3><p className="text-xs text-gray-400 mt-2">Contacte un producteur depuis son profil.</p></div>
     </div>
   </div>;
 }
 
-/* ---------- LISTE PRODUCTEURS ---------- */
 function ArtistsView(props){
-  const [query,setQuery]=React.useState('');
-  const list=props.producers.filter(function(p){return !query||(p.name||'').toLowerCase().includes(query.toLowerCase());});
+  const [q,setQ]=React.useState('');
+  const list=props.producers.filter(function(p){return !q||(p.name||'').toLowerCase().includes(q.toLowerCase());});
   return <section className="fade space-y-5">
     <div className="flex flex-col md:flex-row justify-between gap-4">
       <h2 className="text-3xl font-black border-l-4 border-pinkNeon pl-4">PRODUCTEURS</h2>
-      <input value={query} onChange={function(e){setQuery(e.target.value);}} placeholder="Chercher un beatmaker..." className="bg-cardDark border border-borderDark rounded-xl px-4 py-3 text-sm outline-none focus:border-pinkNeon"/>
+      <input value={q} onChange={function(e){setQ(e.target.value);}} placeholder="Chercher un beatmaker..." className="bg-cardDark border border-borderDark rounded-xl px-4 py-3 text-sm outline-none focus:border-pinkNeon"/>
     </div>
     {list.length===0?<p className="text-center text-gray-400 py-10">Aucun producteur trouvé.</p>:
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{list.map(function(p){
       return <button key={p.id} onClick={function(){props.openProducer(p.id);}} className="card rounded-2xl p-5 text-center lift">
-        <div className="ringg w-20 h-20 mx-auto mb-3"><img src={p.avatar_url||AV} className="w-full h-full rounded-full object-cover" alt=""/></div>
-        <p className="font-black text-white truncate">{p.name}</p><p className="text-xs text-gray-500 mt-1">{p.count} créations</p>
+        <div className="ringg w-20 h-20 mx-auto mb-3"><img src={p.avatar_url||DEFAULT_AVATAR} className="w-full h-full rounded-full object-cover" alt=""/></div>
+        <p className="font-black truncate">{p.name}</p><p className="text-xs text-gray-500 mt-1">{p.count} créations</p>
       </button>;
     })}</div>}
   </section>;
 }
 
-/* ---------- PROFIL PUBLIC ---------- */
 function ProducerPage(props){
-  const [producer,setProducer]=React.useState(null);
+  const [profile,setProfile]=React.useState(null);
   const [tab,setTab]=React.useState('beat');
   const [busy,setBusy]=React.useState(false);
   React.useEffect(function(){
-    let active=true;
-    setProducer(null);
-    sb.rpc('get_producer',{p_id:props.id}).then(function(r){if(active)setProducer(r.data||null);});
-    return function(){active=false;};
+    let alive=true;setProfile(null);
+    sb.rpc('get_producer',{p_id:props.id}).then(function(r){if(alive)setProfile(r.data||null);});
+    return function(){alive=false;};
   },[props.id]);
 
   const mine=props.tracks.filter(function(t){return t.producer_id===props.id;});
   const beats=mine.filter(function(t){return t.type==='beat';});
   const vsts=mine.filter(function(t){return t.type==='vst';});
 
-  async function toggleFollow(){
+  async function follow(){
     setBusy(true);
     const r=await sb.rpc('toggle_follow',{p_id:props.id});
     if(r.error)props.toast(r.error.message,'error');
     else{
-      setProducer(Object.assign({},producer,{is_following:r.data.following,notify:r.data.notify,followers:(producer.followers||0)+(r.data.following?1:-1)}));
+      setProfile(Object.assign({},profile,{
+        is_following:r.data.following,
+        notify:r.data.notify,
+        followers:(profile.followers||0)+(r.data.following?1:-1)
+      }));
       props.toast(r.data.following?'Abonné !':'Désabonné.');
     }
     setBusy(false);
   }
-  async function toggleBell(){
+
+  async function bell(){
     const r=await sb.rpc('toggle_bell',{p_id:props.id});
     if(r.error){props.toast(r.error.message,'error');return;}
-    setProducer(Object.assign({},producer,{notify:r.data.notify}));
-    props.toast(r.data.notify?'Notifications activées':'Notifications coupées');
+    setProfile(Object.assign({},profile,{notify:r.data.notify}));
+    props.toast(r.data.notify?'Notifications activées.':'Notifications coupées.');
   }
-  if(!producer)return <div className="flex justify-center py-20"><div className="loader"></div></div>;
 
-  const products=tab==='beat'?beats:vsts;
-  return <div className="fade space-y-6">
-    <div className="banner rounded-[2rem] p-8 md:p-10 border border-borderDark relative overflow-hidden">
-      <div className="relative z-10 flex flex-col md:flex-row items-center md:items-end gap-6">
-        <div className="ringg w-28 h-28 md:w-32 md:h-32"><img src={producer.avatar_url||AV} className="w-full h-full rounded-full object-cover" alt=""/></div>
+  if(!profile)return <div className="flex justify-center py-20"><div className="loader"></div></div>;
+  const list=tab==='beat'?beats:vsts;
+
+  return <section className="fade space-y-6">
+    <div className="banner card rounded-[2rem] p-7 md:p-10">
+      <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
+        <div className="ringg w-28 h-28"><img src={profile.avatar_url||DEFAULT_AVATAR} className="w-full h-full rounded-full object-cover" alt=""/></div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-[11px] font-black text-goldAccent uppercase tracking-widest">Producteur · Algérie</p>
-          <h1 className="text-4xl md:text-5xl font-black text-white">{producer.name}</h1>
-          <p className="text-sm text-gray-300 mt-2">{producer.bio||'Pas encore de bio.'}</p>
-          {producer.instagram?<a href={'https://instagram.com/'+String(producer.instagram).replace('@','')} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 mt-2 text-xs text-pinkNeon"><Icon name="instagram" size={15}/>@{String(producer.instagram).replace('@','')}</a>:null}
+          <p className="text-[10px] uppercase font-black text-goldAccent tracking-widest">Producteur · Algérie</p>
+          <h1 className="text-3xl md:text-5xl font-black">{profile.name}</h1>
+          <p className="text-sm text-gray-300 mt-2">{profile.bio||'Pas encore de bio.'}</p>
+          {profile.instagram?<a href={'https://instagram.com/'+String(profile.instagram).replace('@','')} target="_blank" rel="noreferrer" className="text-xs text-pinkNeon inline-flex items-center gap-1 mt-2"><Icon name="instagram" size={15}/>@{String(profile.instagram).replace('@','')}</a>:null}
         </div>
         <div className="flex gap-2 flex-wrap justify-center">
           {props.me===props.id
-            ?<button onClick={function(){props.setView('settings');}} className="bg-white text-black font-black px-5 py-3 rounded-xl text-sm">Modifier mon profil</button>
+            ?<button onClick={function(){props.setView('settings');}} className="bg-white text-black font-black px-5 py-3 rounded-xl">Modifier mon profil</button>
             :<React.Fragment>
-              <button onClick={toggleFollow} disabled={busy} className={'font-black px-5 py-3 rounded-xl text-sm flex items-center gap-2 '+(producer.is_following?'bg-cardDark border border-greenPro text-greenPro':'bg-pinkNeon text-black')}>
-                <Icon name={producer.is_following?'check':'plus'} size={16}/>{producer.is_following?'Abonné':"S'abonner"}
+              <button disabled={busy} onClick={follow} className={'px-5 py-3 rounded-xl text-sm font-black '+(profile.is_following?'bg-cardDark border border-greenPro text-greenPro':'bg-pinkNeon text-black')}>
+                {profile.is_following?'Abonné':"S'abonner"}
               </button>
-              {producer.is_following?<button onClick={toggleBell} className="w-12 h-12 rounded-xl border border-borderDark flex items-center justify-center text-goldAccent"><Icon name={producer.notify?'bell':'bellOff'}/></button>:null}
-              <button onClick={function(){props.openChat(props.id,producer.name);}} className="w-12 h-12 rounded-xl border border-cyanNeon text-cyanNeon flex items-center justify-center"><Icon name="chat"/></button>
-            </React.Fragment>
-          }
-          <button onClick={props.share} className="w-12 h-12 rounded-xl border border-borderDark text-gray-300 flex items-center justify-center"><Icon name="share"/></button>
+              {profile.is_following?<button onClick={bell} className="w-12 h-12 rounded-xl border border-borderDark text-goldAccent flex items-center justify-center"><Icon name={profile.notify?'bell':'bellOff'}/></button>:null}
+              <button onClick={function(){props.openChat(props.id,profile.name);}} className="w-12 h-12 rounded-xl border border-cyanNeon text-cyanNeon flex items-center justify-center"><Icon name="chat"/></button>
+            </React.Fragment>}
+          <button onClick={props.share} className="w-12 h-12 rounded-xl border border-borderDark flex items-center justify-center"><Icon name="share"/></button>
         </div>
       </div>
-
-      <div className="grid grid-cols-4 gap-2 md:gap-3 mt-8">
-        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="text-xl font-black text-goldAccent">{producer.beats_count||0}</p><p className="text-[9px] text-gray-400">BEATS</p></div>
-        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="text-xl font-black text-cyanNeon">{producer.vsts_count||0}</p><p className="text-[9px] text-gray-400">VSTS</p></div>
-        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="text-xl font-black text-white">{fmt(producer.plays||0)}</p><p className="text-[9px] text-gray-400">ÉCOUTES</p></div>
-        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="text-xl font-black text-pinkNeon">{fmt(producer.followers||0)}</p><p className="text-[9px] text-gray-400">ABONNÉS</p></div>
+      <div className="grid grid-cols-4 gap-2 mt-7">
+        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="font-black text-goldAccent text-xl">{profile.beats_count||0}</p><p className="text-[9px] text-gray-400">BEATS</p></div>
+        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="font-black text-cyanNeon text-xl">{profile.vsts_count||0}</p><p className="text-[9px] text-gray-400">VST</p></div>
+        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="font-black text-xl">{fmt(profile.plays||0)}</p><p className="text-[9px] text-gray-400">ÉCOUTES</p></div>
+        <div className="bg-black/40 rounded-xl p-3 text-center"><p className="font-black text-pinkNeon text-xl">{fmt(profile.followers||0)}</p><p className="text-[9px] text-gray-400">ABONNÉS</p></div>
       </div>
     </div>
 
-    <div className="flex gap-6 border-b border-borderDark px-2">
-      <button onClick={function(){setTab('beat');}} className={'tab pb-3 text-sm font-black '+(tab==='beat'?'on text-white':'text-gray-500')}>BEATS ({beats.length})</button>
-      <button onClick={function(){setTab('vst');}} className={'tab pb-3 text-sm font-black '+(tab==='vst'?'on text-white':'text-gray-500')}>VST ({vsts.length})</button>
+    <div className="flex gap-6 border-b border-borderDark">
+      <button onClick={function(){setTab('beat');}} className={'tab pb-3 text-xs font-black '+(tab==='beat'?'on text-white':'text-gray-500')}>BEATS ({beats.length})</button>
+      <button onClick={function(){setTab('vst');}} className={'tab pb-3 text-xs font-black '+(tab==='vst'?'on text-white':'text-gray-500')}>VST ({vsts.length})</button>
     </div>
 
-    {products.length===0?<p className="text-center text-gray-500 py-10">Aucune publication ici pour l'instant.</p>:
-    <div className="grid md:grid-cols-3 gap-5">{products.map(function(t){
+    {list.length===0?<p className="text-center text-gray-500 py-10">Aucune publication dans cette catégorie.</p>:
+    <div className="grid md:grid-cols-3 gap-5">{list.map(function(t){
       return <div key={t.id} className="card rounded-2xl p-4 lift">
-        <img loading="lazy" src={t.cover_url||DC} className="w-full h-40 rounded-xl object-cover mb-3" alt=""/>
-        <h3 className="font-black text-white truncate">{t.title}</h3>
+        <img src={t.cover_url||DEFAULT_COVER} className="w-full h-40 rounded-xl object-cover mb-3" alt=""/>
+        <h3 className="font-black truncate">{t.title}</h3>
         <p className="text-xs text-gray-400">{t.type==='vst'?'Plugin VST':t.genre+' · '+t.bpm+' BPM'}</p>
         <div className="flex justify-between items-center mt-3 pt-3 border-t border-borderDark">
           <span className="text-goldAccent font-black">{fmt(t.price_mp3)} DZD</span>
-          {t.is_sold?<span className="text-red-400 text-xs font-bold">VENDU</span>:<button onClick={function(){props.buy(t);}} className="bg-goldAccent text-black text-xs font-bold px-4 py-2 rounded-lg">Acheter</button>}
+          {t.is_sold?<span className="text-xs text-red-400">VENDU</span>:<button onClick={function(){props.buy(t);}} className="bg-goldAccent text-black text-xs font-bold px-4 py-2 rounded-lg">Acheter</button>}
         </div>
       </div>;
     })}</div>}
-  </div>;
+  </section>;
 }
 
-/* ---------- BEATSTORE ---------- */
 function BeatsView(props){
   const [query,setQuery]=React.useState('');
   const [genre,setGenre]=React.useState('Tous');
@@ -646,52 +479,53 @@ function BeatsView(props){
   });
   if(sort==='popular')list=list.slice().sort(function(a,b){return (b.plays||0)-(a.plays||0);});
   if(sort==='cheap')list=list.slice().sort(function(a,b){return (a.price_mp3||0)-(b.price_mp3||0);});
-
   const matched=query?props.producers.filter(function(p){return (p.name||'').toLowerCase().includes(query.toLowerCase());}).slice(0,4):[];
 
   return <section className="fade space-y-4">
-    <div className="flex flex-col md:flex-row justify-between gap-4">
+    <div className="flex flex-col md:flex-row justify-between gap-3">
       <h2 className="text-3xl font-black border-l-4 border-goldAccent pl-4">BEATSTORE</h2>
       <div className="flex gap-2">
         <input value={query} onChange={function(e){setQuery(e.target.value);setLimit(15);}} placeholder="Beat ou beatmaker..." className="bg-cardDark border border-borderDark rounded-xl px-4 py-2.5 text-xs outline-none focus:border-goldAccent"/>
         <select value={sort} onChange={function(e){setSort(e.target.value);}} className="bg-cardDark border border-borderDark rounded-xl px-3 text-xs text-white"><option value="recent">Récent</option><option value="popular">Populaire</option><option value="cheap">Prix bas</option></select>
       </div>
     </div>
-    {matched.length>0?<div className="card p-4 rounded-xl">
-      <p className="text-[10px] font-black text-pinkNeon uppercase mb-3">Producteurs trouvés</p>
+
+    {matched.length>0?<div className="card p-4 rounded-xl"><p className="text-[10px] font-black text-pinkNeon uppercase mb-3">Producteurs trouvés</p>
       <div className="flex gap-2 overflow-x-auto">{matched.map(function(p){
         return <button key={p.id} onClick={function(){props.openProducer(p.id);}} className="flex items-center gap-2 p-2 bg-obsidian border border-borderDark rounded-xl flex-shrink-0">
-          <img src={p.avatar_url||AV} className="w-8 h-8 rounded-full object-cover" alt=""/><span className="text-xs font-bold">{p.name}</span>
+          <img src={p.avatar_url||DEFAULT_AVATAR} className="w-8 h-8 rounded-full object-cover" alt=""/><span className="text-xs font-bold">{p.name}</span>
         </button>;
       })}</div>
     </div>:null}
+
     <div className="flex gap-2 overflow-x-auto pb-2">{GENRES.map(function(g){
       return <button key={g} onClick={function(){setGenre(g);setLimit(15);}} className={'px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap '+(genre===g?'bg-goldAccent text-black':'bg-cardDark text-gray-400 border border-borderDark')}>{g}</button>;
     })}</div>
+
     {list.length===0?<p className="text-center text-gray-400 py-12">Aucun beat trouvé.</p>:
-    <div className="card rounded-2xl p-4 space-y-2">{list.slice(0,limit).map(function(t){
+    <div className="card p-4 rounded-2xl space-y-2">{list.slice(0,limit).map(function(t){
       const active=props.current&&props.current.id===t.id;
-      return <div key={t.id} className={'grid grid-cols-1 md:grid-cols-12 gap-3 items-center p-3 rounded-xl '+(t.is_sold?'opacity-50':'hover:bg-white/5')}>
+      return <div key={t.id} className={'grid grid-cols-1 md:grid-cols-12 gap-3 p-3 items-center rounded-xl '+(t.is_sold?'opacity-50':'hover:bg-white/5')}>
         <div className="col-span-6 flex items-center gap-3">
-          <button onClick={function(){if(t.audio_url&&!t.is_sold)props.play(t);}} className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-            <img loading="lazy" src={t.cover_url||DC} className="w-full h-full object-cover" alt=""/>
-            {t.audio_url&&!t.is_sold?<span className="absolute inset-0 bg-black/40 flex items-center justify-center"><Icon name={active&&props.playing?'pause':'play'} size={20}/></span>:null}
+          <button onClick={function(){if(!t.is_sold&&t.audio_url)props.play(t);}} className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+            <img src={t.cover_url||DEFAULT_COVER} className="w-full h-full object-cover" alt=""/>
+            {t.audio_url&&!t.is_sold?<span className="absolute inset-0 bg-black/40 flex items-center justify-center"><Icon name={active&&props.playing?'pause':'play'}/></span>:null}
           </button>
-          <div className="min-w-0"><p className="font-bold text-white truncate">{t.title} {t.is_sold?<span className="text-red-400 text-[9px]">VENDU</span>:null}</p>
+          <div className="min-w-0"><p className="font-bold truncate">{t.title} {t.is_sold?<span className="text-red-400 text-[9px]">VENDU</span>:null}</p>
             <button onClick={function(){props.openProducer(t.producer_id);}} className="text-xs text-goldAccent hover:underline">{t.producer_name}</button>
             <span className="text-xs text-gray-500"> · {t.genre}</span></div>
         </div>
         <p className="hidden md:block col-span-3 text-xs text-gray-400">{t.bpm} BPM · {t.key} · {t.plays||0} écoutes</p>
-        <div className="col-span-full md:col-span-3 flex justify-end">{t.is_sold
-          ?<span className="text-xs text-red-400 border border-red-900 px-4 py-2 rounded-lg">VENDU</span>
-          :<button onClick={function(){props.buy(t);}} className="border border-goldAccent text-goldAccent px-4 py-2 rounded-xl text-xs font-bold hover:bg-goldAccent hover:text-black">Acheter ({fmt(t.price_mp3)} DZD)</button>}</div>
+        <div className="col-span-full md:col-span-3 flex justify-end">
+          {t.is_sold?<span className="text-xs text-red-400 border border-red-900 rounded-lg px-4 py-2">VENDU</span>:
+          <button onClick={function(){props.buy(t);}} className="border border-goldAccent text-goldAccent px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black">Acheter ({fmt(t.price_mp3)} DZD)</button>}
+        </div>
       </div>;
     })}</div>}
-    {limit<list.length?<button onClick={function(){setLimit(limit+15);}} className="w-full card rounded-xl py-3 text-cyanNeon text-sm font-bold">Charger plus ({list.length-limit} restants)</button>:null}
+    {limit<list.length?<button onClick={function(){setLimit(limit+15);}} className="w-full card rounded-xl py-3 text-cyanNeon text-sm font-bold">Charger plus ({list.length-limit})</button>:null}
   </section>;
 }
 
-/* ---------- VST ---------- */
 function VstsView(props){
   const list=props.tracks.filter(function(t){return t.type==='vst';});
   return <section className="fade">
@@ -699,15 +533,15 @@ function VstsView(props){
     {list.length===0?<p className="text-center text-gray-400 py-12">Aucun VST pour le moment.</p>:
     <div className="grid md:grid-cols-3 gap-5">{list.map(function(t){
       const owned=props.keys.some(function(k){return k.track_id===t.id;});
-      return <div key={t.id} className="card p-5 rounded-2xl border-cyanNeon/25 lift">
-        <img loading="lazy" src={t.cover_url||DC} className="w-full h-44 object-cover rounded-xl mb-4" alt=""/>
+      return <div key={t.id} className="card p-5 rounded-2xl border-cyanNeon/20 lift">
+        <img src={t.cover_url||DEFAULT_COVER} className="w-full h-44 rounded-xl object-cover mb-4" alt=""/>
         <h3 className="text-xl font-black">{t.title}</h3>
         <button onClick={function(){props.openProducer(t.producer_id);}} className="text-xs text-goldAccent mt-1">{t.producer_name}</button>
         <p className="text-sm text-gray-400 my-4">{t.description}</p>
         <div className="flex justify-between items-center border-t border-borderDark pt-4">
-          <span className="font-black text-goldAccent">{fmt(t.price_mp3)} DZD</span>
-          {owned?<button onClick={function(){props.setView('keys');}} className="bg-greenPro text-black font-bold px-4 py-2 rounded-lg text-xs">Ma clé</button>
-          :<button onClick={function(){props.buy(t);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-lg text-xs">Acheter</button>}
+          <span className="text-goldAccent font-black">{fmt(t.price_mp3)} DZD</span>
+          {owned?<button onClick={function(){props.setView('keys');}} className="bg-greenPro text-black rounded-lg px-4 py-2 text-xs font-bold">Ma clé</button>:
+          <button onClick={function(){props.buy(t);}} className="bg-cyanNeon text-black rounded-lg px-4 py-2 text-xs font-bold">Acheter</button>}
         </div>
       </div>;
     })}</div>}
@@ -720,39 +554,41 @@ function OrdersView(props){
     <h2 className="text-3xl font-black border-l-4 border-greenPro pl-4">MES COMMANDES</h2>
     {props.orders.length===0?<p className="text-center text-gray-400 py-12">Aucune commande.</p>:
     props.orders.map(function(o){
-      return <div key={o.id} className="card rounded-2xl p-4 flex flex-col md:flex-row md:items-center gap-4">
-        <img src={o.track&&o.track.cover_url?o.track.cover_url:DC} className="w-14 h-14 object-cover rounded-lg" alt=""/>
+      return <div key={o.id} className="card p-4 rounded-2xl flex flex-col md:flex-row md:items-center gap-4">
+        <img src={o.track&&o.track.cover_url?o.track.cover_url:DEFAULT_COVER} className="w-14 h-14 rounded-lg object-cover" alt=""/>
         <div className="flex-1">
           <p className="font-bold">{o.track?o.track.title:'Produit'}</p>
-          <p className="text-xs text-gray-400">{o.license_type} · {fmt(o.amount)} DZD · {new Date(o.created_at).toLocaleString('fr-FR')}</p>
-          {o.status==='pending'?<p className="text-yellow-400 text-xs mt-1">⏳ En vérification</p>:null}
-          {o.status==='refused'?<p className="text-red-400 text-xs mt-1">❌ Refusée · {o.admin_note||''}</p>:null}
-          {o.status==='validated'?<p className="text-greenPro text-xs mt-1">✅ Validée · Contrat {o.contract_no}</p>:null}
-          {o.vst_key?<p className="font-mono text-greenPro text-sm mt-2">{o.vst_key}</p>:null}
+          <p className="text-xs text-gray-400">{LICENSE_NAMES[o.license_type]||o.license_type} · {fmt(o.amount)} DZD</p>
+          <p className="text-[10px] text-gray-500">{new Date(o.created_at).toLocaleString('fr-FR')}</p>
+          {o.status==='pending'?<p className="text-xs text-yellow-400 mt-1">En attente de vérification.</p>:null}
+          {o.status==='refused'?<p className="text-xs text-red-400 mt-1">Refusée : {o.admin_note||'motif non indiqué'}</p>:null}
+          {o.contract_no?<p className="text-xs font-mono text-cyanNeon mt-1">{o.contract_no}</p>:null}
+          {o.vst_key?<p className="text-sm font-mono text-greenPro mt-1">{o.vst_key}</p>:null}
         </div>
-        {o.contract_no?<button onClick={function(){props.pdf(o.contract_no);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-2"><Icon name="pdf" size={16}/>Contrat PDF</button>:null}
+        {o.status==='validated'&&o.contract_no?<button onClick={function(){props.pdf(o.contract_no);}} className="bg-goldAccent text-black font-bold rounded-lg px-4 py-2 text-xs">Télécharger le PDF</button>:null}
       </div>;
     })}
   </section>;
 }
 
-/* ---------- CLÉS ---------- */
+/* ---------- MES CLÉS ---------- */
 function KeysView(props){
   return <section className="fade space-y-4">
     <h2 className="text-3xl font-black border-l-4 border-greenPro pl-4">MES CLÉS VST & ACHATS</h2>
     {props.purchases.length===0?<p className="text-center text-gray-400 py-12">Aucun achat.</p>:
     props.purchases.map(function(p,i){
       return <div key={p.id||i} className="card p-4 rounded-2xl flex flex-col md:flex-row md:items-center gap-4">
-        <img src={p.track&&p.track.cover_url?p.track.cover_url:DC} className="w-14 h-14 object-cover rounded-lg" alt=""/>
+        <img src={p.track&&p.track.cover_url?p.track.cover_url:DEFAULT_COVER} className="w-14 h-14 rounded-lg object-cover" alt=""/>
         <div className="flex-1"><p className="font-bold">{p.track?p.track.title:'Produit'}</p>
           <p className="text-xs text-gray-400">{LICENSE_NAMES[p.license_type]||p.license_type} · {fmt(p.amount)} DZD</p>
-          {p.contract_no?<p className="font-mono text-xs text-cyanNeon mt-1">{p.contract_no}</p>:null}</div>
+          {p.contract_no?<p className="text-xs font-mono text-cyanNeon">{p.contract_no}</p>:null}
+        </div>
         {p.vst_key?<div className="flex flex-wrap gap-2 items-center">
-          <code className="font-mono text-greenPro bg-obsidian border border-greenPro/40 rounded-lg p-2">{p.vst_key}</code>
+          <code className="font-mono text-greenPro bg-obsidian border border-greenPro/40 p-2 rounded-lg">{p.vst_key}</code>
           <button onClick={function(){props.copy(p.vst_key);}} className="bg-cardDark px-3 py-2 rounded-lg text-xs">Copier</button>
           <button onClick={function(){props.download(p);}} className="bg-cyanNeon text-black px-3 py-2 rounded-lg text-xs">Télécharger</button>
         </div>:null}
-        {p.contract_no?<button onClick={function(){props.pdf(p.contract_no);}} className="bg-goldAccent text-black px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1"><Icon name="pdf" size={15}/>PDF</button>:null}
+        {p.contract_no?<button onClick={function(){props.pdf(p.contract_no);}} className="bg-goldAccent text-black px-3 py-2 rounded-lg text-xs font-bold">Contrat PDF</button>:null}
       </div>;
     })}
   </section>;
@@ -776,17 +612,15 @@ function MessagesView(props){
     const filter='and(sender_id.eq.'+props.userId+',recipient_id.eq.'+id+'),and(sender_id.eq.'+id+',recipient_id.eq.'+props.userId+')';
     const r=await sb.from('messages').select('*').or(filter).order('created_at',{ascending:true}).limit(200);
     if(r.data)setMessages(r.data);
-    await sb.rpc('mark_msgs_read',{p_peer:id});
+    const mark=await sb.rpc('mark_msgs_read',{p_peer:id});
+    if(mark.error)console.warn(mark.error.message);
     props.refreshUnread();
   }
 
   React.useEffect(function(){loadConversations();},[]);
   React.useEffect(function(){
-    if(props.initialPeer){
-      setPeer(props.initialPeer);
-      setPeerName(props.initialName||'');
-    }
-  },[props.initialPeer]);
+    if(props.initialPeer){setPeer(props.initialPeer);setPeerName(props.initialName||'');}
+  },[props.initialPeer,props.initialName]);
   React.useEffect(function(){if(peer)loadThread(peer);},[peer]);
   React.useEffect(function(){if(endRef.current)endRef.current.scrollIntoView({behavior:'smooth'});},[messages]);
 
@@ -796,13 +630,9 @@ function MessagesView(props){
         const m=payload.new;
         if(m.sender_id===props.userId||m.recipient_id===props.userId){
           if(peer&&(m.sender_id===peer||m.recipient_id===peer)){
-            setMessages(function(old){
-              if(old.some(function(x){return x.id===m.id;}))return old;
-              return old.concat([m]);
-            });
+            setMessages(function(old){return old.some(function(x){return x.id===m.id;})?old:old.concat([m]);});
           }
-          loadConversations();
-          props.refreshUnread();
+          loadConversations();props.refreshUnread();
         }
       }).subscribe();
     return function(){sb.removeChannel(channel);};
@@ -812,17 +642,10 @@ function MessagesView(props){
     e.preventDefault();
     if(!text.trim()||!peer)return;
     setBusy(true);
-    const r=await sb.from('messages').insert({
-      sender_id:props.userId,
-      recipient_id:peer,
-      body:text.trim()
-    }).select().single();
+    const body=text.trim();
+    const r=await sb.from('messages').insert({sender_id:props.userId,recipient_id:peer,body:body});
     if(r.error)props.toast(r.error.message,'error');
-    else{
-      setText('');
-      if(r.data)setMessages(function(old){return old.some(function(x){return x.id===r.data.id;})?old:old.concat([r.data]);});
-      loadConversations();
-    }
+    else{setText('');await loadThread(peer);loadConversations();}
     setBusy(false);
   }
 
@@ -834,35 +657,33 @@ function MessagesView(props){
         {conversations.length===0?<p className="text-xs text-gray-500 text-center py-10">Aucune conversation.<br/>Ouvre un profil et clique sur 💬.</p>:
         conversations.map(function(c){
           return <button key={c.peer_id} onClick={function(){setPeer(c.peer_id);setPeerName(c.peer_name);}} className={'w-full flex items-center gap-3 p-2.5 rounded-xl text-left '+(peer===c.peer_id?'bg-cyanNeon/10 border border-cyanNeon/40':'hover:bg-white/5')}>
-            <img src={c.peer_avatar||AV} className="w-10 h-10 rounded-full object-cover" alt=""/>
-            <div className="min-w-0 flex-1"><p className="text-sm font-bold text-white truncate">{c.peer_name}</p><p className="text-[11px] text-gray-500 truncate">{c.last_body}</p></div>
+            <img src={c.peer_avatar||DEFAULT_AVATAR} className="w-10 h-10 rounded-full object-cover" alt=""/>
+            <div className="min-w-0 flex-1"><p className="text-sm font-bold truncate">{c.peer_name}</p><p className="text-[11px] text-gray-500 truncate">{c.last_body}</p></div>
             {Number(c.unread)>0?<span className="bg-pinkNeon text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">{c.unread}</span>:null}
           </button>;
         })}
       </div>
       <div className={'md:col-span-2 card rounded-2xl flex flex-col '+(peer?'':'hidden md:flex')}>
-        {!peer?<div className="flex-1 flex items-center justify-center text-gray-500 text-sm">Choisis une conversation.</div>:
+        {!peer?<div className="flex-1 flex items-center justify-center text-sm text-gray-500">Choisis une conversation.</div>:
         <React.Fragment>
           <div className="flex items-center gap-3 p-4 border-b border-borderDark">
-            <button onClick={function(){setPeer(null);}} className="md:hidden text-gray-400"><Icon name="back"/></button>
-            <p className="font-black text-white flex-1">{peerName}</p>
-            <button onClick={function(){props.openProducer(peer);}} className="text-xs font-bold text-cyanNeon">Voir profil</button>
+            <button onClick={function(){setPeer(null);}} className="md:hidden"><Icon name="back"/></button>
+            <p className="font-black flex-1">{peerName}</p>
+            <button onClick={function(){props.openProducer(peer);}} className="text-xs text-cyanNeon">Voir le profil</button>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
             {messages.length===0?<p className="text-center text-xs text-gray-500 py-10">Démarre la conversation 👋</p>:
             messages.map(function(m){
               const mine=m.sender_id===props.userId;
               return <div key={m.id} className={'flex '+(mine?'justify-end':'justify-start')}>
-                <div className={'bubble '+(mine?'bubble-me':'bubble-peer')}>{m.body}
-                  <p className={'text-[9px] mt-1 '+(mine?'text-black/50':'text-gray-500')}>{timeAgo(m.created_at)}</p>
-                </div>
+                <div className={'bubble '+(mine?'bubble-me':'bubble-peer')}>{m.body}<p className={'text-[9px] mt-1 '+(mine?'text-black/50':'text-gray-500')}>{timeAgo(m.created_at)}</p></div>
               </div>;
             })}
             <div ref={endRef}></div>
           </div>
           <form onSubmit={send} className="p-3 border-t border-borderDark flex gap-2">
             <input value={text} maxLength="1000" onChange={function(e){setText(e.target.value);}} placeholder="Écris ton message..." className="flex-1 bg-obsidian border border-borderDark rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-cyanNeon"/>
-            <button disabled={busy||!text.trim()} className="bg-cyanNeon text-black font-black px-5 rounded-xl disabled:opacity-40"><Icon name="send"/></button>
+            <button disabled={busy||!text.trim()} className="bg-cyanNeon text-black font-black px-4 rounded-xl disabled:opacity-40"><Icon name="send"/></button>
           </form>
         </React.Fragment>}
       </div>
@@ -870,241 +691,78 @@ function MessagesView(props){
   </section>;
 }
 
-/* ---------- VÉRIFICATION VST ---------- */
-function VerifyView(props){
+function VerifyView(){
   const [key,setKey]=React.useState('');
   const [machine,setMachine]=React.useState('PC-'+Math.random().toString(36).slice(2,8).toUpperCase());
   const [result,setResult]=React.useState(null);
   const [busy,setBusy]=React.useState(false);
   async function verify(e){
-    e.preventDefault();
-    setBusy(true);
+    e.preventDefault();setBusy(true);setResult(null);
     const r=await sb.rpc('verify_vst_key',{p_key:key.trim().toUpperCase(),p_machine_id:machine});
     setResult(r.error?{valid:false,reason:r.error.message}:r.data);
     setBusy(false);
   }
   return <div className="max-w-2xl mx-auto card p-8 rounded-3xl fade border-cyanNeon/30">
-    <h2 className="text-3xl font-black text-white mb-2">Vérifier une clé VST</h2>
-    <p className="text-sm text-gray-400 mb-6">Cette page simule le test de licence que fait le plugin.</p>
+    <h2 className="text-3xl font-black mb-2">Vérifier une clé VST</h2>
+    <p className="text-sm text-gray-400 mb-6">Teste ici une clé et son activation.</p>
     <form onSubmit={verify} className="space-y-4">
-      <input required value={key} onChange={function(e){setKey(e.target.value.toUpperCase());}} placeholder="YAN-XXXX-XXXX-XXXX" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-center font-mono text-lg text-white"/>
+      <input required value={key} onChange={function(e){setKey(e.target.value.toUpperCase());}} placeholder="YAN-XXXX-XXXX-XXXX" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-center font-mono text-lg"/>
       <input required value={machine} onChange={function(e){setMachine(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-white font-mono"/>
-      <button disabled={busy} className="w-full bg-cyanNeon text-black font-black py-3 rounded-xl disabled:opacity-50">{busy?'VÉRIFICATION...':'VÉRIFIER'}</button>
+      <button disabled={busy} className="w-full bg-cyanNeon text-black font-black py-3 rounded-xl">{busy?'VÉRIFICATION...':'VÉRIFIER'}</button>
     </form>
     {result?<div className={'mt-5 p-4 rounded-xl border '+(result.valid?'border-greenPro bg-greenPro/10':'border-red-500 bg-red-500/10')}>
-      <p className={'font-black '+(result.valid?'text-greenPro':'text-red-400')}>{result.valid?'CLÉ VALIDE':'CLÉ REFUSÉE'}</p>
+      <p className={result.valid?'text-greenPro font-black':'text-red-400 font-black'}>{result.valid?'CLÉ VALIDE':'CLÉ REFUSÉE'}</p>
       {result.reason?<p className="text-sm mt-1">{result.reason}</p>:null}
       {result.activations!==undefined?<p className="text-xs mt-1">{result.activations}/{result.max_activations} machines</p>:null}
     </div>:null}
   </div>;
 }
 
-/* ---------- DASHBOARD ---------- */
-function DashboardView(props){
-  const [amount,setAmount]=React.useState('');
-  const [tab,setTab]=React.useState('publications');
-  const [sales,setSales]=React.useState([]);
-  const p=props.profile;
-  const mine=props.tracks.filter(function(t){return t.producer_id===p.id;});
-  const plays=mine.reduce(function(total,t){return total+(t.plays||0);},0);
-
-  React.useEffect(function(){
-    sb.rpc('my_sales').then(function(r){if(r.data)setSales(r.data);});
-  },[]);
-
-  return <div className="space-y-6 fade">
-    <div className="card rounded-2xl p-6 flex flex-col md:flex-row justify-between gap-4">
-      <div className="flex items-center gap-4">
-        <img src={p.avatar_url||AV} className="w-16 h-16 rounded-full object-cover border-2 border-goldAccent" alt=""/>
-        <div><h2 className="text-2xl font-black">{p.name}</h2><p className="text-xs text-gray-400">{props.email} (privé)</p>
-          {!p.legal_name?<p className="text-[11px] text-yellow-400 mt-1">Pour une Exclusive, renseigne ton nom légal dans Paramètres.</p>:null}
-        </div>
-      </div>
-      <div className="flex gap-2 flex-wrap">
-        <button onClick={function(){props.openProducer(p.id);}} className="border border-pinkNeon text-pinkNeon px-4 py-3 rounded-xl text-xs font-bold">Profil public</button>
-        <button onClick={function(){props.setView('upload');}} className="bg-cyanNeon text-black px-5 py-3 rounded-xl text-xs font-black">Uploader</button>
-      </div>
+function AdminView(props){
+  const [tab,setTab]=React.useState('orders');
+  const pending=props.orders.filter(function(o){return o.status==='pending';});
+  const fees=props.orders.filter(function(o){return o.status==='validated';}).reduce(function(sum,o){return sum+(Number(o.platform_fee)||0);},0);
+  return <section className="fade space-y-5">
+    <h2 className="text-3xl font-black border-l-4 border-pinkNeon pl-4">ADMINISTRATION</h2>
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="card p-4 rounded-xl"><p className="text-[10px] text-gray-400">COMMISSIONS</p><p className="font-black text-greenPro text-xl">{fmt(fees)} DZD</p></div>
+      <div className="card p-4 rounded-xl"><p className="text-[10px] text-gray-400">COMMANDES EN ATTENTE</p><p className="font-black text-pinkNeon text-xl">{pending.length}</p></div>
+      <div className="card p-4 rounded-xl"><p className="text-[10px] text-gray-400">COMMANDES</p><p className="font-black text-cyanNeon text-xl">{props.orders.length}</p></div>
     </div>
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div className="card p-5 rounded-xl"><p className="text-xs text-gray-400">SOLDE</p><p className="text-xl font-black text-cyanNeon">{fmt(p.balance)} DZD</p></div>
-      <div className="card p-5 rounded-xl"><p className="text-xs text-gray-400">ÉCOUTES</p><p className="text-xl font-black text-goldAccent">{fmt(plays)}</p></div>
-      <div className="card p-5 rounded-xl"><p className="text-xs text-gray-400">ABONNÉS</p><p className="text-xl font-black text-pinkNeon">{fmt(props.followers)}</p></div>
-      <div className="card p-5 rounded-xl"><p className="text-xs text-gray-400">CRÉATIONS</p><p className="text-xl font-black">{mine.length}</p></div>
+    <div className="flex gap-2">
+      <button onClick={function(){setTab('orders');}} className={'px-4 py-2 rounded-xl text-xs font-bold '+(tab==='orders'?'bg-pinkNeon text-black':'bg-cardDark text-gray-400')}>Commandes</button>
+      <button onClick={function(){setTab('withdrawals');}} className={'px-4 py-2 rounded-xl text-xs font-bold '+(tab==='withdrawals'?'bg-greenPro text-black':'bg-cardDark text-gray-400')}>Retraits</button>
     </div>
-    <div className="card p-5 rounded-2xl">
-      <h3 className="font-black mb-2">Retirer mes gains</h3>
-      <p className="text-xs text-gray-400 mb-3">Minimum 1 000 DZD. Versement CCP/BaridiMob sous 7 jours ouvrés.</p>
-      <div className="flex gap-2">
-        <input type="number" value={amount} onChange={function(e){setAmount(e.target.value);}} placeholder="Montant en DZD" className="flex-1 bg-obsidian border border-borderDark rounded-xl px-3"/>
-        <button onClick={function(){props.withdraw(amount);setAmount('');}} className="bg-greenPro text-black font-black px-5 py-3 rounded-xl">Demander</button>
-      </div>
-    </div>
-    <div className="flex gap-5 border-b border-borderDark">
-      <button onClick={function(){setTab('publications');}} className={'tab pb-3 text-xs font-black '+(tab==='publications'?'on text-white':'text-gray-500')}>MES PUBLICATIONS ({mine.length})</button>
-      <button onClick={function(){setTab('sales');}} className={'tab pb-3 text-xs font-black '+(tab==='sales'?'on text-white':'text-gray-500')}>MES VENTES ({sales.length})</button>
-    </div>
-    {tab==='publications'?(mine.length===0?<p className="text-center text-gray-400 py-8">Aucune publication.</p>:
-      <div className="space-y-2">{mine.map(function(t){
-        return <div key={t.id} className="card rounded-xl p-3 flex items-center gap-3">
-          <img src={t.cover_url||DC} className="w-12 h-12 object-cover rounded-lg" alt=""/>
-          <div className="flex-1 min-w-0"><p className="font-bold truncate">{t.title}</p><p className="text-xs text-gray-400">{t.type} · {t.plays||0} écoutes {t.file_hash?'· SHA-256 ✓':''}</p></div>
-          <span className="text-xs text-goldAccent">{fmt(t.price_mp3)} DZD</span>
-          <button onClick={function(){props.remove(t.id);}} className="p-2 text-red-400"><Icon name="trash" size={17}/></button>
-        </div>;
-      })}</div>
-    ):(sales.length===0?<p className="text-center text-gray-400 py-8">Aucune vente validée.</p>:
-      <div className="space-y-2">{sales.map(function(s){
-        return <div key={s.contract_no} className="card rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-3">
-          <div className="flex-1"><p className="font-bold">{s.title}</p><p className="text-xs text-gray-400">{LICENSE_NAMES[s.license_type]||s.license_type} · acheteur : {s.buyer_name}</p>
-          <p className="font-mono text-[10px] text-cyanNeon mt-1">{s.contract_no}</p></div>
-          <p className="font-black text-greenPro">+{fmt(s.seller_amount)} DZD</p>
-          <button onClick={function(){props.pdf(s.contract_no);}} className="bg-goldAccent text-black px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1"><Icon name="pdf" size={15}/>PDF</button>
-        </div>;
-      })}</div>
-    )}
-  </div>;
-}
-
-/* ---------- PUBLICATION ---------- */
-function UploadView(props){
-  const [title,setTitle]=React.useState('');
-  const [type,setType]=React.useState('beat');
-  const [genre,setGenre]=React.useState('Drill');
-  const [bpm,setBpm]=React.useState(140);
-  const [musicKey,setMusicKey]=React.useState('Am');
-  const [p1,setP1]=React.useState(2000),[p2,setP2]=React.useState(4000),[p3,setP3]=React.useState(8000),[p4,setP4]=React.useState(25000);
-  const [description,setDescription]=React.useState('');
-  const [cover,setCover]=React.useState(null),[file,setFile]=React.useState(null);
-  const [busy,setBusy]=React.useState(false),[custom,setCustom]=React.useState(false);
-  const [limits,setLimits]=React.useState(JSON.parse(JSON.stringify(DEFAULT_LIMITS)));
-
-  function updateLimit(license,key,value){
-    const next=JSON.parse(JSON.stringify(limits));
-    next[license][key]=value;
-    setLimits(next);
-  }
-  async function submit(e){
-    e.preventDefault();
-    setBusy(true);
-    const ok=await props.upload({
-      title:title,type:type,genre:genre,bpm:bpm,key:musicKey,
-      p1:p1,p2:p2,p3:p3,p4:p4,description:description,
-      cover:cover,file:file,limits:type==='beat'&&custom?limits:null
-    });
-    if(ok){setTitle('');setDescription('');setCover(null);setFile(null);}
-    setBusy(false);
-  }
-
-  function renderCustomLimits(license){
-    const l=limits[license];
-    return <div key={license} className="p-3 rounded-lg bg-cardDark border border-borderDark">
-      <p className="text-[11px] font-black text-goldAccent uppercase mb-2">{LICENSE_NAMES[license]}</p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <div><label className="text-[10px] text-gray-500">Streams</label><input type="number" min="-1" value={l.streams} onChange={function(e){updateLimit(license,'streams',parseInt(e.target.value,10)||0);}} className="w-full bg-obsidian border border-borderDark rounded p-1.5 text-xs text-white"/></div>
-        <div><label className="text-[10px] text-gray-500">Copies</label><input type="number" min="-1" value={l.copies} onChange={function(e){updateLimit(license,'copies',parseInt(e.target.value,10)||0);}} className="w-full bg-obsidian border border-borderDark rounded p-1.5 text-xs text-white"/></div>
-        <div><label className="text-[10px] text-gray-500">Clips (-1 = illimité)</label><input type="number" min="-1" value={l.videos} onChange={function(e){updateLimit(license,'videos',parseInt(e.target.value,10)||0);}} className="w-full bg-obsidian border border-borderDark rounded p-1.5 text-xs text-white"/></div>
-        <div><label className="text-[10px] text-gray-500">Durée en années</label><input type="number" min="-1" value={l.years} onChange={function(e){updateLimit(license,'years',parseInt(e.target.value,10)||0);}} className="w-full bg-obsidian border border-borderDark rounded p-1.5 text-xs text-white"/></div>
-        <div><label className="text-[10px] text-gray-500">Stations radio (-1 = illimité)</label><input type="number" min="-1" value={l.radio} onChange={function(e){updateLimit(license,'radio',parseInt(e.target.value,10)||0);}} className="w-full bg-obsidian border border-borderDark rounded p-1.5 text-xs text-white"/></div>
-      </div>
-      <div className="flex gap-4 mt-2">
-        <label className="flex items-center gap-1.5 text-[11px] text-gray-400"><input type="checkbox" checked={l.shows} onChange={function(e){updateLimit(license,'shows',e.target.checked);}} className="accent-goldAccent"/>Concerts payants</label>
-        <label className="flex items-center gap-1.5 text-[11px] text-gray-400"><input type="checkbox" checked={l.tag} onChange={function(e){updateLimit(license,'tag',e.target.checked);}} className="accent-goldAccent"/>Tag obligatoire</label>
-      </div>
-    </div>;
-  }
-
-  return <div className="max-w-2xl mx-auto card p-8 rounded-2xl fade">
-    <h2 className="text-2xl font-black text-white mb-2">Nouvelle création</h2>
-    <p className="text-xs text-gray-400 mb-6">Les fichiers reçoivent une empreinte SHA-256 au moment de la publication.</p>
-    <form onSubmit={submit} className="space-y-4">
-      <div><label className="text-xs font-bold block mb-1">Titre</label><input required maxLength="100" value={title} onChange={function(e){setTitle(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div><label className="text-xs font-bold block mb-1">Type</label><select value={type} onChange={function(e){setType(e.target.value);setFile(null);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"><option value="beat">Beat</option><option value="vst">VST</option></select></div>
-        {type==='beat'?<React.Fragment>
-          <div><label className="text-xs font-bold block mb-1">Genre</label><select value={genre} onChange={function(e){setGenre(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white">{GENRES.slice(1).map(function(g){return <option key={g} value={g}>{g}</option>;})}</select></div>
-          <div><label className="text-xs font-bold block mb-1">BPM</label><input type="number" min="40" max="300" value={bpm} onChange={function(e){setBpm(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
-          <div><label className="text-xs font-bold block mb-1">Gamme</label><input maxLength="10" value={musicKey} onChange={function(e){setMusicKey(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
-        </React.Fragment>:null}
-      </div>
-
-      {type==='beat'?<React.Fragment>
-        <div className="p-4 rounded-xl bg-obsidian border border-borderDark">
-          <p className="text-xs font-bold text-goldAccent uppercase mb-3">Prix DZD · commission 5%</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div><label className="text-[11px] text-gray-400">MP3</label><input type="number" min="0" value={p1} onChange={function(e){setP1(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
-            <div><label className="text-[11px] text-gray-400">WAV</label><input type="number" min="0" value={p2} onChange={function(e){setP2(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
-            <div><label className="text-[11px] text-gray-400">Stems</label><input type="number" min="0" value={p3} onChange={function(e){setP3(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
-            <div><label className="text-[11px] text-gray-400">Exclusive</label><input type="number" min="0" value={p4} onChange={function(e){setP4(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+    {tab==='orders'?(props.orders.length===0?<p className="text-center text-gray-400 py-10">Aucune commande.</p>:
+      <div className="space-y-3">{props.orders.map(function(o){
+        return <div key={o.id} className="card p-4 rounded-2xl flex flex-col lg:flex-row gap-3">
+          <div className="flex-1"><p className="font-bold">{o.buyer_name} → {o.track_title}</p>
+            <p className="text-xs text-gray-400">{o.product_type} · {LICENSE_NAMES[o.license_type]||o.license_type} · {fmt(o.amount)} DZD</p>
+            <p className="text-xs text-greenPro">Commission : {fmt(o.platform_fee)} DZD ({o.rate_percent}%)</p>
+            <p className="text-[10px] text-gray-500">{new Date(o.created_at).toLocaleString('fr-FR')}</p>
+            {o.buyer_legal_name?<p className="text-xs text-pinkNeon">Acheteur (nom légal) : {o.buyer_legal_name}</p>:null}
+            {o.proof_url?<button onClick={function(){props.openProof(o.proof_url);}} className="text-xs text-cyanNeon underline mt-1">Ouvrir la preuve de paiement</button>:null}
+            {o.contract_no?<button onClick={function(){props.pdf(o.contract_no);}} className="block text-xs text-goldAccent underline mt-1">{o.contract_no} · Contrat PDF</button>:null}
+            {o.vst_key?<p className="font-mono text-xs text-greenPro mt-1">{o.vst_key}</p>:null}
           </div>
-        </div>
-        <div className="p-4 rounded-xl bg-obsidian border border-borderDark">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" checked={custom} onChange={function(e){setCustom(e.target.checked);}} className="accent-goldAccent"/>
-            <span className="text-xs font-bold">Personnaliser les limites des licences</span>
-          </label>
-          <p className="text-[11px] text-gray-500 mt-1">Sinon les valeurs standard s'appliquent. Les limites de la vente seront conservées dans le contrat PDF.</p>
-          {custom?<div className="mt-4 space-y-3">{['mp3','wav','stems'].map(renderCustomLimits)}<p className="text-[10px] text-gray-500">Pour streams, copies, clips, radio et durée, entre -1 pour « illimité ».</p></div>:null}
-        </div>
-      </React.Fragment>:<div className="p-4 rounded-xl bg-cyanNeon/10 border border-cyanNeon/30">
-        <label className="text-xs font-bold text-cyanNeon block mb-1">Prix VST · commission 8%</label>
-        <input type="number" min="0" value={p1} onChange={function(e){setP1(e.target.value);}} className="w-full bg-cardDark border border-cyanNeon/40 rounded-lg p-2 text-white"/>
-        <p className="text-[11px] text-gray-400 mt-2">Clé unique par acheteur, 3 machines maximum.</p>
-      </div>}
-
-      <div><label className="text-xs font-bold block mb-1">Description</label><textarea maxLength="300" rows="3" value={description} onChange={function(e){setDescription(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white resize-none"/></div>
-      <div><label className="text-xs font-bold block mb-1">Pochette (5 Mo max)</label><input type="file" accept="image/*" onChange={function(e){setCover(e.target.files[0]);}} className="w-full text-xs text-gray-400"/></div>
-      <div><label className="text-xs font-bold block mb-1">{type==='vst'?'Fichier VST':'Fichier audio'} (50 Mo max)</label><input key={type} type="file" accept={type==='vst'?'.zip,.rar,.7z,.exe,.msi,.dmg,.pkg':'.mp3,.wav'} onChange={function(e){setFile(e.target.files[0]);}} className="w-full text-xs text-gray-400"/></div>
-      <button disabled={busy} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-50">{busy?'PUBLICATION...':'PUBLIER'}</button>
-    </form>
-  </div>;
+          <div className="flex gap-2 items-start">
+            {o.status==='pending'?<React.Fragment>
+              <button onClick={function(){props.validate(o.id);}} className="bg-greenPro text-black font-bold px-4 py-2 rounded-lg text-xs">Valider</button>
+              <button onClick={function(){props.refuse(o.id);}} className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg text-xs">Refuser</button>
+            </React.Fragment>:<span className="text-xs font-bold">{o.status==='validated'?'✅ Validée':'❌ Refusée'}</span>}
+          </div>
+        </div>;
+      })}</div>
+    ):(props.withdrawals.length===0?<p className="text-center text-gray-400 py-10">Aucun retrait.</p>:
+      <div className="space-y-3">{props.withdrawals.map(function(w){
+        return <div key={w.id} className="card p-4 rounded-xl flex justify-between items-center">
+          <div><p className="font-bold">{fmt(w.amount)} DZD</p><p className="text-xs font-mono text-goldAccent">{w.rip}</p></div>
+          {w.status==='pending'?<button onClick={function(){props.payWithdrawal(w.id);}} className="bg-greenPro text-black px-4 py-2 rounded-lg text-xs font-bold">Marquer payé</button>:<span className="text-greenPro text-xs">Payé</span>}
+        </div>;
+      })}</div>)}
+  </section>;
 }
 
-/* ---------- PARAMÈTRES ---------- */
-function SettingsView(props){
-  const p=props.profile;
-  const [name,setName]=React.useState(p.name||'');
-  const [legal,setLegal]=React.useState(p.legal_name||'');
-  const [rip,setRip]=React.useState(p.rip||'');
-  const [bio,setBio]=React.useState(p.bio||'');
-  const [instagram,setInstagram]=React.useState(p.instagram||'');
-  const [avatar,setAvatar]=React.useState(null);
-  const [preview,setPreview]=React.useState(p.avatar_url||AV);
-  const [busy,setBusy]=React.useState(false);
-
-  async function submit(e){
-    e.preventDefault();setBusy(true);
-    await props.save({name:name,legal_name:legal,rip:rip,bio:bio,instagram:instagram,avatar:avatar});
-    setAvatar(null);setBusy(false);
-  }
-
-  return <div className="max-w-2xl mx-auto card p-8 rounded-3xl fade">
-    <h2 className="text-3xl font-black text-white mb-6">Paramètres du profil</h2>
-    <form onSubmit={submit} className="space-y-5">
-      <div className="flex items-center gap-5 p-4 rounded-2xl bg-obsidian border border-borderDark">
-        <div className="ringg w-20 h-20"><img src={preview} className="w-full h-full rounded-full object-cover" alt=""/></div>
-        <div><label className="text-xs font-bold block mb-2">Photo de profil (5 Mo max)</label>
-          <input type="file" accept="image/*" onChange={function(e){const f=e.target.files[0];if(f){setAvatar(f);setPreview(URL.createObjectURL(f));}}}/></div>
-      </div>
-      <div><label className="text-xs font-bold block mb-1">Nom d'artiste public</label><input required maxLength="50" value={name} onChange={function(e){setName(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
-      <div className="p-4 rounded-xl bg-pinkNeon/5 border border-pinkNeon/30">
-        <label className="text-xs font-bold text-pinkNeon block mb-1">Nom légal (privé)</label>
-        <p className="text-[11px] text-gray-400 mb-2">Requis uniquement pour vendre ou acheter une Exclusive. Jamais affiché publiquement.</p>
-        <input maxLength="80" value={legal} onChange={function(e){setLegal(e.target.value);}} placeholder="Nom et prénom selon ta pièce d'identité" className="w-full bg-obsidian border border-pinkNeon/30 rounded-xl p-3 text-sm text-white"/>
-      </div>
-      <div><label className="text-xs font-bold block mb-1">Bio publique</label><textarea maxLength="200" rows="3" value={bio} onChange={function(e){setBio(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white resize-none"/></div>
-      <div><label className="text-xs font-bold block mb-1">Instagram public</label><input maxLength="40" value={instagram} onChange={function(e){setInstagram(e.target.value);}} placeholder="@tonpseudo" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
-      <div className="p-4 rounded-xl bg-goldAccent/5 border border-goldAccent/30">
-        <label className="text-xs font-bold text-goldAccent block mb-1">CCP / BaridiMob</label>
-        <p className="text-[11px] text-gray-400 mb-2">Privé ; visible uniquement dans l'écran d'achat d'un de tes produits.</p>
-        <input value={rip} onChange={function(e){setRip(e.target.value);}} className="w-full bg-obsidian border border-goldAccent/30 rounded-xl p-3 text-sm text-white font-mono"/>
-      </div>
-      <button disabled={busy} className="w-full bg-white text-black font-black py-4 rounded-xl disabled:opacity-50">{busy?'ENREGISTREMENT...':'ENREGISTRER'}</button>
-    </form>
-  </div>;
-}
-
-/* ---------- MODAL D'ACHAT ---------- */
 function BuyModal(props){
   const item=props.item;
   const [license,setLicense]=React.useState(item.type==='vst'?'vst':'mp3');
@@ -1116,7 +774,10 @@ function BuyModal(props){
   const [busy,setBusy]=React.useState(false);
 
   React.useEffect(function(){
-    sb.rpc('get_seller_payment',{p_track_id:item.id}).then(function(r){if(r.data)setSeller(r.data);});
+    sb.rpc('get_seller_payment',{p_track_id:item.id}).then(function(r){
+      if(r.data)setSeller(r.data);
+      else if(r.error)console.warn('Coordonnées vendeur:',r.error.message);
+    });
   },[item.id]);
 
   React.useEffect(function(){setAccepted(false);setBuyerLegal('');},[license]);
@@ -1128,15 +789,13 @@ function BuyModal(props){
     if(l==='exclusive')return Number(item.price_exclusive)||0;
     return Number(item.price_mp3)||0;
   }
-
   const rate=item.type==='vst'?8:5;
-  const limits=(item.limits&&item.limits[license])?item.limits[license]:DEFAULT_LIMITS[license];
-  const needsLegal=license==='exclusive';
+  const limits=item.limits&&item.limits[license]?item.limits[license]:DEFAULT_LIMITS[license];
+  const exclusive=license==='exclusive';
   const sellerReady=seller&&seller.legal_name_ready===true;
-  const buyerReady=buyerLegal.trim().length>=3;
-  const ready=!!proof&&accepted&&(!needsLegal||(buyerReady&&sellerReady));
+  const ready=!!proof&&accepted&&(!exclusive||(buyerLegal.trim().length>=3&&sellerReady));
 
-  async function send(){
+  async function submit(){
     if(!ready)return;
     setBusy(true);
     await props.submit(item,license,price(license),rate,proof,buyerLegal.trim(),accepted);
@@ -1146,17 +805,16 @@ function BuyModal(props){
   return <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
     <div className="card rounded-2xl max-w-lg w-full p-6 relative my-8 fade">
       <button onClick={props.close} className="absolute top-4 right-4 text-gray-400"><Icon name="close"/></button>
-      <h3 className="text-xl font-black text-white mb-4">Achat : {item.title}</h3>
+      <h3 className="text-xl font-black mb-4">Achat : {item.title}</h3>
 
       {item.type==='beat'?<div className="space-y-2 mb-4">{LICENSES.map(function(l){
-        const active=license===l;
-        return <button type="button" key={l} onClick={function(){setLicense(l);}} className={'w-full text-left p-3 rounded-xl border '+(active?(l==='exclusive'?'border-pinkNeon bg-pinkNeon/10':'border-goldAccent bg-goldAccent/10'):'border-borderDark')}>
+        return <button key={l} type="button" onClick={function(){setLicense(l);}} className={'w-full text-left p-3 rounded-xl border '+(license===l?(l==='exclusive'?'border-pinkNeon bg-pinkNeon/10':'border-goldAccent bg-goldAccent/10'):'border-borderDark')}>
           <span className="flex justify-between font-bold"><span>{l==='exclusive'?'🔥 ':''}{LICENSE_NAMES[l]}</span><span className="text-goldAccent">{fmt(price(l))} DZD</span></span>
         </button>;
       })}</div>:null}
 
       <div className="p-4 rounded-xl bg-goldAccent/10 border border-goldAccent/30 mb-4 flex justify-between">
-        <span className="font-bold">Total à payer</span><span className="font-black text-goldAccent">{fmt(price(license))} DZD</span>
+        <span>Total à payer</span><b className="text-goldAccent">{fmt(price(license))} DZD</b>
       </div>
 
       {limits?<div className="mb-4 rounded-xl border border-cyanNeon/25 bg-cyanNeon/5 overflow-hidden">
@@ -1167,46 +825,44 @@ function BuyModal(props){
           <span className="text-gray-400">Streams</span><b className="text-right">{unlimited(limits.streams)}</b>
           <span className="text-gray-400">Copies vendues</span><b className="text-right">{unlimited(limits.copies)}</b>
           <span className="text-gray-400">Clips vidéo</span><b className="text-right">{unlimited(limits.videos)}</b>
-          <span className="text-gray-400">Radio</span><b className="text-right">{limits.radio===-1?'Illimitée':(limits.radio>0?limits.radio+' stations':'Non')}</b>
+          <span className="text-gray-400">Radio</span><b className="text-right">{limits.radio===-1?'Illimitée':limits.radio>0?limits.radio+' stations':'Non'}</b>
           <span className="text-gray-400">Concerts payants</span><b className="text-right">{limits.shows?'Oui':'Non'}</b>
           <span className="text-gray-400">Tag producteur</span><b className="text-right">{limits.tag?'À conserver':'Retiré'}</b>
           <span className="text-gray-400">Durée</span><b className="text-right">{limits.years===-1?'Illimitée':limits.years+' ans'}</b>
-          {license==='exclusive'?<React.Fragment><span className="text-gray-400">Exclusivité</span><b className="text-right text-pinkNeon">Beat retiré du catalogue</b></React.Fragment>:null}
+          {exclusive?<React.Fragment><span className="text-gray-400">Exclusivité</span><b className="text-right text-pinkNeon">Beat retiré du catalogue</b></React.Fragment>:null}
         </div>:null}
       </div>:null}
 
-      {item.type==='vst'?<div className="mb-4 text-xs text-cyanNeon bg-cyanNeon/5 border border-cyanNeon/20 rounded-xl p-3">🔑 Clé unique par achat · 3 machines maximum · partage interdit</div>:null}
+      {item.type==='vst'?<p className="p-3 mb-4 text-xs text-cyanNeon bg-cyanNeon/5 rounded-xl border border-cyanNeon/20">Clé unique · 3 machines maximum · ne partage pas ta clé.</p>:null}
 
       <div className="p-4 rounded-xl bg-obsidian border border-borderDark mb-4">
-        <p className="text-xs font-bold text-white mb-2">Paiement CCP / BaridiMob</p>
+        <p className="text-xs font-bold mb-2">Paiement CCP / BaridiMob</p>
         {seller&&seller.rip?<React.Fragment><p className="font-mono text-greenPro font-bold select-all">{seller.rip}</p><p className="text-xs text-gray-400 mt-1">Bénéficiaire : {seller.name}</p></React.Fragment>:<p className="text-xs text-yellow-400">Le vendeur n'a pas renseigné son CCP.</p>}
         <p className="text-[10px] text-gray-500 mt-2">Commission plateforme : {rate}% prélevée sur la part du vendeur.</p>
       </div>
 
-      {needsLegal?<div className="p-4 mb-4 rounded-xl bg-pinkNeon/5 border border-pinkNeon/30">
-        <label className="text-xs font-bold text-pinkNeon block mb-1">Nom légal complet obligatoire</label>
-        <p className="text-[11px] text-gray-400 mb-2">Pour une Exclusive, les deux parties doivent figurer sur le contrat. Ton nom ne sera pas public.</p>
+      {exclusive?<div className="p-4 mb-4 rounded-xl bg-pinkNeon/5 border border-pinkNeon/30">
+        <label className="text-xs font-bold text-pinkNeon block mb-2">Nom légal complet de l'acheteur</label>
         <input value={buyerLegal} maxLength="80" onChange={function(e){setBuyerLegal(e.target.value);}} placeholder="Nom et prénom selon ta pièce d'identité" className="w-full bg-obsidian border border-pinkNeon/30 rounded-xl p-3 text-sm text-white"/>
-        {seller&&!sellerReady?<p className="text-[11px] text-red-400 mt-2">Le producteur doit aussi renseigner son nom légal avant de vendre cette Exclusive.</p>:null}
+        {!sellerReady&&seller?<p className="text-xs text-red-400 mt-2">Le producteur doit renseigner son nom légal avant de vendre une Exclusive.</p>:null}
       </div>:null}
 
-      <div className="mb-4"><label className="text-xs font-bold block mb-1">Capture du paiement · 5 Mo maximum</label>
+      <div className="mb-4"><label className="text-xs block mb-1">Capture de paiement (5 Mo maximum)</label>
         <input type="file" accept="image/*" onChange={function(e){setProof(e.target.files[0]||null);}} className="w-full text-xs text-gray-400"/></div>
 
       <label className="flex items-start gap-3 p-3 mb-4 bg-obsidian rounded-xl border border-borderDark cursor-pointer">
         <input type="checkbox" checked={accepted} onChange={function(e){setAccepted(e.target.checked);}} className="mt-1 accent-goldAccent"/>
-        <span className="text-[11px] text-gray-300">J'ai lu les limites affichées et j'accepte la licence <b className="text-white">{LICENSE_NAMES[license]}</b> et les <a href="infos.html#cgu" target="_blank" className="text-goldAccent underline">CGU</a>. Mon acceptation sera horodatée.</span>
+        <span className="text-[11px] text-gray-300">J'ai lu les limites de cette licence et j'accepte les <a href="infos.html#cgu" target="_blank" className="text-goldAccent underline">CGU</a>. L'acceptation sera horodatée.</span>
       </label>
 
-      <button onClick={send} disabled={busy||!ready} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-40">
+      <button onClick={submit} disabled={busy||!ready} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl disabled:opacity-40">
         {busy?'ENVOI...':'ENVOYER LA COMMANDE'}
       </button>
-      <p className="text-[10px] text-gray-500 text-center mt-2">Le contrat PDF est généré après validation du paiement par l'administration.</p>
+      <p className="text-[10px] text-gray-500 text-center mt-2">Le contrat PDF apparaît après validation manuelle du paiement.</p>
     </div>
   </div>;
 }
 
-/* ---------- LECTEUR ---------- */
 function Player(props){
   const t=props.track;
   return <div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-4 py-3">
@@ -1215,11 +871,10 @@ function Player(props){
       <input type="range" min="0" max="100" value={props.progress} onChange={props.seek} className="flex-1" style={{background:'linear-gradient(to right,#00f0ff '+props.progress+'%,#222638 '+props.progress+'%)'}}/>
       <span>{formatTime(props.duration)}</span>
     </div>
-    <div className="flex justify-between items-center">
-      <div className="flex items-center gap-3 w-1/3 min-w-0">
-        <img src={t.cover_url||DC} className="w-10 h-10 rounded-lg object-cover" alt=""/>
-        <div className="hidden md:block min-w-0"><p className="text-sm font-bold truncate">{t.title}</p>
-          <button onClick={function(){props.openProducer(t.producer_id);}} className="text-xs text-goldAccent truncate">{t.producer_name}</button></div>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2 w-1/3 min-w-0">
+        <img src={t.cover_url||DEFAULT_COVER} className="w-10 h-10 rounded-lg object-cover" alt=""/>
+        <div className="hidden md:block min-w-0"><p className="text-sm font-bold truncate">{t.title}</p><button onClick={function(){props.openProducer(t.producer_id);}} className="text-xs text-goldAccent truncate">{t.producer_name}</button></div>
       </div>
       <div className="flex items-center gap-3">
         <button onClick={props.toggleMute}><Icon name={props.muted?'mute':'volume'} size={18}/></button>
@@ -1231,11 +886,11 @@ function Player(props){
   </div>;
 }
 
-/* ---------- APP ---------- */
 function App(){
   const [loading,setLoading]=React.useState(true);
   const [session,setSession]=React.useState(null);
   const [profile,setProfile]=React.useState(null);
+  const [profileError,setProfileError]=React.useState('');
   const [tracks,setTracks]=React.useState([]);
   const [producers,setProducers]=React.useState([]);
   const [purchases,setPurchases]=React.useState([]);
@@ -1267,42 +922,44 @@ function App(){
     setToasts(function(old){return old.concat([{id:id,message:message,type:type||'success'}]);});
     setTimeout(function(){setToasts(function(old){return old.filter(function(x){return x.id!==id;});});},4000);
   }
-  function openProducer(id){
-    if(!id)return;
-    setProducerId(id);setViewRaw('producer');window.scrollTo({top:0,behavior:'smooth'});
-  }
-  function openChat(id,name){
-    setChatPeer(id);setChatName(name||'');setView('messages');
-  }
   async function copy(text){
     try{await navigator.clipboard.writeText(text);toast('Copié !');}
-    catch(e){toast('La copie automatique n’est pas disponible. Sélectionne le texte.','error');}
+    catch(e){toast('Sélectionne le texte pour le copier.','error');}
   }
   function pdf(no){downloadContract(no,toast);}
-  function share(){copy(window.location.href);}
+  function openProducer(id){if(!id)return;setProducerId(id);setView('producer');}
+  function openChat(id,name){setChatPeer(id);setChatName(name||'');setView('messages');}
 
   React.useEffect(function(){
     let alive=true;
-    async function init(){
-      const result=await sb.auth.getSession();
-      if(!alive)return;
-      const s=result.data.session;
-      setSession(s);
-      if(s){
-        loadProfile(s.user.id);
-        loadPurchases(s.user.id);
-        loadMyOrders(s.user.id);
-        loadNotifications(s.user.id);
-        loadFollowers(s.user.id);
-        loadMessageUnread();
+    async function initialize(){
+      try{
+        const auth=await sb.auth.getSession();
+        if(auth.error)throw auth.error;
+        if(!alive)return;
+        const s=auth.data.session;
+        setSession(s);
+        if(s){
+          loadProfile(s.user.id);
+          loadPurchases(s.user.id);
+          loadMyOrders(s.user.id);
+          loadNotifications(s.user.id);
+          loadFollowers(s.user.id);
+          loadMessageUnread();
+        }
+        await loadTracks();
+      }catch(error){
+        console.error('Initialisation Supabase:',error);
+        toast('Connexion Supabase impossible : vérifie la clé et la configuration.','error');
+      }finally{
+        if(alive)setLoading(false);
       }
-      await loadTracks();
-      if(alive)setLoading(false);
     }
-    init();
+    initialize();
 
     const auth=sb.auth.onAuthStateChange(function(event,s){
       setSession(s);
+      setProfileError('');
       if(s){
         loadProfile(s.user.id);
         loadPurchases(s.user.id);
@@ -1350,108 +1007,106 @@ function App(){
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'recipient_id=eq.'+session.user.id},function(){
         loadMessageUnread();
         if(view!=='messages')toast('💬 Nouveau message');
-      })
-      .subscribe();
+      }).subscribe();
     return function(){sb.removeChannel(channel);};
   },[session&&session.user.id,view]);
 
   async function loadTracks(){
-    const result=await sb.from('tracks').select('*').order('created_at',{ascending:false});
-    if(!result.data)return;
-    setTracks(result.data);
+    const r=await sb.from('tracks').select('*').order('created_at',{ascending:false});
+    if(r.error){console.error('Chargement tracks:',r.error.message);return;}
+    const data=r.data||[];
+    setTracks(data);
     const publicResult=await sb.from('public_profiles').select('id,name,avatar_url,bio,instagram');
-    if(publicResult.data){
-      const counts={};
-      result.data.forEach(function(t){
-        if(!t.producer_id)return;
-        if(!counts[t.producer_id])counts[t.producer_id]={count:0,plays:0,name:t.producer_name};
-        counts[t.producer_id].count++;
-        counts[t.producer_id].plays+=t.plays||0;
-      });
-      setProducers(publicResult.data.filter(function(p){return !!counts[p.id];}).map(function(p){
-        return Object.assign({},p,counts[p.id]);
-      }).sort(function(a,b){return (b.count||0)-(a.count||0);}));
-    }
+    if(publicResult.error){console.warn('Profils publics:',publicResult.error.message);setProducers([]);return;}
+    const counts={};
+    data.forEach(function(t){
+      if(!t.producer_id)return;
+      if(!counts[t.producer_id])counts[t.producer_id]={count:0,plays:0};
+      counts[t.producer_id].count++;
+      counts[t.producer_id].plays+=Number(t.plays)||0;
+    });
+    setProducers((publicResult.data||[]).map(function(p){
+      return Object.assign({},p,counts[p.id]||{count:0,plays:0});
+    }).sort(function(a,b){return b.count-a.count;}));
   }
 
   async function loadProfile(uid,attempt){
     attempt=attempt||0;
-    const result=await sb.from('profiles').select('*').eq('id',uid).single();
-    if(result.data){setProfile(result.data);return;}
-    if(attempt<5)setTimeout(function(){loadProfile(uid,attempt+1);},1200);
-    else toast('Impossible de charger le profil. Vérifie la table profiles et ses règles RLS.','error');
+    const r=await sb.from('profiles').select('*').eq('id',uid).single();
+    if(r.data){setProfile(r.data);setProfileError('');return;}
+    if(attempt<5){
+      setTimeout(function(){loadProfile(uid,attempt+1);},1000);
+    }else{
+      setProfileError(r.error?r.error.message:'Profil introuvable');
+    }
   }
 
   async function loadPurchases(uid){
     const r=await sb.from('sales').select('*').eq('buyer_id',uid).order('created_at',{ascending:false});
-    if(!r.data)return;
-    const ids=r.data.map(function(x){return x.track_id;}).filter(Boolean);
+    if(r.error){console.warn('Achats:',r.error.message);return;}
+    const ids=(r.data||[]).map(function(x){return x.track_id;}).filter(Boolean);
     const map={};
     if(ids.length){
       const q=await sb.from('tracks').select('id,title,cover_url,type,file_path').in('id',ids);
       (q.data||[]).forEach(function(t){map[t.id]=t;});
     }
-    setPurchases(r.data.map(function(x){return Object.assign({},x,{track:map[x.track_id]||null});}));
+    setPurchases((r.data||[]).map(function(x){return Object.assign({},x,{track:map[x.track_id]||null});}));
   }
 
   async function loadMyOrders(uid){
     const r=await sb.from('orders').select('*').eq('buyer_id',uid).order('created_at',{ascending:false});
-    if(!r.data)return;
-    const ids=r.data.map(function(x){return x.track_id;});
+    if(r.error){console.warn('Commandes:',r.error.message);return;}
+    const ids=(r.data||[]).map(function(x){return x.track_id;});
     const map={};
     if(ids.length){
       const q=await sb.from('tracks').select('id,title,cover_url').in('id',ids);
       (q.data||[]).forEach(function(t){map[t.id]=t;});
     }
-    setMyOrders(r.data.map(function(x){return Object.assign({},x,{track:map[x.track_id]||null});}));
+    setMyOrders((r.data||[]).map(function(x){return Object.assign({},x,{track:map[x.track_id]||null});}));
   }
 
   async function loadAdminOrders(){
     const r=await sb.from('orders').select('*').order('created_at',{ascending:false});
-    if(!r.data)return;
-    const buyerIds=r.data.map(function(x){return x.buyer_id;});
-    const trackIds=r.data.map(function(x){return x.track_id;});
+    if(r.error){console.warn('Commandes admin:',r.error.message);return;}
+    const buyerIds=(r.data||[]).map(function(x){return x.buyer_id;});
+    const trackIds=(r.data||[]).map(function(x){return x.track_id;});
     const buyers={},titles={};
     if(buyerIds.length){
-      const b=await sb.from('public_profiles').select('id,name').in('id',buyerIds);
-      (b.data||[]).forEach(function(x){buyers[x.id]=x.name;});
+      const q=await sb.from('public_profiles').select('id,name').in('id',buyerIds);
+      (q.data||[]).forEach(function(x){buyers[x.id]=x.name;});
     }
     if(trackIds.length){
-      const t=await sb.from('tracks').select('id,title').in('id',trackIds);
-      (t.data||[]).forEach(function(x){titles[x.id]=x.title;});
+      const q=await sb.from('tracks').select('id,title').in('id',trackIds);
+      (q.data||[]).forEach(function(x){titles[x.id]=x.title;});
     }
-    setAdminOrders(r.data.map(function(x){return Object.assign({},x,{buyer_name:buyers[x.buyer_id]||'Client',track_title:titles[x.track_id]||'—'});}));
+    setAdminOrders((r.data||[]).map(function(x){return Object.assign({},x,{buyer_name:buyers[x.buyer_id]||'Client',track_title:titles[x.track_id]||'—'});}));
   }
 
   async function loadWithdrawals(){
     const r=await sb.from('withdrawals').select('*').order('created_at',{ascending:false});
     if(r.data)setWithdrawals(r.data);
   }
-
   async function loadNotifications(uid){
     const r=await sb.from('notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(40);
     if(r.data)setNotifications(r.data);
   }
-
   async function loadFollowers(uid){
     const r=await sb.rpc('get_producer',{p_id:uid});
     if(r.data)setFollowers(r.data.followers||0);
   }
-
   async function loadMessageUnread(){
     const r=await sb.rpc('my_conversations');
     if(r.data)setMessageUnread(r.data.reduce(function(sum,c){return sum+Number(c.unread||0);},0));
   }
-
   async function markNotificationsRead(){
-    await sb.rpc('mark_notifications_read');
+    const r=await sb.rpc('mark_notifications_read');
+    if(r.error){console.warn(r.error.message);return;}
     setNotifications(function(old){return old.map(function(n){return Object.assign({},n,{is_read:true});});});
   }
 
   async function logout(){
     audioRef.current.pause();setPlaying(false);
-    await sb.auth.signOut();
-    setView('home');toast('Déconnecté.');
+    await sb.auth.signOut();setView('home');toast('Déconnecté.');
   }
 
   async function play(track){
@@ -1466,17 +1121,15 @@ function App(){
     audioRef.current.volume=muted?0:volume;
     audioRef.current.play().catch(function(){});
     setPlaying(true);
-    const r=await sb.rpc('increment_plays',{track_id:track.id});
-    if(r.error)console.warn('Compteur d’écoutes :',r.error.message);
-    loadTracks();
+    await sb.rpc('increment_plays',{track_id:track.id});
   }
 
   function seek(e){
     if(duration>0)audioRef.current.currentTime=(Number(e.target.value)/100)*duration;
   }
-  function setAudioVolume(e){
-    const v=parseFloat(e.target.value);
-    setVolume(v);audioRef.current.volume=v;setMuted(v===0);
+  function changeVolume(e){
+    const value=parseFloat(e.target.value);
+    setVolume(value);audioRef.current.volume=value;setMuted(value===0);
   }
   function toggleMute(){
     if(muted){audioRef.current.volume=volume||0.5;setMuted(false);}
@@ -1486,15 +1139,15 @@ function App(){
   async function submitOrder(item,license,amount,rate,proof,buyerLegal,termsAccepted){
     if(!proof){toast('Ajoute la capture du paiement.','error');return;}
     if(proof.size>5*1024*1024){toast('La capture ne doit pas dépasser 5 Mo.','error');return;}
-    if(!termsAccepted){toast('Tu dois accepter les conditions de la licence.','error');return;}
+    if(!termsAccepted){toast('Accepte les conditions de la licence.','error');return;}
+
     try{
       const sellerAmount=Math.floor(amount*(1-rate/100));
       const fee=amount-sellerAmount;
-      let proofUrl='';
-      const path=session.user.id+'-'+Date.now()+'-proof.'+(proof.name.split('.').pop()||'jpg');
-      const uploaded=await sb.storage.from('covers').upload(path,proof);
+      const fileName=proof.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const proofPath=session.user.id+'/'+Date.now()+'-'+fileName;
+      const uploaded=await sb.storage.from('payment-proofs').upload(proofPath,proof);
       if(uploaded.error)throw uploaded.error;
-      proofUrl=sb.storage.from('covers').getPublicUrl(path).data.publicUrl;
 
       const result=await sb.from('orders').insert({
         buyer_id:session.user.id,
@@ -1506,18 +1159,26 @@ function App(){
         seller_amount:sellerAmount,
         platform_fee:fee,
         rate_percent:rate,
-        proof_url:proofUrl,
+        proof_url:proofPath,
+        buyer_legal_name:license==='exclusive'?buyerLegal:null,
         terms_accepted:true,
-        accepted_at:new Date().toISOString(),
-        buyer_legal_name:license==='exclusive'?buyerLegal:null
+        terms_version:'3.0'
       });
 
       if(result.error)throw result.error;
-      toast('Commande envoyée. Le PDF sera disponible après validation du paiement.');
+      toast('Commande envoyée. Le contrat sera disponible après vérification du paiement.');
       setBuyItem(null);
       loadMyOrders(session.user.id);
       if(profile&&profile.is_admin)loadAdminOrders();
     }catch(error){toast(error.message||'Impossible d’envoyer la commande.','error');}
+  }
+
+  async function openProof(path){
+    if(!path){toast('Preuve introuvable.','error');return;}
+    if(/^https?:\/\//i.test(path)){window.open(path,'_blank','noopener');return;}
+    const r=await sb.storage.from('payment-proofs').createSignedUrl(path,180);
+    if(r.error){toast(r.error.message,'error');return;}
+    window.open(r.data.signedUrl,'_blank','noopener');
   }
 
   async function validateOrder(id){
@@ -1539,7 +1200,7 @@ function App(){
   }
 
   async function payWithdrawal(id){
-    if(!confirm('As-tu bien effectué le virement au vendeur ?'))return;
+    if(!confirm('As-tu bien fait le virement au vendeur ?'))return;
     const r=await sb.rpc('pay_withdrawal',{p_id:id});
     if(r.error){toast(r.error.message,'error');return;}
     toast('Retrait marqué comme payé.');loadWithdrawals();
@@ -1557,7 +1218,7 @@ function App(){
     if(!p.track||!p.track.file_path){toast('Fichier indisponible.','error');return;}
     const r=await sb.storage.from('vst-files').createSignedUrl(p.track.file_path,120,{download:true});
     if(r.error){toast(r.error.message,'error');return;}
-    window.open(r.data.signedUrl,'_blank');
+    window.open(r.data.signedUrl,'_blank','noopener');
   }
 
   async function saveProfile(details){
@@ -1566,8 +1227,8 @@ function App(){
       if(details.avatar){
         if(details.avatar.size>5*1024*1024)throw new Error('Photo : maximum 5 Mo.');
         const fileName=profile.id+'-'+Date.now()+'.'+(details.avatar.name.split('.').pop()||'jpg');
-        const upload=await sb.storage.from('avatars').upload(fileName,details.avatar,{upsert:true});
-        if(upload.error)throw upload.error;
+        const uploaded=await sb.storage.from('avatars').upload(fileName,details.avatar,{upsert:true});
+        if(uploaded.error)throw uploaded.error;
         avatarUrl=sb.storage.from('avatars').getPublicUrl(fileName).data.publicUrl;
       }
       const result=await sb.from('profiles').update({
@@ -1580,54 +1241,49 @@ function App(){
       }).eq('id',profile.id).select().single();
 
       if(result.error)throw result.error;
-      setProfile(result.data);toast('Profil sauvegardé !');setView('dashboard');
+      setProfile(result.data);toast('Profil enregistré !');setView('dashboard');
     }catch(error){toast(error.message,'error');}
   }
 
   async function uploadTrack(d){
     try{
       if(!d.title.trim())throw new Error('Le titre est obligatoire.');
-      if(d.type==='vst'&&!d.file)throw new Error('Ajoute le fichier du plugin VST.');
+      if(d.type==='vst'&&!d.file)throw new Error('Ajoute le fichier du plugin.');
       if(d.file&&d.file.size>50*1024*1024)throw new Error('Fichier trop lourd : 50 Mo maximum.');
       if(d.cover&&d.cover.size>5*1024*1024)throw new Error('Pochette trop lourde : 5 Mo maximum.');
       if(d.type==='beat'&&(Number(d.bpm)<40||Number(d.bpm)>300))throw new Error('Le BPM doit être entre 40 et 300.');
+      if([d.p1,d.p2,d.p3,d.p4].some(function(p){return Number(p)<0||!Number.isFinite(Number(p));}))throw new Error('Vérifie les prix.');
 
-      let coverUrl=DC,audioUrl='',filePath=null,fileHash=null;
+      let coverUrl=DEFAULT_COVER,audioUrl='',filePath=null,fileHash=null;
+
       if(d.cover){
         const coverName=profile.id+'-'+Date.now()+'-cover.'+(d.cover.name.split('.').pop()||'jpg');
-        const upCover=await sb.storage.from('covers').upload(coverName,d.cover);
-        if(upCover.error)throw upCover.error;
+        const uploaded=await sb.storage.from('covers').upload(coverName,d.cover);
+        if(uploaded.error)throw uploaded.error;
         coverUrl=sb.storage.from('covers').getPublicUrl(coverName).data.publicUrl;
       }
+
       if(d.file){
         fileHash=await hashFile(d.file);
         const safeName=d.file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
         if(d.type==='vst'){
           filePath=profile.id+'/'+Date.now()+'-'+safeName;
-          const up=await sb.storage.from('vst-files').upload(filePath,d.file);
-          if(up.error)throw new Error('Upload VST échoué : '+up.error.message);
+          const uploaded=await sb.storage.from('vst-files').upload(filePath,d.file);
+          if(uploaded.error)throw new Error('Upload VST échoué : '+uploaded.error.message);
         }else{
           const audioName=profile.id+'-'+Date.now()+'-audio.'+(d.file.name.split('.').pop()||'mp3');
-          const up=await sb.storage.from('audio').upload(audioName,d.file);
-          if(up.error)throw new Error('Upload audio échoué : '+up.error.message);
+          const uploaded=await sb.storage.from('audio').upload(audioName,d.file);
+          if(uploaded.error)throw new Error('Upload audio échoué : '+uploaded.error.message);
           audioUrl=sb.storage.from('audio').getPublicUrl(audioName).data.publicUrl;
         }
       }
 
       const row={
-        title:d.title.trim(),
-        type:d.type,
-        genre:d.genre,
-        bpm:parseInt(d.bpm,10)||140,
-        key:d.key,
-        producer_id:profile.id,
-        producer_name:profile.name,
-        cover_url:coverUrl,
-        audio_url:audioUrl,
-        price_mp3:parseInt(d.p1,10)||0,
-        price_wav:parseInt(d.p2,10)||0,
-        price_stems:parseInt(d.p3,10)||0,
-        price_exclusive:parseInt(d.p4,10)||0,
+        title:d.title.trim(),type:d.type,genre:d.genre,bpm:parseInt(d.bpm,10)||140,key:d.key,
+        producer_id:profile.id,producer_name:profile.name,
+        cover_url:coverUrl,audio_url:audioUrl,
+        price_mp3:parseInt(d.p1,10)||0,price_wav:parseInt(d.p2,10)||0,
+        price_stems:parseInt(d.p3,10)||0,price_exclusive:parseInt(d.p4,10)||0,
         description:d.description.trim()||(d.type==='vst'?'Plugin VST':'Beat '+d.genre)
       };
       if(filePath)row.file_path=filePath;
@@ -1637,21 +1293,20 @@ function App(){
       const result=await sb.from('tracks').insert(row);
       if(result.error)throw result.error;
       toast(fileHash?'Publié ! Empreinte SHA-256 enregistrée.':'Publié avec succès !');
-      await loadTracks();
-      setView('dashboard');
-      return true;
+      await loadTracks();setView('dashboard');return true;
     }catch(error){toast(error.message||'Publication impossible.','error');return false;}
   }
 
   async function removeTrack(id){
     if(!confirm('Supprimer cette publication ?'))return;
     const r=await sb.from('tracks').delete().eq('id',id);
-    if(r.error){toast(r.error.code==='23503'?'Ce produit a déjà une vente et ne peut plus être supprimé.':r.error.message,'error');return;}
+    if(r.error){toast(r.error.code==='23503'?'Un produit ayant une vente ne peut plus être supprimé.':r.error.message,'error');return;}
     toast('Publication supprimée.');loadTracks();
   }
 
-  function openBuy(item){
+  function buy(item){
     if(!session){toast('Connecte-toi pour acheter.','error');return;}
+    if(item.producer_id===session.user.id){toast('Tu ne peux pas acheter ta propre publication.','error');return;}
     setBuyItem(item);
   }
 
@@ -1661,17 +1316,23 @@ function App(){
   }
 
   if(loading)return <div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
-
   if(!session)return <React.Fragment>
     <Toasts items={toasts} remove={function(id){setToasts(function(old){return old.filter(function(t){return t.id!==id;});});}}/>
     <AuthPage toast={toast}/>
   </React.Fragment>;
 
-  if(!profile)return <div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
+  if(!profile){
+    return <div className="min-h-screen flex items-center justify-center p-5">
+      <div className="card max-w-md p-7 rounded-2xl text-center">
+        {profileError?<React.Fragment><h2 className="text-xl font-black">Profil non chargé</h2><p className="text-xs text-gray-400 mt-3">{profileError}</p>
+          <button onClick={function(){loadProfile(session.user.id);}} className="mt-5 bg-cyanNeon text-black px-4 py-2 rounded-lg font-bold">Réessayer</button>
+        </React.Fragment>:<React.Fragment><div className="loader mx-auto"></div><p className="text-xs text-gray-400 mt-4">Chargement du profil...</p></React.Fragment>}
+      </div>
+    </div>;
+  }
 
   const myKeys=purchases.filter(function(p){return p.license_type==='vst'&&p.vst_key;});
-  const pendingCount=adminOrders.filter(function(o){return o.status==='pending';}).length+
-    withdrawals.filter(function(w){return w.status==='pending';}).length;
+  const pendingCount=adminOrders.filter(function(o){return o.status==='pending';}).length+withdrawals.filter(function(w){return w.status==='pending';}).length;
   const unread=notifications.filter(function(n){return !n.is_read;}).length;
 
   return <div className="relative">
@@ -1686,10 +1347,10 @@ function App(){
 
       {view==='home'?<HomeView setView={setView} producers={producers} openProducer={openProducer}/>:null}
       {view==='artists'?<ArtistsView producers={producers} openProducer={openProducer}/>:null}
-      {view==='beats'?<BeatsView tracks={tracks} producers={producers} current={current} playing={playing} play={play} buy={openBuy} openProducer={openProducer}/>:null}
-      {view==='vsts'?<VstsView tracks={tracks} keys={myKeys} buy={openBuy} setView={setView} openProducer={openProducer}/>:null}
-      {view==='producer'&&producerId?<ProducerPage id={producerId} me={profile.id} tracks={tracks} current={current} playing={playing} play={play} buy={openBuy} toast={toast} setView={setView} share={share} openChat={openChat}/>:null}
-      {view==='me'?<ProducerPage id={profile.id} me={profile.id} tracks={tracks} current={current} playing={playing} play={play} buy={openBuy} toast={toast} setView={setView} share={share} openChat={openChat}/>:null}
+      {view==='beats'?<BeatsView tracks={tracks} producers={producers} current={current} playing={playing} play={play} buy={buy} openProducer={openProducer}/>:null}
+      {view==='vsts'?<VstsView tracks={tracks} keys={myKeys} buy={buy} setView={setView} openProducer={openProducer}/>:null}
+      {view==='producer'&&producerId?<ProducerPage id={producerId} me={profile.id} tracks={tracks} current={current} playing={playing} play={play} buy={buy} toast={toast} setView={setView} share={share} openChat={openChat}/>:null}
+      {view==='me'?<ProducerPage id={profile.id} me={profile.id} tracks={tracks} current={current} playing={playing} play={play} buy={buy} toast={toast} setView={setView} share={share} openChat={openChat}/>:null}
       {view==='dashboard'?<DashboardView profile={profile} email={session.user.email} tracks={tracks} followers={followers} setView={setView} openProducer={openProducer} withdraw={requestWithdrawal} remove={removeTrack} pdf={pdf}/>:null}
       {view==='upload'?<UploadView upload={uploadTrack}/>:null}
       {view==='settings'?<SettingsView profile={profile} save={saveProfile}/>:null}
@@ -1697,11 +1358,11 @@ function App(){
       {view==='keys'?<KeysView purchases={purchases} pdf={pdf} copy={copy} download={downloadVst}/>:null}
       {view==='messages'?<MessagesView userId={session.user.id} initialPeer={chatPeer} initialName={chatName} toast={toast} openProducer={openProducer} refreshUnread={loadMessageUnread}/>:null}
       {view==='verify'?<VerifyView/>:null}
-      {view==='admin'&&profile.is_admin?<AdminView orders={adminOrders} withdrawals={withdrawals} validate={validateOrder} refuse={refuseOrder} payWithdrawal={payWithdrawal} pdf={pdf}/>:null}
+      {view==='admin'&&profile.is_admin?<AdminView orders={adminOrders} withdrawals={withdrawals} validate={validateOrder} refuse={refuseOrder} payWithdrawal={payWithdrawal} pdf={pdf} openProof={openProof}/>:null}
     </main>
 
     {buyItem?<BuyModal item={buyItem} close={function(){setBuyItem(null);}} submit={submitOrder}/>:null}
-    {current?<Player track={current} playing={playing} play={play} progress={progress} duration={duration} time={currentTime} seek={seek} volume={volume} muted={muted} setVolume={setAudioVolume} toggleMute={toggleMute} buy={openBuy} openProducer={openProducer}/>:null}
+    {current?<Player track={current} playing={playing} play={play} progress={progress} duration={duration} time={currentTime} seek={seek} volume={volume} muted={muted} setVolume={changeVolume} toggleMute={toggleMute} buy={buy} openProducer={openProducer}/>:null}
   </div>;
 }
 
