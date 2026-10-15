@@ -11,7 +11,7 @@
 <meta property="og:description" content="Achète et vends des beats et plugins VST avec contrat PDF officiel.">
 <meta property="og:image" content="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050508'/%3E%3Ctext x='32' y='47' font-size='42' font-weight='900' text-anchor='middle' fill='%23e2b053' font-family='Arial'%3EY%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2300f0ff'/%3E%3Cstop offset='100%25' stop-color='%238a2be2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%23050508'/%3E%3Ctext x='32' y='40' font-size='20' font-weight='900' text-anchor='middle' fill='url(%23g)' font-family='Arial'%3E213%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://ryhnnlphdeuxrvpxyfgc.supabase.co" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -143,7 +143,7 @@ async function makeContractPdf(no,toast){
   function line(yy){p.setDrawColor(215,215,215);p.line(M,yy,W-M,yy);}
 
   p.setFillColor(5,5,8);p.rect(0,0,W,30,'F');
-  txt('213WAVE',M,14,19,'bold',[226,176,83]);
+  txt('213WAVE',M,14,19,'bold',[0,240,255]);
   txt('CONTRAT DE LICENCE MUSICALE',M,22,9,'normal',[200,200,200]);
   txt(d.no,W-M-p.getTextWidth(d.no),14,13,'bold',[0,240,255]);
   txt('Marketplace algerienne',W-M-32,22,8,'normal',[150,150,150]);
@@ -311,7 +311,7 @@ function AuthPage(props){
     <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade">
       <div className="text-center lg:text-left space-y-6">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg">Y</div>
-        <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tgold">213WAVE</span></h1>
+        <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tcyan">213WAVE</span></h1>
         <p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie.</p>
         <div className="hidden lg:block space-y-3 pt-4">
           <p className="text-sm font-bold text-white">📄 Contrat PDF officiel à chaque vente</p>
@@ -1548,5 +1548,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b04b567e0b038f',t:'MTc5MjA4MjcyNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b051660d8602d4',t:'MTc5MjA4Mjk3NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
