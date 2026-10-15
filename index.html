@@ -186,8 +186,16 @@ async function resolveAudioUrl(val){
     return r.data.signedUrl;
   }catch(e){return val;}
 }
-async function downloadAudio(t){
-  const url=await resolveAudioUrl(t&&t.audio_url);
+function audioPathFor(t,license){
+  if(!t)return null;
+  if(license==='wav'&&t.audio_wav_url)return t.audio_wav_url;
+  if(license==='stems'&&t.audio_stems_url)return t.audio_stems_url;
+  if(license==='exclusive'&&t.audio_exclusive_url)return t.audio_exclusive_url;
+  return t.audio_url||null;
+}
+async function downloadAudio(t,license){
+  const path=audioPathFor(t,license||'mp3');
+  const url=await resolveAudioUrl(path);
   if(!url){alert('Fichier indisponible');return;}
   window.open(url,'_blank');
 }
@@ -581,6 +589,7 @@ function NavBar(props){
 
 function MobileNav(props){
   const items=[{v:'home',n:'home',l:'Accueil'},{v:'beats',n:'note',l:'Beats'},{v:'vsts',n:'cpu',l:'VSTs'},{v:'messages',n:'chat',l:'Chat'},{v:'upload',n:'up',l:'Poster'}];
+  if(props.isAdmin)items.push({v:'admin',n:'list',l:'Admin'});
   return <nav className={'md:hidden fixed inset-x-0 z-40 glass border-t border-borderDark px-2 py-2 flex justify-around '+(props.hasPlayer?'bottom-[96px]':'bottom-0')}>
     {items.map(function(it){
       return <button key={it.v} onClick={function(){props.setView(it.v);}} className={'relative flex flex-col items-center gap-1 transition '+(props.view===it.v?'text-cyanNeon scale-110':'text-gray-400')}>
@@ -958,7 +967,7 @@ function MyOrdersView(props){
         <div className="flex flex-col gap-2 items-end">
           {badge}
           {o.contract_no?<button onClick={function(){props.pdf(o.contract_no);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 hover:scale-105 transition"><Icon n="pdf" c="w-4 h-4"/>Contrat PDF</button>:null}
-          {o.track&&o.track.audio_url&&o.product_type==='beat'?<button onClick={function(){downloadAudio(o.track);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Télécharger le beat</button>:null}
+          {o.track&&o.track.audio_url&&o.product_type==='beat'?<button onClick={function(){downloadAudio(o.track,o.license_type);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Télécharger le beat</button>:null}
         </div></div>;})}
     </div>}
   </section>;
@@ -981,7 +990,7 @@ function KeysView(props){
           <span className="text-[11px] text-gray-400">{(p.activations||[]).length}/{p.max_activations||3} PC</span>
           <button onClick={function(){props.copy(p.vst_key);}} className="bg-cardDark border border-borderDark text-white font-bold px-3 py-2 rounded-lg text-xs">Copier</button>
           <button onClick={function(){props.download(p);}} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs">Télécharger</button>
-        </div>:(p.track&&p.track.audio_url)?<button onClick={function(){downloadAudio(p.track);}} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs">Télécharger</button>:null}</div>;})}
+        </div>:(p.track&&p.track.audio_url)?<button onClick={function(){downloadAudio(p.track,p.license_type);}} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs">Télécharger</button>:null}</div>;})}
     </div>}
   </section>;
 }
@@ -1160,15 +1169,17 @@ function UploadView(props){
   const [title,setTitle]=React.useState(''),[type,setType]=React.useState('beat'),[genre,setGenre]=React.useState('Drill');
   const [bpm,setBpm]=React.useState(140),[mkey,setMkey]=React.useState('Am');
   const [p1,setP1]=React.useState(2000),[p2,setP2]=React.useState(4000),[p3,setP3]=React.useState(8000),[p4,setP4]=React.useState(25000);
-  const [desc,setDesc]=React.useState(''),[cover,setCover]=React.useState(null),[file,setFile]=React.useState(null);
+  const [desc,setDesc]=React.useState(''),[cover,setCover]=React.useState(null);
+  const [fmp3,setFmp3]=React.useState(null),[fwav,setFwav]=React.useState(null),[fstems,setFstems]=React.useState(null),[fexc,setFexc]=React.useState(null);
+  const [file,setFile]=React.useState(null);
   const [busy,setBusy]=React.useState(false),[custom,setCustom]=React.useState(false);
   const [lim,setLim]=React.useState(JSON.parse(JSON.stringify(DEFLIM)));
   function setL(l,k,v){const c=JSON.parse(JSON.stringify(lim));c[l][k]=v;setLim(c);}
   async function submit(e){
     e.preventDefault();setBusy(true);
     const ok=await props.upload({title:title,type:type,genre:genre,bpm:bpm,key:mkey,p1:p1,p2:p2,p3:p3,p4:p4,
-      desc:desc,cover:cover,file:file,limits:(type==='beat'&&custom)?lim:null});
-    if(ok){setTitle('');setDesc('');setCover(null);setFile(null);}
+      desc:desc,cover:cover,file:file,fmp3:fmp3,fwav:fwav,fstems:fstems,fexc:fexc,limits:(type==='beat'&&custom)?lim:null});
+    if(ok){setTitle('');setDesc('');setCover(null);setFile(null);setFmp3(null);setFwav(null);setFstems(null);setFexc(null);}
     setBusy(false);
   }
   return <div className="max-w-2xl mx-auto card p-8 rounded-2xl border-goldAccent/40 fade">
@@ -1177,7 +1188,7 @@ function UploadView(props){
     <form onSubmit={submit} className="space-y-4">
       <div><label className="text-xs font-bold text-gray-300 block mb-1">Titre</label><input type="text" required maxLength="100" value={title} onChange={function(e){setTitle(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/></div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div><label className="text-xs font-bold text-gray-300 block mb-1">Type</label><select value={type} onChange={function(e){setType(e.target.value);setFile(null);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"><option value="beat">Beat</option><option value="vst">VST</option></select></div>
+        <div><label className="text-xs font-bold text-gray-300 block mb-1">Type</label><select value={type} onChange={function(e){setType(e.target.value);setFile(null);setFmp3(null);setFwav(null);setFstems(null);setFexc(null);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"><option value="beat">Beat</option><option value="vst">VST</option></select></div>
         {type==='beat'?<React.Fragment>
           <div><label className="text-xs font-bold text-gray-300 block mb-1">Genre</label><select value={genre} onChange={function(e){setGenre(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white">{GENRES.slice(1).map(function(g){return <option key={g} value={g}>{g}</option>;})}</select></div>
           <div><label className="text-xs font-bold text-gray-300 block mb-1">BPM</label><input type="number" min="40" max="300" value={bpm} onChange={function(e){setBpm(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white"/></div>
@@ -1221,7 +1232,15 @@ function UploadView(props){
         <p className="text-[11px] text-gray-400 mt-2">Clé unique par acheteur, 3 machines max.</p></div>}
       <div><label className="text-xs font-bold text-gray-300 block mb-1">Description</label><textarea maxLength="300" rows="2" value={desc} onChange={function(e){setDesc(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white resize-none outline-none"></textarea></div>
       <div><label className="text-xs font-bold text-gray-300 block mb-1">Pochette (max 5MB)</label><input type="file" accept="image/*" onChange={function(e){setCover(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/></div>
-      <div><label className="text-xs font-bold text-gray-300 block mb-1">{type==='vst'?'Fichier plugin (ZIP/EXE)':'Audio (MP3/WAV)'} — max 50MB</label><input key={type} type="file" accept={type==='vst'?'.zip,.rar,.7z,.exe,.msi,.dmg,.pkg':'.mp3,.wav'} onChange={function(e){setFile(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-goldAccent file:text-black"/></div>
+      {type==='vst'?<div><label className="text-xs font-bold text-gray-300 block mb-1">Fichier plugin (ZIP/EXE) — max 50MB</label><input key={type} type="file" accept=".zip,.rar,.7z,.exe,.msi,.dmg,.pkg" onChange={function(e){setFile(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-goldAccent file:text-black"/></div>
+      :<div className="space-y-3 p-4 rounded-xl bg-obsidian/60 border border-borderDark">
+        <p className="text-xs font-bold text-goldAccent uppercase">Fichiers audio (max 50MB chacun)</p>
+        <div><label className="text-[11px] text-gray-400">MP3 (obligatoire)</label><input type="file" accept=".mp3" onChange={function(e){setFmp3(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-goldAccent file:text-black"/></div>
+        <div><label className="text-[11px] text-gray-400">WAV (optionnel)</label><input type="file" accept=".wav" onChange={function(e){setFwav(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-cyanNeon file:text-black"/></div>
+        <div><label className="text-[11px] text-gray-400">Stems (ZIP, optionnel)</label><input type="file" accept=".zip,.rar,.7z" onChange={function(e){setFstems(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-pinkNeon file:text-black"/></div>
+        <div><label className="text-[11px] text-gray-400">Exclusif (ZIP/WAV, optionnel)</label><input type="file" accept=".zip,.wav,.mp3" onChange={function(e){setFexc(e.target.files[0]);}} className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-greenPro file:text-black"/></div>
+        <p className="text-[10px] text-gray-500">Si un format n'est pas uploadé, l'acheteur reçoit le MP3 par défaut.</p>
+      </div>}
       <button type="submit" disabled={busy} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-50">{busy?'UPLOAD EN COURS...':'PUBLIER'}</button>
     </form>
   </div>;
@@ -1524,13 +1543,13 @@ function App(){
     const r=await sb.from('sales').select('*').eq('buyer_id',uid).order('created_at',{ascending:false});
     if(!r.data)return;
     const ids=r.data.map(function(s){return s.track_id;}).filter(Boolean);const m={};
-    if(ids.length){const t=await sb.from('tracks').select('id,title,cover_url,type,file_path,audio_url').in('id',ids);(t.data||[]).forEach(function(x){m[x.id]=x;});}
+    if(ids.length){const t=await sb.from('tracks').select('id,title,cover_url,type,file_path,audio_url,audio_wav_url,audio_stems_url,audio_exclusive_url').in('id',ids);(t.data||[]).forEach(function(x){m[x.id]=x;});}
     setPurchases(r.data.map(function(s){s.track=m[s.track_id]||null;return s;}));}
   async function loadMyOrders(uid){
     const r=await sb.from('orders').select('*').eq('buyer_id',uid).order('created_at',{ascending:false});
     if(!r.data)return;
     const ids=r.data.map(function(o){return o.track_id;});const m={};
-    if(ids.length){const t=await sb.from('tracks').select('id,title,cover_url,audio_url').in('id',ids);(t.data||[]).forEach(function(x){m[x.id]=x;});}
+    if(ids.length){const t=await sb.from('tracks').select('id,title,cover_url,audio_url,audio_wav_url,audio_stems_url,audio_exclusive_url').in('id',ids);(t.data||[]).forEach(function(x){m[x.id]=x;});}
     setMyOrders(r.data.map(function(o){o.track=m[o.track_id]||null;return o;}));}
   async function loadAdminOrders(){
     const r=await sb.from('orders').select('*').order('created_at',{ascending:false});
@@ -1634,21 +1653,35 @@ function App(){
         const n=profile.id+'-'+Date.now()+'-c.'+d.cover.name.split('.').pop();
         const up=await sb.storage.from('covers').upload(n,d.cover);
         if(!up.error)coverUrl=sb.storage.from('covers').getPublicUrl(n).data.publicUrl;}
-      if(d.file){
+      let audioWav='',audioStems='',audioExc='';
+      if(d.type==='vst'){
+        if(!d.file)throw new Error('Ajoute le fichier du plugin');
+        if(d.file.size>50*1024*1024)throw new Error('Fichier max 50MB');
         hash=await sha256File(d.file);
         const safe=d.file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-        if(d.type==='vst'){
-          const path=profile.id+'/'+Date.now()+'-'+safe;
-          const up=await sb.storage.from('vst-files').upload(path,d.file);
+        const path=profile.id+'/'+Date.now()+'-'+safe;
+        const up=await sb.storage.from('vst-files').upload(path,d.file);
+        if(up.error)throw new Error('Upload échoué : '+up.error.message);
+        filePath=path;
+      }else{
+        if(!d.fmp3)throw new Error('Fichier MP3 obligatoire');
+        async function upAudio(f,suffix){
+          if(!f)return '';
+          if(f.size>50*1024*1024)throw new Error('Fichier max 50MB');
+          const n=profile.id+'-'+Date.now()+'-'+suffix+'.'+f.name.split('.').pop();
+          const up=await sb.storage.from('audio').upload(n,f);
           if(up.error)throw new Error('Upload échoué : '+up.error.message);
-          filePath=path;
-        }else{
-          const n=profile.id+'-'+Date.now()+'-a.'+d.file.name.split('.').pop();
-          const up=await sb.storage.from('audio').upload(n,d.file);
-          if(up.error)throw new Error('Upload échoué : '+up.error.message);
-          audioUrl=n;}}
+          return n;
+        }
+        audioUrl=await upAudio(d.fmp3,'mp3');
+        audioWav=await upAudio(d.fwav,'wav');
+        audioStems=await upAudio(d.fstems,'stems');
+        audioExc=await upAudio(d.fexc,'exc');
+        hash=await sha256File(d.fmp3);
+      }
       const row={title:d.title.trim(),type:d.type,genre:d.genre,bpm:parseInt(d.bpm,10)||140,key:d.key,
         producer_id:profile.id,producer_name:profile.name,cover_url:coverUrl,audio_url:audioUrl,
+        audio_wav_url:audioWav||null,audio_stems_url:audioStems||null,audio_exclusive_url:audioExc||null,
         price_mp3:parseInt(d.p1,10)||0,price_wav:parseInt(d.p2,10)||0,price_stems:parseInt(d.p3,10)||0,
         price_exclusive:parseInt(d.p4,10)||0,
         description:d.desc.trim()||(d.type==='vst'?'Plugin VST':'Beat '+d.genre)};
@@ -1701,7 +1734,7 @@ function App(){
     <div className="cursor-ring" style={{left:spot.x,top:spot.y}}></div>
     <NavBar view={view} setView={setView} profile={profile} email={session.user.email} logout={logout} pending={pendingCount}
       notifications={notifications} unread={unread} markRead={markRead} openProducer={openProducer} msgUnread={msgUnread}/>
-    <MobileNav view={view} setView={setView} hasPlayer={!!current} msgUnread={msgUnread}/>
+    <MobileNav view={view} setView={setView} hasPlayer={!!current} msgUnread={msgUnread} isAdmin={profile.is_admin}/>
 
     <div key={view} className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto fade">
       {view!=='home'?<button onClick={function(){setView('home');}} className="mb-6 flex items-center gap-2 text-gray-400 text-sm font-bold hover:text-white transition"><Icon n="back" c="w-4 h-4"/>{tr('Retour')}</button>:null}
@@ -1733,5 +1766,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b07d76c8815ca4',t:'MTc5MjA4NDc4MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b08b372c69ec9e',t:'MTc5MjA4NTM0Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
