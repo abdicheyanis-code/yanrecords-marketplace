@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>YANrecords | VST & Beatstore 🇩🇿</title>
+<meta name="description" content="YANrecords : la marketplace algérienne de beats et de plugins VST. Licences claires, contrat PDF officiel, paiement CCP/BaridiMob.">
+<meta name="theme-color" content="#050508">
+<meta property="og:type" content="website"><meta property="og:site_name" content="YANrecords">
+<meta property="og:title" content="YANrecords | Beats & VST algériens 🇩🇿">
+<meta property="og:description" content="Achète et vends des beats et plugins VST avec contrat PDF officiel.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050508'/%3E%3Ctext x='32' y='47' font-size='42' font-weight='900' text-anchor='middle' fill='%23e2b053' font-family='Arial'%3EY%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://ryhnnlphdeuxrvpxyfgc.supabase.co" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -53,6 +64,12 @@ body{background:#050508;color:#f8fafc;overflow-x:hidden}
 input[type=range]{-webkit-appearance:none;background:transparent}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:14px;width:14px;border-radius:50%;background:#00f0ff;margin-top:-5px;cursor:pointer}
 input[type=range]::-webkit-slider-runnable-track{height:4px;background:#222638;border-radius:2px}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:14px}
+.eq i{display:block;width:3px;background:#00f0ff;border-radius:1px;animation:eqb .8s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}
+@keyframes eqb{0%,100%{height:3px}50%{height:14px}}
+.sk{background:linear-gradient(90deg,#161a2a 25%,#1f2437 50%,#161a2a 75%);background-size:200% 100%;animation:skk 1.4s infinite}
+@keyframes skk{to{background-position:-200% 0}}
 </style>
 </head>
 <body class="min-h-screen pb-44 md:pb-28">
@@ -94,6 +111,20 @@ async function sha256File(file){
   }catch(e){return null;}
 }
 
+/* ---------- LANGUE FR / AR ---------- */
+let LANG='fr';try{LANG=localStorage.getItem('yan_lang')||'fr';}catch(e){}
+if(LANG==='ar'){document.documentElement.dir='rtl';document.documentElement.lang='ar';}
+function setLang(l){try{localStorage.setItem('yan_lang',l);}catch(e){}location.reload();}
+const AR={'Accueil':'الرئيسية','VSTs':'إضافات VST','Beats':'بيتات','Artistes':'الفنانون','Poster':'نشر','Retour':'رجوع','Annuler':'إلغاء','Acheter':'شراء',
+'Mes commandes':'طلباتي','Messages':'الرسائل','Mes clés VST':'مفاتيح VST','Mes favoris':'مفضلتي','Paramètres':'الإعدادات','Déconnexion':'تسجيل الخروج',
+'Dashboard':'لوحة التحكم','Guide & Infos':'الدليل والمعلومات','Vérifier une clé':'التحقق من مفتاح','BEATSTORE':'متجر البيتات','PLUGINS VST':'إضافات VST',
+'LES PRODUCTEURS':'المنتجون','MES COMMANDES':'طلباتي','MES FAVORIS':'مفضلتي','Derniers beats':'أحدث البيتات','Les plus écoutés':'الأكثر استماعا',
+'Beat du jour':'بيت اليوم','Comment ça marche':'كيف يعمل الموقع','Voir tout →':'عرض الكل ←','Explorer le beatstore':'تصفح المتجر','Publier mes prods':'انشر إنتاجاتك',
+'Producteurs':'منتجون','Beats en ligne':'بيت متوفر','Écoutes':'استماع','La marketplace musicale algérienne':'السوق الموسيقي الجزائري',
+'Beats, plugins VST et contrat PDF officiel à chaque vente.':'بيتات وإضافات VST وعقد PDF رسمي مع كل عملية بيع.',
+'1. Écoute':'١. استمع','Trouve le beat qui te correspond.':'اعثر على البيت الذي يناسبك.','2. Choisis ta licence':'٢. اختر رخصتك',
+'MP3, WAV, Stems ou Exclusive.':'MP3 أو WAV أو Stems أو حصري.','3. Paye et reçois ton contrat':'٣. ادفع واستلم عقدك','CCP / BaridiMob, puis contrat PDF numéroté.':'CCP / بريدي موب ثم عقد PDF مرقّم.'};
+function tr(s){return (LANG==='ar'&&AR[s])?AR[s]:s;}
 /* ---------- GÉNÉRATION PDF ---------- */
 async function makeContractPdf(no,toast){
   const r=await sb.rpc('get_contract',{p_no:no});
@@ -338,7 +369,7 @@ function ReviewsModal(props){
     <div className="min-h-full flex items-center justify-center p-4">
     <div className="card rounded-2xl max-w-lg w-full p-6 pop">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={props.close} className="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-white"><Icon n="back" c="w-4 h-4"/>Retour</button>
+        <button onClick={props.close} className="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-white"><Icon n="back" c="w-4 h-4"/>{tr('Retour')}</button>
         <button onClick={props.close} className="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-red-500 transition"><Icon n="x" c="w-5 h-5"/></button>
       </div>
       <h3 className="text-xl font-black text-white">Avis : {t.title}</h3>
@@ -364,7 +395,7 @@ function ReviewsModal(props){
 function FavsView(props){
   const list=props.tracks.filter(function(t){return props.favs.indexOf(t.id)>=0;});
   return <section className="fade space-y-4">
-    <h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">MES FAVORIS</h3>
+    <h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">{tr('MES FAVORIS')}</h3>
     {list.length===0?<p className="text-gray-400 text-center py-12">Aucun favori. Clique sur le ♥ d'un beat ou d'un VST.</p>:
     <div className="space-y-3">{list.map(function(t){
       const isCur=props.current&&props.current.id===t.id;
@@ -382,6 +413,29 @@ function FavsView(props){
   </section>;
 }
 
+function Eq(){return <span className="eq"><i></i><i></i><i></i></span>;}
+function Skel(){return <div className="card rounded-2xl p-3"><div className="sk aspect-square rounded-xl mb-3"></div><div className="sk h-4 w-3/4 rounded mb-2"></div><div className="sk h-3 w-1/2 rounded"></div></div>;}
+function TrackCard(props){
+  const b=props.t,isCur=props.current&&props.current.id===b.id,on=isCur&&props.playing;
+  return <div className="card rounded-2xl p-3 lift">
+    <div className="relative rounded-xl overflow-hidden mb-3 cursor-pointer group" onClick={function(){if(!b.is_sold&&b.audio_url)props.play(b);}}>
+      <img loading="lazy" src={b.cover_url||DC} className="w-full aspect-square object-cover" alt=""/>
+      {(!b.is_sold&&b.audio_url)?<div className={'absolute inset-0 bg-black/45 flex items-center justify-center transition '+(on?'':'opacity-0 group-hover:opacity-100')}><div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center"><Icon n={on?'pause':'play'} c="w-6 h-6"/></div></div>:null}
+      {on?<div className="absolute bottom-2 left-2 bg-black/70 rounded-lg px-2 py-1"><Eq/></div>:null}
+      {b.is_sold?<span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded">VENDU</span>:null}
+    </div>
+    <h4 className="font-black text-white truncate">{b.title}</h4>
+    <button onClick={function(){props.openProducer(b.producer_id);}} className="text-xs text-goldAccent font-bold hover:underline truncate max-w-full">{b.producer_name}</button>
+    <div className="flex gap-1.5 flex-wrap my-2">
+      <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.genre}</span>
+      <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.bpm} BPM</span>
+      <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.key}</span></div>
+    <div className="flex items-center gap-2 flex-wrap">
+      <FavBtn id={b.id} favs={props.favs} toggle={props.toggleFav}/><RateBtn track={b} ratings={props.ratings} open={props.openReviews}/>
+      {!b.is_sold?<button onClick={function(){props.buy(b);}} className="flex-1 bg-goldAccent text-black font-black px-3 py-2 rounded-xl text-xs whitespace-nowrap hover:scale-105 transition">{fmt(b.price_mp3)} DZD</button>:null}
+    </div></div>;
+}
+
 /* ============ NAVBAR ============ */
 function NavBar(props){
   const [open,setOpen]=React.useState(false),[bell,setBell]=React.useState(false);
@@ -396,12 +450,13 @@ function NavBar(props){
         <h1 className="text-xl font-black tracking-widest text-white hidden sm:block">YAN<span className="tgold">RECORDS</span></h1>
       </div>
       <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
-        <button onClick={function(){go('home');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='home'?'bg-white text-black':'text-gray-400 hover:text-white')}>Accueil</button>
-        <button onClick={function(){go('vsts');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='vsts'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white')}>VSTs</button>
-        <button onClick={function(){go('beats');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='beats'?'bg-goldAccent text-black':'text-gray-400 hover:text-white')}>Beats</button>
-        <button onClick={function(){go('artists');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='artists'?'bg-pinkNeon text-black':'text-gray-400 hover:text-white')}>Artistes</button>
+        <button onClick={function(){go('home');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='home'?'bg-white text-black':'text-gray-400 hover:text-white')}>{tr('Accueil')}</button>
+        <button onClick={function(){go('vsts');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='vsts'?'bg-cyanNeon text-black':'text-gray-400 hover:text-white')}>{tr('VSTs')}</button>
+        <button onClick={function(){go('beats');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='beats'?'bg-goldAccent text-black':'text-gray-400 hover:text-white')}>{tr('Beats')}</button>
+        <button onClick={function(){go('artists');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='artists'?'bg-pinkNeon text-black':'text-gray-400 hover:text-white')}>{tr('Artistes')}</button>
       </div>
       <div className="flex items-center gap-2 relative z-50">
+        <button onClick={function(){setLang(LANG==='ar'?'fr':'ar');}} className="h-10 px-3 rounded-xl bg-cardDark border border-borderDark text-xs font-black text-goldAccent hover:border-goldAccent transition">{LANG==='ar'?'FR':'عربية'}</button>
         <button onClick={function(){go('messages');}} className="relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-cyanNeon transition text-gray-300">
           <Icon n="chat" c="w-5 h-5"/>{props.msgUnread>0?<span className="dot"></span>:null}
         </button>
@@ -419,7 +474,7 @@ function NavBar(props){
               </button>;})}
           </div>:null}
         </div>
-        <button onClick={function(){go('upload');}} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs gc hover:scale-105 transition"><Icon n="up" c="w-4 h-4"/>Poster</button>
+        <button onClick={function(){go('upload');}} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs gc hover:scale-105 transition"><Icon n="up" c="w-4 h-4"/>{tr('Poster')}</button>
         <div className="relative">
           <button onClick={function(){setOpen(!open);setBell(false);}} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl hover:border-cyanNeon transition relative">
             <img src={(p&&p.avatar_url)?p.avatar_url:AV} className="w-7 h-7 rounded-full object-cover" alt=""/>
@@ -430,17 +485,17 @@ function NavBar(props){
           {open?<div className="absolute right-0 top-12 mt-2 w-60 card rounded-xl p-2 flex flex-col gap-1 drop">
             <button onClick={function(){go('me');}} className="px-3 py-2 border-b border-borderDark/50 mb-1 text-left hover:bg-white/5 rounded-lg transition">
               <p className="text-xs text-gray-400">Voir mon profil public</p><p className="text-sm font-bold text-white truncate">{p?p.name:''}</p></button>
-            <button onClick={function(){go('dashboard');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="dash" c="w-4 h-4"/>Dashboard</button>
-            <button onClick={function(){go('myorders');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="bag" c="w-4 h-4"/>Mes commandes</button>
+            <button onClick={function(){go('dashboard');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="dash" c="w-4 h-4"/>{tr('Dashboard')}</button>
+            <button onClick={function(){go('myorders');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="bag" c="w-4 h-4"/>{tr('Mes commandes')}</button>
             <button onClick={function(){go('messages');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="chat" c="w-4 h-4"/>Messages{props.msgUnread>0?<span className="ml-auto bg-pinkNeon text-black text-[10px] font-black px-1.5 rounded">{props.msgUnread}</span>:null}</button>
-            <button onClick={function(){go('favs');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><span className="w-4 text-center">♥</span>Mes favoris</button>
-            <button onClick={function(){go('keys');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="key" c="w-4 h-4"/>Mes clés VST</button>
-            <button onClick={function(){go('verify');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="shield" c="w-4 h-4"/>Vérifier une clé</button>
+            <button onClick={function(){go('favs');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><span className="w-4 text-center">♥</span>{tr('Mes favoris')}</button>
+            <button onClick={function(){go('keys');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="key" c="w-4 h-4"/>{tr('Mes clés VST')}</button>
+            <button onClick={function(){go('verify');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="shield" c="w-4 h-4"/>{tr('Vérifier une clé')}</button>
             {(p&&p.is_admin)?<button onClick={function(){go('admin');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-pinkNeon hover:bg-pinkNeon/10 transition"><Icon n="list" c="w-4 h-4"/>Admin ({props.pending})</button>:null}
-            <button onClick={function(){go('settings');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="gear" c="w-4 h-4"/>Paramètres</button>
-            <a href="#" onClick={function(e){e.preventDefault();window.openGuide('top');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-cyanNeon hover:bg-cyanNeon/10 transition"><Icon n="doc" c="w-4 h-4"/>Guide & Infos</a>
+            <button onClick={function(){go('settings');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-white/10 transition"><Icon n="gear" c="w-4 h-4"/>{tr('Paramètres')}</button>
+            <a href="#" onClick={function(e){e.preventDefault();window.openGuide('top');}} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-cyanNeon hover:bg-cyanNeon/10 transition"><Icon n="doc" c="w-4 h-4"/>{tr('Guide & Infos')}</a>
             <div className="h-px bg-borderDark my-1"></div>
-            <button onClick={props.logout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10 transition"><Icon n="out" c="w-4 h-4"/>Déconnexion</button>
+            <button onClick={props.logout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10 transition"><Icon n="out" c="w-4 h-4"/>{tr('Déconnexion')}</button>
           </div>:null}
         </div>
       </div>
@@ -453,7 +508,7 @@ function MobileNav(props){
   return <nav className={'md:hidden fixed inset-x-0 z-40 glass border-t border-borderDark px-2 py-2 flex justify-around '+(props.hasPlayer?'bottom-[96px]':'bottom-0')}>
     {items.map(function(it){
       return <button key={it.v} onClick={function(){props.setView(it.v);}} className={'relative flex flex-col items-center gap-1 transition '+(props.view===it.v?'text-cyanNeon scale-110':'text-gray-400')}>
-        <Icon n={it.n} c="w-5 h-5"/><span className="text-[9px] font-bold">{it.l}</span>
+        <Icon n={it.n} c="w-5 h-5"/><span className="text-[9px] font-bold">{tr(it.l)}</span>
         {(it.v==='messages'&&props.msgUnread>0)?<span className="dot"></span>:null}</button>;})}
   </nav>;
 }
@@ -461,7 +516,41 @@ function MobileNav(props){
 /* ============ HOME ============ */
 function HomeView(props){
   const top=props.producers.slice(0,6);
+  const beats=props.tracks.filter(function(x){return x.type==='beat'&&!x.is_sold;});
+  const latest=beats.slice(0,4);
+  const topP=beats.slice().sort(function(a,b){return (b.plays||0)-(a.plays||0);}).slice(0,4);
+  const daily=beats.length?beats[Math.floor(Date.now()/86400000)%beats.length]:null;
+  const totalPlays=props.tracks.reduce(function(sum,x){return sum+(x.plays||0);},0);
+  const cp={current:props.current,playing:props.playing,play:props.play,buy:props.buy,favs:props.favs,toggleFav:props.toggleFav,ratings:props.ratings,openReviews:props.openReviews,openProducer:props.openProducer};
+  function row(title,arr){return <div>
+    <div className="flex items-center justify-between mb-4"><h3 className="text-2xl font-black text-white">{tr(title)}</h3>
+      <button onClick={function(){props.setView('beats');}} className="text-xs font-bold text-cyanNeon hover:underline">{tr('Voir tout →')}</button></div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{!props.ready?[0,1,2,3].map(function(i){return <Skel key={i}/>;}):arr.map(function(b){return <TrackCard key={b.id} t={b} {...cp}/>;})}</div></div>;}
   return <div className="space-y-10 fade">
+    <div className="banner rounded-[2rem] p-8 md:p-14 border border-borderDark relative overflow-hidden">
+      <div className="absolute -top-24 -right-24 w-80 h-80 bg-goldAccent/10 rounded-full blur-3xl"></div>
+      <div className="relative z-10 max-w-3xl">
+        <p className="text-xs font-black text-goldAccent uppercase tracking-[0.25em] mb-3">YANrecords 🇩🇿</p>
+        <h2 className="text-4xl md:text-6xl font-black text-white leading-tight">{tr('La marketplace musicale algérienne')}</h2>
+        <p className="text-gray-300 mt-4 text-lg">{tr('Beats, plugins VST et contrat PDF officiel à chaque vente.')}</p>
+        <div className="flex flex-col sm:flex-row gap-3 mt-7">
+          <button onClick={function(){props.setView('beats');}} className="bg-goldAccent text-black font-black px-7 py-3.5 rounded-xl gg hover:scale-105 transition">🎧 {tr('Explorer le beatstore')}</button>
+          <button onClick={function(){props.setView('upload');}} className="border-2 border-cyanNeon text-cyanNeon font-black px-7 py-3.5 rounded-xl hover:bg-cyanNeon/10 transition">🎹 {tr('Publier mes prods')}</button></div>
+        <div className="grid grid-cols-3 gap-3 mt-9 max-w-xl">
+          <div className="bg-black/40 border border-borderDark rounded-2xl p-4 text-center"><p className="text-2xl font-black text-goldAccent">{props.producers.length}</p><p className="text-[10px] text-gray-400 uppercase font-bold">{tr('Producteurs')}</p></div>
+          <div className="bg-black/40 border border-borderDark rounded-2xl p-4 text-center"><p className="text-2xl font-black text-cyanNeon">{beats.length}</p><p className="text-[10px] text-gray-400 uppercase font-bold">{tr('Beats en ligne')}</p></div>
+          <div className="bg-black/40 border border-borderDark rounded-2xl p-4 text-center"><p className="text-2xl font-black text-pinkNeon">{fmt(totalPlays)}</p><p className="text-[10px] text-gray-400 uppercase font-bold">{tr('Écoutes')}</p></div>
+        </div></div></div>
+    {daily?<div className="card rounded-3xl p-5 md:p-6 border-goldAccent/40 flex flex-col sm:flex-row items-center gap-6">
+      <div className="w-full sm:w-56 flex-shrink-0"><TrackCard t={daily} {...cp}/></div>
+      <div className="text-center sm:text-left"><p className="text-xs font-black text-goldAccent uppercase tracking-widest mb-2">⭐ {tr('Beat du jour')}</p>
+        <h3 className="text-3xl font-black text-white">{daily.title}</h3><p className="text-gray-400 mt-1">{daily.producer_name}</p></div></div>:null}
+    {row('Derniers beats',latest)}
+    {row('Les plus écoutés',topP)}
+    <div><h3 className="text-2xl font-black text-white mb-4">{tr('Comment ça marche')}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[['🎧','1. Écoute','Trouve le beat qui te correspond.'],['📜','2. Choisis ta licence','MP3, WAV, Stems ou Exclusive.'],['📄','3. Paye et reçois ton contrat','CCP / BaridiMob, puis contrat PDF numéroté.']].map(function(x,i){
+          return <div key={i} className="card rounded-2xl p-6 lift"><p className="text-3xl mb-2">{x[0]}</p><p className="font-black text-white">{tr(x[1])}</p><p className="text-sm text-gray-400 mt-1">{tr(x[2])}</p></div>;})}</div></div>
     <div className="card p-8 md:p-12 rounded-3xl border-goldAccent/50 lift">
       <div className="flex items-center gap-3 mb-4"><div className="w-12 h-12 rounded-xl bg-goldAccent/20 flex items-center justify-center"><Icon n="note" c="w-6 h-6 text-goldAccent"/></div><span className="text-xs font-bold text-goldAccent uppercase tracking-widest">Pour les Producteurs</span></div>
       <h3 className="text-3xl md:text-4xl font-black text-white mb-4">VOUS ÊTES BEATMAKER ?</h3>
@@ -499,7 +588,7 @@ function ArtistsView(props){
   const list=props.producers.filter(function(a){if(!q)return true;return (a.name||'').toLowerCase().indexOf(q.toLowerCase())>=0;});
   return <section className="fade space-y-6">
     <div className="flex flex-col md:flex-row justify-between gap-4">
-      <h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">LES PRODUCTEURS</h3>
+      <h3 className="text-3xl font-black text-white border-l-4 border-pinkNeon pl-4">{tr('LES PRODUCTEURS')}</h3>
       <div className="relative w-full md:w-64"><input type="text" value={q} onChange={function(e){setQ(e.target.value);}} placeholder="Chercher un beatmaker..." className="w-full bg-cardDark border border-borderDark rounded-xl pl-9 pr-4 py-2.5 text-xs text-white outline-none focus:border-pinkNeon transition"/>
       <div className="absolute left-3 top-3 text-gray-500"><Icon n="find" c="w-4 h-4"/></div></div>
     </div>
@@ -587,7 +676,7 @@ function ProducerPage(props){
         <p className="text-xs text-gray-400">{t.type==='vst'?'Plugin VST':t.genre+' · '+t.bpm+' BPM'}</p>
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-borderDark">
           <span className="font-black text-goldAccent">{fmt(t.price_mp3)} DZD</span>
-          {!t.is_sold?<button onClick={function(){props.buy(t);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs hover:scale-105 transition">Acheter</button>:null}
+          {!t.is_sold?<button onClick={function(){props.buy(t);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs hover:scale-105 transition">{tr('Acheter')}</button>:null}
         </div></div>;})}
     </div>}
   </div>;
@@ -595,7 +684,7 @@ function ProducerPage(props){
 
 /* ============ BEATS ============ */
 function BeatsView(props){
-  const [q,setQ]=React.useState(''),[genre,setGenre]=React.useState('Tous'),[sort,setSort]=React.useState('recent'),[limit,setLimit]=React.useState(15);
+  const [q,setQ]=React.useState(''),[genre,setGenre]=React.useState('Tous'),[sort,setSort]=React.useState('recent'),[limit,setLimit]=React.useState(15),[mode,setMode]=React.useState('list');
   let list=props.tracks.filter(function(t){
     if(t.type!=='beat')return false;
     if(genre!=='Tous'&&t.genre!==genre)return false;
@@ -606,11 +695,12 @@ function BeatsView(props){
   const found=q?props.producers.filter(function(a){return (a.name||'').toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,4):[];
   return <section className="fade space-y-4">
     <div className="flex flex-col md:flex-row justify-between gap-4">
-      <h3 className="text-3xl font-black text-white border-l-4 border-goldAccent pl-4">BEATSTORE</h3>
+      <h3 className="text-3xl font-black text-white border-l-4 border-goldAccent pl-4">{tr('BEATSTORE')}</h3>
       <div className="flex gap-2">
         <div className="relative flex-1 md:w-60"><input type="text" value={q} onChange={function(e){setQ(e.target.value);setLimit(15);}} placeholder="Beat ou beatmaker..." className="w-full bg-cardDark border border-borderDark rounded-xl pl-9 pr-4 py-2.5 text-xs text-white outline-none focus:border-goldAccent transition"/>
         <div className="absolute left-3 top-3 text-gray-500"><Icon n="find" c="w-4 h-4"/></div></div>
         <select value={sort} onChange={function(e){setSort(e.target.value);}} className="bg-cardDark border border-borderDark rounded-xl px-3 text-xs text-white"><option value="recent">Récent</option><option value="pop">Populaire</option><option value="cheap">Prix bas</option></select>
+        <button onClick={function(){setMode(mode==='grid'?'list':'grid');}} className="bg-cardDark border border-borderDark rounded-xl px-3 text-xs font-bold text-white whitespace-nowrap">{mode==='grid'?'☰ Liste':'▦ Grille'}</button>
       </div>
     </div>
     {found.length>0?<div className="card rounded-2xl p-4 pop">
@@ -623,7 +713,9 @@ function BeatsView(props){
     <div className="flex gap-2 overflow-x-auto pb-2">{GENRES.map(function(g){
       return <button key={g} onClick={function(){setGenre(g);setLimit(15);}} className={'px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition '+(genre===g?'bg-goldAccent text-black':'bg-cardDark text-gray-400 border border-borderDark hover:text-white')}>{g}</button>;})}
     </div>
-    {list.length===0?<p className="text-gray-400 text-center py-12">Aucun beat trouvé.</p>:
+    {!props.ready?<div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[0,1,2,3,4,5,6,7].map(function(i){return <Skel key={i}/>;})}</div>:
+    list.length===0?<p className="text-gray-400 text-center py-12">Aucun beat trouvé.</p>:
+    mode==='grid'?<div className="grid grid-cols-2 md:grid-cols-4 gap-4">{list.slice(0,limit).map(function(b){return <TrackCard key={b.id} {...props} t={b}/>;})}</div>:
     <div className="card rounded-2xl p-4 space-y-2">{list.slice(0,limit).map(function(b){
       const isCur=props.current&&props.current.id===b.id;
       return <div key={b.id} className={'grid grid-cols-1 md:grid-cols-12 gap-3 items-center p-3 rounded-xl transition '+(b.is_sold?'opacity-50 bg-black/60':'hover:bg-white/5')}>
@@ -651,7 +743,7 @@ function BeatsView(props){
 function VstsView(props){
   const list=props.tracks.filter(function(t){return t.type==='vst';});
   return <section className="fade">
-    <h3 className="text-3xl font-black mb-6 text-white border-l-4 border-cyanNeon pl-4">PLUGINS VST</h3>
+    <h3 className="text-3xl font-black mb-6 text-white border-l-4 border-cyanNeon pl-4">{tr('PLUGINS VST')}</h3>
     {list.length===0?<p className="text-gray-400 text-center py-12">Aucun VST pour le moment.</p>:
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{list.map(function(v){
       const owned=props.myKeys.filter(function(k){return k.track_id===v.id;})[0];
@@ -665,7 +757,7 @@ function VstsView(props){
         <div className="flex items-center justify-between pt-4 border-t border-borderDark">
           <span className="text-lg font-black text-goldAccent">{fmt(v.price_mp3)} DZD</span>
           {owned?<button onClick={function(){props.setView('keys');}} className="bg-greenPro text-black font-bold px-4 py-2 rounded-xl text-xs">Ma clé</button>
-          :<button onClick={function(){props.buy(v);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs hover:scale-105 transition">Acheter</button>}
+          :<button onClick={function(){props.buy(v);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs hover:scale-105 transition">{tr('Acheter')}</button>}
         </div></div>;})}
     </div>}
   </section>;
@@ -674,7 +766,7 @@ function VstsView(props){
 /* ============ MES COMMANDES ============ */
 function MyOrdersView(props){
   return <section className="fade space-y-4">
-    <h3 className="text-3xl font-black text-white border-l-4 border-greenPro pl-4">MES COMMANDES</h3>
+    <h3 className="text-3xl font-black text-white border-l-4 border-greenPro pl-4">{tr('MES COMMANDES')}</h3>
     {props.orders.length===0?<p className="text-gray-400 text-center py-12">Aucune commande.</p>:
     <div className="space-y-3">{props.orders.map(function(o){
       let badge=null;
@@ -1071,7 +1163,7 @@ function BuyModal(props){
     <div className="min-h-full flex items-center justify-center p-4">
     <div className="card rounded-2xl max-w-lg w-full p-6 relative pop">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={props.close} className="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-white"><Icon n="back" c="w-4 h-4"/>Retour</button>
+        <button onClick={props.close} className="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-white"><Icon n="back" c="w-4 h-4"/>{tr('Retour')}</button>
         <button onClick={props.close} className="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-red-500 transition"><Icon n="x" c="w-5 h-5"/></button>
       </div>
       <h3 className="text-xl font-black text-white mb-4">Achat : {item.title}</h3>
@@ -1123,7 +1215,7 @@ function BuyModal(props){
       </label>
 
       <button onClick={send} disabled={busy||!proof||!accept||(needLegal&&legal.trim().length<3)} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-40">{busy?'ENVOI...':'ENVOYER LA COMMANDE'}</button>
-      <button type="button" onClick={props.close} className="w-full mt-3 border border-borderDark text-gray-300 font-bold py-3 rounded-xl hover:bg-white/5 transition">Annuler</button>
+      <button type="button" onClick={props.close} className="w-full mt-3 border border-borderDark text-gray-300 font-bold py-3 rounded-xl hover:bg-white/5 transition">{tr('Annuler')}</button>
       <p className="text-[11px] text-gray-500 text-center mt-2">Après validation, votre contrat PDF sera disponible dans « Mes commandes ».</p>
     </div></div></div>;
 }
@@ -1134,17 +1226,17 @@ function Player(props){
   return <div className="fixed bottom-0 inset-x-0 z-50 glass border-t border-goldAccent/30 px-4 md:px-6 py-3">
     <div className="flex items-center gap-3 text-xs text-gray-400 font-mono mb-2">
       <span>{ftime(props.time)}</span>
-      <input type="range" min="0" max="100" value={props.progress} onChange={props.seek} className="flex-1 h-1 rounded-lg cursor-pointer" style={{background:'linear-gradient(to right,#00f0ff '+props.progress+'%,#222638 '+props.progress+'%)'}}/>
+      <input type="range" min="0" max="100" value={props.progress} onChange={props.seek} className="flex-1 h-1 rounded-lg cursor-pointer" style={{background:'linear-gradient(to right,#e2b053,#00f0ff '+props.progress+'%,#222638 '+props.progress+'%)'}}/>
       <span>{ftime(props.duration)}</span></div>
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3 w-1/3 min-w-0"><img loading="lazy" src={t.cover_url||DC} className="w-11 h-11 rounded-lg object-cover" alt=""/>
+      <div className="flex items-center gap-3 w-1/3 min-w-0"><img loading="lazy" src={t.cover_url||DC} className="w-11 h-11 rounded-lg object-cover" alt=""/>{props.playing?<Eq/>:null}
         <div className="min-w-0 hidden md:block"><h4 className="font-bold text-sm text-white truncate">{t.title}</h4>
         <button onClick={function(){props.openProducer(t.producer_id);}} className="text-xs text-goldAccent font-bold truncate hover:underline">{t.producer_name}</button></div></div>
       <div className="flex items-center gap-3">
         <button onClick={props.toggleMute} className="text-gray-400"><Icon n={props.muted?'mute':'vol'} c="w-5 h-5"/></button>
         <input type="range" min="0" max="1" step="0.1" value={props.muted?0:props.volume} onChange={props.setVolume} className="w-20 hidden md:block"/>
         <button onClick={function(){props.play(t);}} className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition"><Icon n={props.playing?'pause':'play'} c="w-5 h-5"/></button></div>
-      <div className="w-1/3 flex justify-end"><button onClick={function(){props.buy(t);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs">Acheter</button></div>
+      <div className="w-1/3 flex justify-end"><button onClick={function(){props.buy(t);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs">{tr('Acheter')}</button></div>
     </div></div>;
 }
 
@@ -1172,7 +1264,7 @@ function GuideOverlay(){
 function App(){
   const [loading,setLoading]=React.useState(true);
   const [profileErr,setProfileErr]=React.useState(null);
-  const [favs,setFavs]=React.useState([]),[ratings,setRatings]=React.useState({}),[reviewTrack,setReviewTrack]=React.useState(null);
+  const [tracksReady,setTracksReady]=React.useState(false),[favs,setFavs]=React.useState([]),[ratings,setRatings]=React.useState({}),[reviewTrack,setReviewTrack]=React.useState(null);
   const [allProfiles,setAllProfiles]=React.useState([]);
   const [session,setSession]=React.useState(null),[profile,setProfile]=React.useState(null);
   const [tracks,setTracks]=React.useState([]),[purchases,setPurchases]=React.useState([]);
@@ -1229,7 +1321,7 @@ function App(){
     return function(){sb.removeChannel(ch);};
   },[session&&session.user.id,view]);
 
-  async function loadTracks(){const r=await sb.from('tracks').select('*').order('created_at',{ascending:false});if(r.data)setTracks(r.data);}
+  async function loadTracks(){const r=await sb.from('tracks').select('*').order('created_at',{ascending:false});if(r.data)setTracks(r.data);setTracksReady(true);}
   async function loadProfile(uid,tries){
     tries=tries||0;
     const r=await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
@@ -1397,7 +1489,7 @@ function App(){
   function openBuy(item){if(!session){toast('Connecte-toi','error');return;}setBuyItem(item);}
   function share(){copy(window.location.href);}
 
-  if(loading)return <div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
+  if(loading)return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg flex items-center justify-center animate-pulse">Y</div></div>;
   if(!session)return <React.Fragment>
     <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
     <AuthPage toast={toast}/><GuideOverlay/></React.Fragment>;
@@ -1427,10 +1519,10 @@ function App(){
     <MobileNav view={view} setView={setView} hasPlayer={!!current} msgUnread={msgUnread}/>
 
     <div className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto">
-      {view!=='home'?<button onClick={function(){setView('home');}} className="mb-6 flex items-center gap-2 text-gray-400 text-sm font-bold hover:text-white transition"><Icon n="back" c="w-4 h-4"/>Retour</button>:null}
+      {view!=='home'?<button onClick={function(){setView('home');}} className="mb-6 flex items-center gap-2 text-gray-400 text-sm font-bold hover:text-white transition"><Icon n="back" c="w-4 h-4"/>{tr('Retour')}</button>:null}
 
-      {view==='home'?<HomeView setView={setView} producers={producers} openProducer={openProducer}/>:null}
-      {view==='beats'?<BeatsView tracks={tracks} producers={producers} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
+      {view==='home'?<HomeView setView={setView} producers={producers} openProducer={openProducer} tracks={tracks} ready={tracksReady} play={play} playing={playing} current={current} buy={openBuy} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
+      {view==='beats'?<BeatsView ready={tracksReady} tracks={tracks} producers={producers} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
       {view==='vsts'?<VstsView tracks={tracks} myKeys={myKeys} buy={openBuy} setView={setView} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
       {view==='favs'?<FavsView tracks={tracks} favs={favs} toggleFav={toggleFav} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer}/>:null}
       {view==='artists'?<ArtistsView producers={producers} openProducer={openProducer}/>:null}
