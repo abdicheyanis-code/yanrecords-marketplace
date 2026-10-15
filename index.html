@@ -59,6 +59,22 @@ body{background:linear-gradient(135deg,#050508,#0a0d1a,#050508);background-size:
 @keyframes floatup{0%{transform:translateY(100%) rotate(0deg);opacity:0}10%{opacity:.15}90%{opacity:.15}100%{transform:translateY(-120%) rotate(360deg);opacity:0}}
 .neon-text{background:linear-gradient(135deg,#00f0ff,#8a2be2,#ff007f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:sh 4s linear infinite}
 
+/* Mobile / touch optimizations */
+@media (hover:none),(pointer:coarse){
+  body{cursor:auto}
+  .cursor-dot,.cursor-ring,.spotlight{display:none!important}
+  a,button,input,textarea,select{cursor:auto}
+}
+@media (max-width:768px){
+  .aurora{display:none}
+  .floatnote{display:none}
+  canvas.particles-canvas,canvas[style*="opacity: .7"]{display:none}
+  .lift:hover{transform:translateY(-4px)}
+  .card::before{display:none}
+  body{background:#050508}
+}
+*{touch-action:manipulation}
+
 /* Aurora borealis background */
 .aurora{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .aurora::before,.aurora::after{content:'';position:absolute;width:140%;height:140%;top:-20%;left:-20%;background:radial-gradient(ellipse at 20% 30%,rgba(0,240,255,.12),transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(138,43,226,.14),transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(255,0,127,.1),transparent 50%);animation:aurora 22s ease-in-out infinite;filter:blur(40px)}
@@ -602,7 +618,7 @@ function Particles(){
     draw();
     return function(){cancelAnimationFrame(raf);window.removeEventListener('resize',resize);};
   },[]);
-  return <canvas ref={ref} className="absolute inset-0 w-full h-full pointer-events-none" style={{opacity:.7}}></canvas>;
+  return <canvas ref={ref} className="particles-canvas absolute inset-0 w-full h-full pointer-events-none" style={{opacity:.7}}></canvas>;
 }
 
 function Typewriter(props){
@@ -1717,5 +1733,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b077f36aba2919',t:'MTc5MjA4NDU1NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b07d76c8815ca4',t:'MTc5MjA4NDc4MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
