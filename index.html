@@ -1115,7 +1115,7 @@ function AdminView(props){
       return <div key={o.id} className={'card rounded-2xl p-4 '+(o.status==='pending'?'border-pinkNeon/50':o.status==='validated'?'border-greenPro/30':'border-red-500/30')}>
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            {o.proof_url?<img loading="lazy" src={o.proof_url} className="w-16 h-16 rounded-lg object-cover cursor-pointer border border-borderDark" onClick={function(){window.open(o.proof_url,'_blank');}} alt="preuve"/>:null}
+            {o.proof_view?<img loading="lazy" src={o.proof_view} className="w-16 h-16 rounded-lg object-cover cursor-pointer border border-borderDark" onClick={function(){window.open(o.proof_view,'_blank');}} alt="preuve"/>:null}
             <div className="min-w-0"><p className="font-bold text-white truncate">{o.buyer_name} → {o.track_title}</p>
               <p className="text-xs text-gray-400">{o.product_type.toUpperCase()} · {LNAME[o.license_type]||o.license_type} · {fmt(o.amount)} DZD</p>
               <p className="text-xs text-greenPro font-bold">Ma part {o.rate_percent}% : {fmt(o.platform_fee)} DZD</p>
@@ -1368,7 +1368,10 @@ function App(){
     const b=r.data.map(function(o){return o.buyer_id;});const t2=r.data.map(function(o){return o.track_id;});
     if(b.length){const p=await sb.rpc('list_producers');(p.data||[]).forEach(function(x){bm[x.id]=x.name;});}
     if(t2.length){const t=await sb.from('tracks').select('id,title').in('id',t2);(t.data||[]).forEach(function(x){tm[x.id]=x.title;});}
-    setAdminOrders(r.data.map(function(o){o.buyer_name=bm[o.buyer_id]||'Client';o.track_title=tm[o.track_id]||'—';return o;}));}
+    const paths=r.data.filter(function(o){return o.proof_url&&o.proof_url.indexOf('http')!==0;}).map(function(o){return o.proof_url;});
+    const sm={};
+    if(paths.length){const sg=await sb.storage.from('payment-proofs').createSignedUrls(paths,3600);(sg.data||[]).forEach(function(x){if(x.signedUrl)sm[x.path]=x.signedUrl;});}
+    setAdminOrders(r.data.map(function(o){o.proof_view=sm[o.proof_url]||o.proof_url;o.buyer_name=bm[o.buyer_id]||'Client';o.track_title=tm[o.track_id]||'—';return o;}));}
   async function loadWithdrawals(){const r=await sb.from('withdrawals').select('*').order('created_at',{ascending:false});if(r.data)setWithdrawals(r.data);}
 
   async function logout(){audio.current.pause();setPlaying(false);await sb.auth.signOut();setView('home');toast('Déconnecté.');}
@@ -1389,9 +1392,10 @@ function App(){
     if(proof.size>5*1024*1024){toast('Image max 5MB','error');return;}
     try{
       const sa=Math.floor(amount*(1-rate/100));const fee=amount-sa;
-      let url='';const pn=session.user.id+'-'+Date.now()+'-proof.'+proof.name.split('.').pop();
-      const up=await sb.storage.from('covers').upload(pn,proof);
-      if(!up.error)url=sb.storage.from('covers').getPublicUrl(pn).data.publicUrl;
+      const pn=session.user.id+'/'+Date.now()+'-proof.'+proof.name.split('.').pop();
+      const up=await sb.storage.from('payment-proofs').upload(pn,proof);
+      if(up.error)throw new Error('Envoi de la capture échoué : '+up.error.message);
+      const url=pn;
       const r=await sb.from('orders').insert({buyer_id:session.user.id,seller_id:item.producer_id,track_id:item.id,
         product_type:item.type,license_type:license,amount:amount,seller_amount:sa,platform_fee:fee,rate_percent:rate,
         proof_url:url,accepted_at:new Date().toISOString(),buyer_legal_name:(legal||'').trim()||null});
