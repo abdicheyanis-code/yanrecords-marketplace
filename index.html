@@ -44,8 +44,21 @@ body{background:#050508;color:#f8fafc;overflow-x:hidden}
 @keyframes dp{from{opacity:0;transform:scale(.92) translateY(-12px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .pop{animation:pp .35s cubic-bezier(.2,.9,.3,1.4) forwards}
 @keyframes pp{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
-.lift{transition:transform .25s,box-shadow .25s,border-color .25s}
-.lift:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,.55)}
+.spotlight{position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,240,255,.13),rgba(138,43,226,.07) 40%,transparent 70%);pointer-events:none;z-index:2;mix-blend-mode:screen;transition:left .08s ease-out,top .08s ease-out}
+body{background:linear-gradient(135deg,#050508,#0a0d1a,#050508);background-size:400% 400%;animation:bgshift 18s ease infinite}
+@keyframes bgshift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.lift{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s;transform-style:preserve-3d}
+.lift:hover{transform:perspective(900px) rotateX(4deg) rotateY(-4deg) translateY(-10px);box-shadow:0 28px 60px rgba(0,0,0,.65),0 0 40px rgba(0,240,255,.18)}
+.gg{animation:glowpulseG 2.6s ease-in-out infinite}
+.gc{animation:glowpulseC 2.6s ease-in-out infinite}
+.gp{animation:glowpulseP 2.6s ease-in-out infinite}
+@keyframes glowpulseG{0%,100%{box-shadow:0 0 25px rgba(226,176,83,.35)}50%{box-shadow:0 0 45px rgba(226,176,83,.7),0 0 90px rgba(226,176,83,.25)}}
+@keyframes glowpulseC{0%,100%{box-shadow:0 0 25px rgba(0,240,255,.35)}50%{box-shadow:0 0 45px rgba(0,240,255,.7),0 0 90px rgba(0,240,255,.25)}}
+@keyframes glowpulseP{0%,100%{box-shadow:0 0 25px rgba(255,0,127,.35)}50%{box-shadow:0 0 45px rgba(255,0,127,.7),0 0 90px rgba(255,0,127,.25)}}
+.floatnote{position:absolute;font-size:2rem;opacity:.15;animation:floatup 8s linear infinite;pointer-events:none}
+@keyframes floatup{0%{transform:translateY(100%) rotate(0deg);opacity:0}10%{opacity:.15}90%{opacity:.15}100%{transform:translateY(-120%) rotate(360deg);opacity:0}}
+.neon-text{background:linear-gradient(135deg,#00f0ff,#8a2be2,#ff007f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:sh 4s linear infinite}
+
 .gc{box-shadow:0 0 25px rgba(0,240,255,.35)}.gg{box-shadow:0 0 25px rgba(226,176,83,.35)}.gp{box-shadow:0 0 25px rgba(255,0,127,.35)}
 .ringg{background:linear-gradient(135deg,#e2b053,#ff007f,#00f0ff);padding:3px;border-radius:9999px;animation:sh 5s linear infinite;background-size:200% auto}
 .banner{background:radial-gradient(900px 260px at 15% -40%,rgba(226,176,83,.35),transparent),radial-gradient(700px 260px at 85% -30%,rgba(0,240,255,.28),transparent),linear-gradient(145deg,#101320,#070910)}
@@ -513,6 +526,38 @@ function MobileNav(props){
   </nav>;
 }
 
+function Particles(){
+  const ref=React.useRef(null);
+  React.useEffect(function(){
+    const c=ref.current; if(!c) return;
+    const ctx=c.getContext('2d');
+    let w=c.width=c.offsetWidth||800, h=c.height=c.offsetHeight||400;
+    const dots=Array.from({length:70},function(){return {x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*1.6+.4,color:Math.random()>.5?'#00f0ff':'#8a2be2'};});
+    let raf;
+    function resize(){if(!c)return;w=c.width=c.offsetWidth||800;h=c.height=c.offsetHeight||400;}
+    window.addEventListener('resize',resize);
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+      dots.forEach(function(d){
+        d.x+=d.vx; d.y+=d.vy;
+        if(d.x<0||d.x>w)d.vx*=-1;
+        if(d.y<0||d.y>h)d.vy*=-1;
+        ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+        ctx.fillStyle=d.color;ctx.globalAlpha=.75;ctx.fill();ctx.globalAlpha=1;
+      });
+      for(let i=0;i<dots.length;i++){for(let j=i+1;j<dots.length;j++){
+        const dx=dots[i].x-dots[j].x,dy=dots[i].y-dots[j].y,dist=Math.hypot(dx,dy);
+        if(dist<100){ctx.beginPath();ctx.moveTo(dots[i].x,dots[i].y);ctx.lineTo(dots[j].x,dots[j].y);
+        ctx.strokeStyle='rgba(0,240,255,'+(1-dist/100)*.18+')';ctx.stroke();}
+      }}
+      raf=requestAnimationFrame(draw);
+    }
+    draw();
+    return function(){cancelAnimationFrame(raf);window.removeEventListener('resize',resize);};
+  },[]);
+  return <canvas ref={ref} className="absolute inset-0 w-full h-full pointer-events-none" style={{opacity:.7}}></canvas>;
+}
+
 function HomeView(props){
   const top=props.producers.slice(0,6);
   const beats=props.tracks.filter(function(x){return x.type==='beat'&&!x.is_sold;});
@@ -528,6 +573,13 @@ function HomeView(props){
   return <div className="space-y-10 fade">
     <div className="relative rounded-[2rem] p-8 md:p-14 border border-cyanNeon/30 overflow-hidden" style={{background:'radial-gradient(1200px 400px at 20% -20%,rgba(0,240,255,.25),transparent),radial-gradient(900px 400px at 80% -10%,rgba(138,43,226,.3),transparent),linear-gradient(145deg,#050508,#0a0d1a)'}}>
       <div className="wavebg absolute inset-0 pointer-events-none"></div>
+      <Particles/>
+      <span className="floatnote" style={{left:'8%',bottom:'0',animationDelay:'0s'}}>♪</span>
+      <span className="floatnote" style={{left:'22%',bottom:'0',animationDelay:'2s'}}>♫</span>
+      <span className="floatnote" style={{left:'40%',bottom:'0',animationDelay:'4s'}}>♩</span>
+      <span className="floatnote" style={{left:'60%',bottom:'0',animationDelay:'1s'}}>♬</span>
+      <span className="floatnote" style={{left:'78%',bottom:'0',animationDelay:'3s'}}>♪</span>
+      <span className="floatnote" style={{left:'90%',bottom:'0',animationDelay:'5s'}}>♫</span>
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-cyanNeon/20 rounded-full blur-3xl animate-pulse" style={{animationDelay:'1s'}}></div>
       <div className="relative z-10 max-w-3xl">
@@ -1263,6 +1315,7 @@ function App(){
   const [withdrawals,setWithdrawals]=React.useState([]),[notifications,setNotifications]=React.useState([]);
   const [myFollowers,setMyFollowers]=React.useState(0),[msgUnread,setMsgUnread]=React.useState(0);
   const [toasts,setToasts]=React.useState([]),[view,setViewRaw]=React.useState('home');
+  const [spot,setSpot]=React.useState({x:-400,y:-400});
   const [buyItem,setBuyItem]=React.useState(null),[producerId,setProducerId]=React.useState(null);
   const [chatPeer,setChatPeer]=React.useState(null),[chatName,setChatName]=React.useState('');
   const [current,setCurrent]=React.useState(null),[playing,setPlaying]=React.useState(false);
@@ -1298,6 +1351,7 @@ function App(){
     return function(){sub.data.subscription.unsubscribe();a.removeEventListener('ended',onEnd);a.removeEventListener('timeupdate',onTime);a.removeEventListener('loadedmetadata',onMeta);};
   },[]);
 
+  React.useEffect(function(){function onMove(e){setSpot({x:e.clientX,y:e.clientY});}window.addEventListener('mousemove',onMove);return function(){window.removeEventListener('mousemove',onMove);};},[]);
   React.useEffect(function(){if(profile&&profile.is_admin){loadAdminOrders();loadWithdrawals();}},[profile&&profile.is_admin]);
   React.useEffect(function(){if(session)loadProducers();},[session&&session.user.id]);
   React.useEffect(function(){loadRatings();if(session)loadFavs(session.user.id);else setFavs([]);},[session&&session.user.id]);
@@ -1514,6 +1568,7 @@ function App(){
 
   return <div className="relative">
     <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
+    <div className="spotlight" style={{left:spot.x-200,top:spot.y-200}}></div>
     <NavBar view={view} setView={setView} profile={profile} email={session.user.email} logout={logout} pending={pendingCount}
       notifications={notifications} unread={unread} markRead={markRead} openProducer={openProducer} msgUnread={msgUnread}/>
     <MobileNav view={view} setView={setView} hasPlayer={!!current} msgUnread={msgUnread}/>
@@ -1548,5 +1603,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b058bd89ed0359',t:'MTc5MjA4MzI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b05e23283805e7',t:'MTc5MjA4MzQ5Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
