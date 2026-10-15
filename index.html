@@ -11,7 +11,7 @@
 <meta property="og:description" content="Achète et vends des beats et plugins VST avec contrat PDF officiel.">
 <meta property="og:image" content="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2300f0ff'/%3E%3Cstop offset='100%25' stop-color='%238a2be2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%23050508'/%3E%3Ctext x='32' y='40' font-size='20' font-weight='900' text-anchor='middle' fill='url(%23g)' font-family='Arial'%3E213%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23050508'/%3E%3Ctext%20x='32'%20y='44'%20font-size='26'%20font-weight='900'%20text-anchor='middle'%20font-family='Arial'%3E%3Ctspan%20fill='%2300a651'%3E%D9%A2%3C/tspan%3E%3Ctspan%20fill='%23ffffff'%3E%D9%A1%3C/tspan%3E%3Ctspan%20fill='%23d52b1e'%3E%D9%A3%3C/tspan%3E%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://ryhnnlphdeuxrvpxyfgc.supabase.co" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -310,7 +310,7 @@ function AuthPage(props){
     <div className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"></div>
     <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade">
       <div className="text-center lg:text-left space-y-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg">Y</div>
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-green-500/50 font-black text-3xl gg"><span style={{color:'#00a651'}}>٢</span><span style={{color:'#ffffff'}}>١</span><span style={{color:'#d52b1e'}}>٣</span></div>
         <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tcyan">213WAVE</span></h1>
         <p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie.</p>
         <div className="hidden lg:block space-y-3 pt-4">
@@ -446,7 +446,7 @@ function NavBar(props){
     {(open||bell)?<div className="fixed inset-0 z-40" onClick={function(){setOpen(false);setBell(false);}}></div>:null}
     <nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-3 cursor-pointer" onClick={function(){go('home');}}>
-        <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent gg">Y</div>
+        <div className="w-14 h-10 rounded-lg bg-black border border-green-500/50 flex items-center justify-center font-black text-lg gg"><span style={{color:'#00a651'}}>٢</span><span style={{color:'#ffffff'}}>١</span><span style={{color:'#d52b1e'}}>٣</span></div>
         <h1 className="text-xl font-black tracking-widest text-white hidden sm:block">213<span className="tcyan">WAVE</span></h1>
       </div>
       <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
@@ -532,7 +532,7 @@ function HomeView(props){
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-cyanNeon/20 rounded-full blur-3xl animate-pulse" style={{animationDelay:'1s'}}></div>
       <div className="relative z-10 max-w-3xl">
         <div className="flex items-baseline gap-3 mb-4">
-          <span className="text-6xl md:text-8xl font-black leading-none" style={{background:'linear-gradient(135deg,#00f0ff,#8a2be2)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',filter:'drop-shadow(0 0 18px rgba(0,240,255,.6))'}}>٢١٣</span>
+          <span className="text-6xl md:text-8xl font-black leading-none" style={{filter:'drop-shadow(0 0 18px rgba(0,166,81,.6))'}}><span style={{color:'#00a651'}}>٢</span><span style={{color:'#ffffff'}}>١</span><span style={{color:'#d52b1e'}}>٣</span></span>
           <span className="text-3xl md:text-5xl font-black text-white tracking-widest" style={{textShadow:'0 0 20px rgba(138,43,226,.6)'}}>WAVE</span>
         </div>
         <p className="text-xs font-black text-cyanNeon uppercase tracking-[0.3em] mb-3">🇩🇿 ALGERIAN MUSIC MARKETPLACE</p>
@@ -1489,7 +1489,7 @@ function App(){
   function openBuy(item){if(!session){toast('Connecte-toi','error');return;}setBuyItem(item);}
   function share(){copy(window.location.href);}
 
-  if(loading)return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg flex items-center justify-center animate-pulse">Y</div></div>;
+  if(loading)return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 rounded-2xl bg-black border border-green-500/50 font-black text-3xl gg flex items-center justify-center animate-pulse"><span style={{color:'#00a651'}}>٢</span><span style={{color:'#ffffff'}}>١</span><span style={{color:'#d52b1e'}}>٣</span></div></div>;
   if(!session)return <React.Fragment>
     <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
     <AuthPage toast={toast}/><GuideOverlay/></React.Fragment>;
@@ -1548,5 +1548,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b051660d8602d4',t:'MTc5MjA4Mjk3NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b058bd89ed0359',t:'MTc5MjA4MzI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
