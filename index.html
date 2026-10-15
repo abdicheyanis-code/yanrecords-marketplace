@@ -989,9 +989,13 @@ function BuyModal(props){
   const L=(item.limits&&item.limits[license])?item.limits[license]:(DEFLIM[license]||null);
   const needLegal=license==='exclusive';
   async function send(){setBusy(true);await props.submit(item,license,price(license),rate,proof,legal);setBusy(false);}
-  return <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
-    <div className="card rounded-2xl max-w-lg w-full p-6 relative my-8 pop">
-      <button onClick={props.close} className="absolute top-4 right-4 text-gray-400"><Icon n="x" c="w-5 h-5"/></button>
+  return <div className="fixed inset-0 z-[100] bg-black/90 overflow-y-auto">
+    <div className="min-h-full flex items-center justify-center p-4">
+    <div className="card rounded-2xl max-w-lg w-full p-6 relative pop">
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={props.close} className="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-white"><Icon n="back" c="w-4 h-4"/>Retour</button>
+        <button onClick={props.close} className="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-red-500 transition"><Icon n="x" c="w-5 h-5"/></button>
+      </div>
       <h3 className="text-xl font-black text-white mb-4">Achat : {item.title}</h3>
       {item.type==='beat'?<div className="space-y-2 mb-4">{LICS.map(function(l){
         const on=license===l;
@@ -1041,8 +1045,9 @@ function BuyModal(props){
       </label>
 
       <button onClick={send} disabled={busy||!proof||!accept||(needLegal&&legal.trim().length<3)} className="w-full bg-goldAccent text-black font-black py-4 rounded-xl gg disabled:opacity-40">{busy?'ENVOI...':'ENVOYER LA COMMANDE'}</button>
+      <button type="button" onClick={props.close} className="w-full mt-3 border border-borderDark text-gray-300 font-bold py-3 rounded-xl hover:bg-white/5 transition">Annuler</button>
       <p className="text-[11px] text-gray-500 text-center mt-2">Après validation, votre contrat PDF sera disponible dans « Mes commandes ».</p>
-    </div></div>;
+    </div></div></div>;
 }
 
 /* ============ PLAYER ============ */
@@ -1068,6 +1073,8 @@ function Player(props){
 /* ================= APP ================= */
 function App(){
   const [loading,setLoading]=React.useState(true);
+  const [profileErr,setProfileErr]=React.useState(null);
+  const [allProfiles,setAllProfiles]=React.useState([]);
   const [session,setSession]=React.useState(null),[profile,setProfile]=React.useState(null);
   const [tracks,setTracks]=React.useState([]),[purchases,setPurchases]=React.useState([]);
   const [myOrders,setMyOrders]=React.useState([]),[adminOrders,setAdminOrders]=React.useState([]);
@@ -1109,6 +1116,7 @@ function App(){
   },[]);
 
   React.useEffect(function(){if(profile&&profile.is_admin){loadAdminOrders();loadWithdrawals();}},[profile&&profile.is_admin]);
+  React.useEffect(function(){if(session)loadProducers();},[session&&session.user.id]);
 
   React.useEffect(function(){
     if(!session)return;
@@ -1122,7 +1130,17 @@ function App(){
   },[session&&session.user.id,view]);
 
   async function loadTracks(){const r=await sb.from('tracks').select('*').order('created_at',{ascending:false});if(r.data)setTracks(r.data);}
-  async function loadProfile(uid){const r=await sb.from('profiles').select('*').eq('id',uid).single();if(r.data)setProfile(r.data);else setTimeout(function(){loadProfile(uid);},1500);}
+  async function loadProfile(uid,tries){
+    tries=tries||0;
+    const r=await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
+    if(r.data){setProfile(r.data);setProfileErr(null);return;}
+    if(r.error){setProfileErr(r.error.message);return;}
+    if(tries<2){setTimeout(function(){loadProfile(uid,tries+1);},1500);return;}
+    const u=(await sb.auth.getUser()).data.user;
+    const ins=await sb.from('profiles').insert({id:uid,name:(u.user_metadata&&u.user_metadata.full_name)||u.email.split('@')[0],email:u.email}).select().single();
+    if(ins.data)setProfile(ins.data);else setProfileErr(ins.error?ins.error.message:'Profil introuvable');
+  }
+  async function loadProducers(){const r=await sb.rpc('list_producers');if(r.data)setAllProfiles(r.data);}
   async function loadNotifications(uid){const r=await sb.from('notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(30);if(r.data)setNotifications(r.data);}
   async function loadFollowers(uid){const r=await sb.rpc('get_producer',{p_id:uid});if(r.data)setMyFollowers(r.data.followers||0);}
   async function loadMsgUnread(){const r=await sb.rpc('my_conversations');
@@ -1273,13 +1291,18 @@ function App(){
   if(!session)return <React.Fragment>
     <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
     <AuthPage toast={toast}/></React.Fragment>;
-  if(!profile)return <div className="min-h-screen flex items-center justify-center"><div className="loader"></div></div>;
+  if(!profile)return <div className="min-h-screen flex items-center justify-center p-4"><div className="card p-8 rounded-2xl text-center max-w-md">
+    {profileErr?<React.Fragment><h2 className="text-xl font-black text-white mb-2">Profil inaccessible</h2>
+    <p className="text-xs text-red-400 mb-4">{profileErr}</p>
+    <button onClick={logout} className="bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Se déconnecter</button></React.Fragment>
+    :<div className="loader mx-auto"></div>}</div></div>;
 
   const myKeys=purchases.filter(function(p){return p.license_type==='vst'&&p.vst_key;});
   const pendingCount=adminOrders.filter(function(o){return o.status==='pending';}).length
     +withdrawals.filter(function(w){return w.status==='pending';}).length;
   const unread=notifications.filter(function(n){return !n.is_read;}).length;
   const pmap={};
+  allProfiles.forEach(function(p){pmap[p.id]={id:p.id,name:p.name||'Producteur',avatar_url:p.avatar_url||null,count:0,plays:0};});
   tracks.forEach(function(t){
     if(!t.producer_id)return;
     if(!pmap[t.producer_id])pmap[t.producer_id]={id:t.producer_id,name:t.producer_name||'Producteur',avatar_url:null,count:0,plays:0};
