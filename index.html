@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>YANrecords | VST & Beatstore 🇩🇿</title>
-<meta name="description" content="YANrecords : la marketplace algérienne de beats et de plugins VST. Licences claires, contrat PDF officiel, paiement CCP/BaridiMob.">
+<title>213WAVE | VST & Beatstore 🇩🇿</title>
+<meta name="description" content="213WAVE : la marketplace algérienne de beats et de plugins VST. Licences claires, contrat PDF officiel, paiement CCP/BaridiMob.">
 <meta name="theme-color" content="#050508">
-<meta property="og:type" content="website"><meta property="og:site_name" content="YANrecords">
-<meta property="og:title" content="YANrecords | Beats & VST algériens 🇩🇿">
+<meta property="og:type" content="website"><meta property="og:site_name" content="213WAVE">
+<meta property="og:title" content="213WAVE | Beats & VST algériens 🇩🇿">
 <meta property="og:description" content="Achète et vends des beats et plugins VST avec contrat PDF officiel.">
 <meta property="og:image" content="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80">
 <meta name="twitter:card" content="summary_large_image">
@@ -49,6 +49,11 @@ body{background:#050508;color:#f8fafc;overflow-x:hidden}
 .gc{box-shadow:0 0 25px rgba(0,240,255,.35)}.gg{box-shadow:0 0 25px rgba(226,176,83,.35)}.gp{box-shadow:0 0 25px rgba(255,0,127,.35)}
 .ringg{background:linear-gradient(135deg,#e2b053,#ff007f,#00f0ff);padding:3px;border-radius:9999px;animation:sh 5s linear infinite;background-size:200% auto}
 .banner{background:radial-gradient(900px 260px at 15% -40%,rgba(226,176,83,.35),transparent),radial-gradient(700px 260px at 85% -30%,rgba(0,240,255,.28),transparent),linear-gradient(145deg,#101320,#070910)}
+.wavebg{background:linear-gradient(180deg,transparent 0%,rgba(0,240,255,.06) 50%,transparent 100%);animation:wave 6s ease-in-out infinite}
+.wavebg::before,.wavebg::after{content:'';position:absolute;left:-50%;width:200%;height:40%;bottom:0;background:radial-gradient(ellipse at center,rgba(138,43,226,.18) 0%,transparent 70%);animation:wavemove 8s linear infinite}
+.wavebg::after{animation-delay:-4s;opacity:.6}
+@keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes wavemove{0%{transform:translateX(0)}100%{transform:translateX(25%)}}
 .loader{border:3px solid #222638;border-top:3px solid #00f0ff;border-radius:50%;width:40px;height:40px;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .shake{animation:sk .6s ease-in-out}
@@ -138,7 +143,7 @@ async function makeContractPdf(no,toast){
   function line(yy){p.setDrawColor(215,215,215);p.line(M,yy,W-M,yy);}
 
   p.setFillColor(5,5,8);p.rect(0,0,W,30,'F');
-  txt('YANrecords',M,14,19,'bold',[226,176,83]);
+  txt('213WAVE',M,14,19,'bold',[226,176,83]);
   txt('CONTRAT DE LICENCE MUSICALE',M,22,9,'normal',[200,200,200]);
   txt(d.no,W-M-p.getTextWidth(d.no),14,13,'bold',[0,240,255]);
   txt('Marketplace algerienne',W-M-32,22,8,'normal',[150,150,150]);
@@ -205,16 +210,16 @@ async function makeContractPdf(no,toast){
   y=wrap('b) Le Beneficiaire s engage a respecter strictement les limites ci-dessus. Tout depassement impose l acquisition immediate de la licence superieure, a defaut de quoi la presente licence est resiliee de plein droit.',M+2,y,W-2*M-4,8.4)+1;
   y=wrap('c) La revente, la redistribution, le partage et la mise a disposition de l oeuvre sous forme brute sont strictement interdits.',M+2,y,W-2*M-4,8.4)+1;
   y=wrap('d) Le credit "Prod. by '+(d.seller_name||'')+'" doit figurer dans le titre, la description et les metadonnees de distribution.',M+2,y,W-2*M-4,8.4)+1;
-  y=wrap('e) YANrecords intervient exclusivement comme intermediaire technique et n est pas partie au present contrat.',M+2,y,W-2*M-4,8.4)+1;
+  y=wrap('e) 213WAVE intervient exclusivement comme intermediaire technique et n est pas partie au present contrat.',M+2,y,W-2*M-4,8.4)+1;
   y=wrap('f) Le present contrat est soumis au droit algerien. Tout litige releve des juridictions algeriennes competentes.',M+2,y,W-2*M-4,8.4)+3;
 
   txt((d.vst_key?'7':'6')+'. ACCEPTATION',M,y,11,'bold',[0,0,0]);y+=2;line(y);y+=6;
   txt('Conditions acceptees electroniquement le : '+(d.accepted_at?new Date(d.accepted_at).toLocaleString('fr-FR'):'-'),M+2,y,8.6);y+=4.5;
   txt('Licence validee et livree le : '+(d.date?new Date(d.date).toLocaleString('fr-FR'):'-'),M+2,y,8.6);y+=4.5;
-  txt('Contrat genere automatiquement par YANrecords - reference unique '+d.no,M+2,y,8,'normal',[120,120,120]);
+  txt('Contrat genere automatiquement par 213WAVE - reference unique '+d.no,M+2,y,8,'normal',[120,120,120]);
 
   p.setFillColor(5,5,8);p.rect(0,282,W,15,'F');
-  txt('YANrecords - Marketplace musicale algerienne',M,290,8,'normal',[170,170,170]);
+  txt('213WAVE - Marketplace musicale algerienne',M,290,8,'normal',[170,170,170]);
   txt('Document genere le '+new Date().toLocaleDateString('fr-FR'),W-M-42,290,8,'normal',[120,120,120]);
 
   p.save('Contrat-'+d.no+'.pdf');
@@ -306,7 +311,7 @@ function AuthPage(props){
     <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade">
       <div className="text-center lg:text-left space-y-6">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-goldAccent/50 font-black text-3xl text-goldAccent gg">Y</div>
-        <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tgold">YANRECORDS</span></h1>
+        <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">BIENVENUE SUR<br/><span className="tgold">213WAVE</span></h1>
         <p className="text-gray-400 text-lg">La marketplace musicale n°1 en Algérie.</p>
         <div className="hidden lg:block space-y-3 pt-4">
           <p className="text-sm font-bold text-white">📄 Contrat PDF officiel à chaque vente</p>
@@ -442,7 +447,7 @@ function NavBar(props){
     <nav className="glass fixed top-0 w-full z-50 px-4 md:px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-3 cursor-pointer" onClick={function(){go('home');}}>
         <div className="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent gg">Y</div>
-        <h1 className="text-xl font-black tracking-widest text-white hidden sm:block">YAN<span className="tgold">RECORDS</span></h1>
+        <h1 className="text-xl font-black tracking-widest text-white hidden sm:block">213<span className="tcyan">WAVE</span></h1>
       </div>
       <div className="hidden md:flex bg-black/40 border border-borderDark rounded-full p-1">
         <button onClick={function(){go('home');}} className={'px-5 py-2 rounded-full text-sm font-bold transition '+(props.view==='home'?'bg-white text-black':'text-gray-400 hover:text-white')}>{tr('Accueil')}</button>
@@ -521,11 +526,17 @@ function HomeView(props){
       <button onClick={function(){props.setView('beats');}} className="text-xs font-bold text-cyanNeon hover:underline">{tr('Voir tout →')}</button></div>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{!props.ready?[0,1,2,3].map(function(i){return <Skel key={i}/>;}):arr.map(function(b){return <TrackCard key={b.id} t={b} {...cp}/>;})}</div></div>;}
   return <div className="space-y-10 fade">
-    <div className="banner rounded-[2rem] p-8 md:p-14 border border-borderDark relative overflow-hidden">
-      <div className="absolute -top-24 -right-24 w-80 h-80 bg-goldAccent/10 rounded-full blur-3xl"></div>
+    <div className="relative rounded-[2rem] p-8 md:p-14 border border-cyanNeon/30 overflow-hidden" style={{background:'radial-gradient(1200px 400px at 20% -20%,rgba(0,240,255,.25),transparent),radial-gradient(900px 400px at 80% -10%,rgba(138,43,226,.3),transparent),linear-gradient(145deg,#050508,#0a0d1a)'}}>
+      <div className="wavebg absolute inset-0 pointer-events-none"></div>
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-cyanNeon/20 rounded-full blur-3xl animate-pulse" style={{animationDelay:'1s'}}></div>
       <div className="relative z-10 max-w-3xl">
-        <p className="text-xs font-black text-goldAccent uppercase tracking-[0.25em] mb-3">YANrecords 🇩🇿</p>
-        <h2 className="text-4xl md:text-6xl font-black text-white leading-tight">{tr('La marketplace musicale algérienne')}</h2>
+        <div className="flex items-baseline gap-3 mb-4">
+          <span className="text-6xl md:text-8xl font-black leading-none" style={{background:'linear-gradient(135deg,#00f0ff,#8a2be2)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',filter:'drop-shadow(0 0 18px rgba(0,240,255,.6))'}}>٢١٣</span>
+          <span className="text-3xl md:text-5xl font-black text-white tracking-widest" style={{textShadow:'0 0 20px rgba(138,43,226,.6)'}}>WAVE</span>
+        </div>
+        <p className="text-xs font-black text-cyanNeon uppercase tracking-[0.3em] mb-3">🇩🇿 ALGERIAN MUSIC MARKETPLACE</p>
+        <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">{tr('La marketplace musicale algérienne')}</h2>
         <p className="text-gray-300 mt-4 text-lg">{tr('Beats, plugins VST et contrat PDF officiel à chaque vente.')}</p>
         <div className="flex flex-col sm:flex-row gap-3 mt-7">
           <button onClick={function(){props.setView('beats');}} className="bg-goldAccent text-black font-black px-7 py-3.5 rounded-xl gg hover:scale-105 transition">🎧 {tr('Explorer le beatstore')}</button>
@@ -901,7 +912,7 @@ function VerifyView(props){
       <div className="w-16 h-16 rounded-full bg-cyanNeon/10 flex items-center justify-center"><Icon n="key" c="w-8 h-8 text-cyanNeon"/></div>
       <div><h2 className="text-3xl font-black text-white">Vérifier une clé</h2><p className="text-sm text-gray-400">Simule ce que fait le plugin.</p></div></div>
     <form onSubmit={run} className="space-y-4">
-      <div><label className="text-xs font-bold text-gray-400 block mb-1">Clé de licence</label><input type="text" value={key} onChange={function(e){setKey(e.target.value.toUpperCase());}} maxLength="24" placeholder="YAN-XXXX-XXXX-XXXX" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-lg text-white font-mono text-center outline-none"/></div>
+      <div><label className="text-xs font-bold text-gray-400 block mb-1">Clé de licence</label><input type="text" value={key} onChange={function(e){setKey(e.target.value.toUpperCase());}} maxLength="24" placeholder="213-XXXX-XXXX-XXXX" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-lg text-white font-mono text-center outline-none"/></div>
       <div><label className="text-xs font-bold text-gray-400 block mb-1">ID Machine</label>
         <div className="flex gap-2"><input type="text" value={machine} onChange={function(e){setMachine(e.target.value);}} className="flex-1 bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white font-mono outline-none"/>
         <button type="button" onClick={function(){setMachine('PC-'+Math.random().toString(36).substring(2,8).toUpperCase());}} className="bg-cardDark border border-borderDark text-white font-bold px-4 rounded-xl text-xs">Autre PC</button></div></div>
@@ -915,7 +926,7 @@ function VerifyView(props){
     </div>:null}
     {props.myKeys.length>0?<div className="mt-8 pt-6 border-t border-borderDark"><p className="text-xs font-bold text-gray-400 mb-3">Tester avec mes clés :</p>
       <div className="flex flex-wrap gap-2">{props.myKeys.map(function(k){return <button key={k.vst_key} onClick={function(){setKey(k.vst_key);setResult(null);}} className="font-mono text-xs bg-obsidian border border-greenPro/40 text-greenPro px-3 py-1.5 rounded-lg">{k.vst_key}</button>;})}
-      <button onClick={function(){setKey('YAN-FAKE-1234-ABCD');setResult(null);}} className="font-mono text-xs bg-obsidian border border-red-500/40 text-red-400 px-3 py-1.5 rounded-lg">Fausse clé</button></div></div>:null}
+      <button onClick={function(){setKey('213-FAKE-1234-ABCD');setResult(null);}} className="font-mono text-xs bg-obsidian border border-red-500/40 text-red-400 px-3 py-1.5 rounded-lg">Fausse clé</button></div></div>:null}
   </div>;
 }
 
@@ -1537,5 +1548,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4afe4a42f8026a9',t:'MTc5MjA3ODUyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b04b567e0b038f',t:'MTc5MjA4MjcyNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
