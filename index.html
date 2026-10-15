@@ -155,6 +155,27 @@ async function sha256File(file){
   }catch(e){return null;}
 }
 
+
+async function resolveAudioUrl(val){
+  if(!val)return null;
+  let path=val;
+  if(val.indexOf('http')===0){
+    const m=val.match(/\/audio\/(.+?)(\?|$)/);
+    if(m)path=decodeURIComponent(m[1]);
+    else return val;
+  }
+  try{
+    const r=await sb.storage.from('audio').createSignedUrl(path,3600);
+    if(r.error)return val;
+    return r.data.signedUrl;
+  }catch(e){return val;}
+}
+async function downloadAudio(t){
+  const url=await resolveAudioUrl(t&&t.audio_url);
+  if(!url){alert('Fichier indisponible');return;}
+  window.open(url,'_blank');
+}
+
 let LANG='fr';try{LANG=localStorage.getItem('yan_lang')||'fr';}catch(e){}
 if(LANG==='ar'){document.documentElement.dir='rtl';document.documentElement.lang='ar';}
 function setLang(l){try{localStorage.setItem('yan_lang',l);}catch(e){}location.reload();}
@@ -921,7 +942,7 @@ function MyOrdersView(props){
         <div className="flex flex-col gap-2 items-end">
           {badge}
           {o.contract_no?<button onClick={function(){props.pdf(o.contract_no);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 hover:scale-105 transition"><Icon n="pdf" c="w-4 h-4"/>Contrat PDF</button>:null}
-          {o.track&&o.track.audio_url&&o.product_type==='beat'?<a href={o.track.audio_url} download className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Télécharger le beat</a>:null}
+          {o.track&&o.track.audio_url&&o.product_type==='beat'?<button onClick={function(){downloadAudio(o.track);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Télécharger le beat</button>:null}
         </div></div>;})}
     </div>}
   </section>;
@@ -944,7 +965,7 @@ function KeysView(props){
           <span className="text-[11px] text-gray-400">{(p.activations||[]).length}/{p.max_activations||3} PC</span>
           <button onClick={function(){props.copy(p.vst_key);}} className="bg-cardDark border border-borderDark text-white font-bold px-3 py-2 rounded-lg text-xs">Copier</button>
           <button onClick={function(){props.download(p);}} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs">Télécharger</button>
-        </div>:(p.track&&p.track.audio_url)?<a href={p.track.audio_url} download className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs">Télécharger</a>:null}</div>;})}
+        </div>:(p.track&&p.track.audio_url)?<button onClick={function(){downloadAudio(p.track);}} className="bg-cyanNeon text-black font-bold px-3 py-2 rounded-lg text-xs">Télécharger</button>:null}</div>;})}
     </div>}
   </section>;
 }
@@ -1518,7 +1539,9 @@ function App(){
     if(!t.audio_url){toast("Pas d'audio",'error');return;}
     if(current&&current.id===t.id){
       if(playing){audio.current.pause();setPlaying(false);}else{audio.current.play().catch(function(){});setPlaying(true);}return;}
-    setCurrent(t);audio.current.src=t.audio_url;audio.current.volume=muted?0:volume;
+    const src=await resolveAudioUrl(t.audio_url);
+    if(!src){toast("Audio indisponible",'error');return;}
+    setCurrent(t);audio.current.src=src;audio.current.volume=muted?0:volume;
     audio.current.play().catch(function(){});setPlaying(true);
     await sb.rpc('increment_plays',{track_id:t.id});}
   function seek(e){if(!audio.current||!isFinite(duration)||duration<=0)return;audio.current.currentTime=(e.target.value/100)*duration;setProgress(e.target.value);}
@@ -1607,7 +1630,7 @@ function App(){
           const n=profile.id+'-'+Date.now()+'-a.'+d.file.name.split('.').pop();
           const up=await sb.storage.from('audio').upload(n,d.file);
           if(up.error)throw new Error('Upload échoué : '+up.error.message);
-          audioUrl=sb.storage.from('audio').getPublicUrl(n).data.publicUrl;}}
+          audioUrl=n;}}
       const row={title:d.title.trim(),type:d.type,genre:d.genre,bpm:parseInt(d.bpm,10)||140,key:d.key,
         producer_id:profile.id,producer_name:profile.name,cover_url:coverUrl,audio_url:audioUrl,
         price_mp3:parseInt(d.p1,10)||0,price_wav:parseInt(d.p2,10)||0,price_stems:parseInt(d.p3,10)||0,
@@ -1694,5 +1717,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b06972ef229b38',t:'MTc5MjA4Mzk2MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b077f36aba2919',t:'MTc5MjA4NDU1NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
