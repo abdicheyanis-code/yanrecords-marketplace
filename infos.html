@@ -7,77 +7,744 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script>
-tailwind.config={darkMode:'class',theme:{extend:{colors:{
-  obsidian:'#050508', cardDark:'#131520', borderDark:'#222638',
-  cyanNeon:'#00f0ff', goldAccent:'#e2b053', pinkNeon:'#ff007f', greenPro:'#10b981'
-}}}}
+tailwind.config={darkMode:'class',theme:{extend:{colors:{obsidian:'#050508',cardDark:'#131520',borderDark:'#222638',cyanNeon:'#00f0ff',goldAccent:'#e2b053',pinkNeon:'#ff007f',greenPro:'#10b981'}}}}
 </script>
 <style>
 *{font-family:'Inter',system-ui,sans-serif;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
 body{background:#050508;color:#f8fafc}
 .glass{background:rgba(19,21,32,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(34,38,56,.9)}
 .card{background:linear-gradient(145deg,rgba(20,22,35,.92),rgba(10,11,18,.92));border:1px solid rgba(255,255,255,.07);box-shadow:0 8px 32px rgba(0,0,0,.45)}
-.tgold{background:linear-gradient(135deg,#e2b053,#fff176,#e2b053);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800}
-details{border:1px solid #222638;border-radius:16px;overflow:hidden;background:rgba(19,21,32,.55);margin-bottom:12px}
-summary{cursor:pointer;padding:16px 18px;font-weight:700;font-size:15px;color:#fff}
-.ans{padding:0 18px 18px 18px;color:#cbd5e1;font-size:14px;line-height:1.75}
+.tgold{background:linear-gradient(135deg,#e2b053,#fff176,#e2b053);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:sh 4s linear infinite}
+.tcyan{background:linear-gradient(135deg,#00f0ff,#0080ff,#00f0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:sh 4s linear infinite}
+@keyframes sh{to{background-position:200% center}}
+.mesh{position:fixed;inset:0;z-index:-1;background:#050508}
+.blob{position:absolute;filter:blur(130px);opacity:.28;border-radius:50%;animation:fl 22s ease-in-out infinite}
+.blob:nth-child(2){animation-delay:-8s}.blob:nth-child(3){animation-delay:-15s}
+@keyframes fl{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-60px) scale(1.12)}}
+::-webkit-scrollbar{width:7px}::-webkit-scrollbar-track{background:#050508}::-webkit-scrollbar-thumb{background:#222638;border-radius:5px}
+.fade{animation:fi .5s ease-out both}
+@keyframes fi{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.banner{background:radial-gradient(900px 300px at 12% -50%,rgba(226,176,83,.32),transparent),radial-gradient(800px 300px at 88% -40%,rgba(0,240,255,.26),transparent),linear-gradient(150deg,#101320,#070910)}
+details{border:1px solid #222638;border-radius:16px;overflow:hidden;transition:border-color .25s,background .25s;background:rgba(19,21,32,.55)}
+details:hover{border-color:#3a4060}
+details[open]{border-color:rgba(226,176,83,.5);background:rgba(19,21,32,.85)}
+summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:700;font-size:15px;color:#fff;display:flex;align-items:center;gap:12px;transition:color .2s}
+summary::-webkit-details-marker{display:none}
+summary:hover{color:#e2b053}
+.arrow{margin-left:auto;transition:transform .3s cubic-bezier(.2,.9,.3,1.3);color:#6b7280;flex-shrink:0}
+details[open] .arrow{transform:rotate(180deg);color:#e2b053}
+.ans{padding:0 18px 18px 18px;color:#cbd5e1;font-size:14px;line-height:1.75;animation:op .3s ease-out both}
+@keyframes op{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.ans b{color:#fff}
+.ans code{background:#0a0b12;border:1px solid #222638;padding:2px 7px;border-radius:6px;font-size:12px;color:#00f0ff}
+.navlink{display:block;padding:9px 14px;border-radius:11px;font-size:13px;font-weight:700;color:#94a3b8;transition:all .2s;border-left:2px solid transparent}
+.navlink:hover{background:rgba(255,255,255,.06);color:#fff}
+.navlink.on{background:rgba(226,176,83,.12);color:#e2b053;border-left-color:#e2b053}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em}
+.lift{transition:transform .25s,box-shadow .25s,border-color .25s}
+.lift:hover{transform:translateY(-5px);box-shadow:0 18px 42px rgba(0,0,0,.6)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:12px 10px;text-align:left;border-bottom:1px solid #222638}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:800}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+.yes{color:#10b981;font-weight:800}.no{color:#ef4444;font-weight:800}
+#top{position:fixed;right:20px;bottom:20px;width:46px;height:46px;border-radius:14px;background:#e2b053;color:#000;display:none;align-items:center;justify-content:center;font-weight:900;box-shadow:0 8px 24px rgba(226,176,83,.4);z-index:60;cursor:pointer}
+#top.show{display:flex}
+.hidden-row{display:none !important}
+.step{display:flex;gap:14px;align-items:flex-start;padding:14px;border-radius:14px;background:rgba(10,11,18,.6);border:1px solid #222638}
+.num{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
 </style>
 </head>
 <body class="min-h-screen">
+<div class="mesh">
+<div class="blob bg-blue-900 w-[600px] h-[600px] top-[-12%] left-[-10%]"></div>
+<div class="blob bg-purple-900 w-[700px] h-[700px] bottom-[-22%] right-[-12%]"></div>
+<div class="blob bg-teal-900/30 w-[420px] h-[420px] top-[42%] left-[38%]"></div>
+</div>
+
 <header class="glass fixed top-0 inset-x-0 z-50 px-4 md:px-7 py-4 flex items-center justify-between">
   <a href="index.html" class="flex items-center gap-3">
-    <div class="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent">Y</div>
+    <div class="w-10 h-10 rounded-lg bg-black border border-goldAccent/50 flex items-center justify-center font-black text-xl text-goldAccent" style="box-shadow:0 0 22px rgba(226,176,83,.35)">Y</div>
     <h1 class="text-lg font-black tracking-widest text-white hidden sm:block">YAN<span class="tgold">RECORDS</span></h1>
   </a>
-  <span class="pill bg-cyanNeon/15 text-cyanNeon border border-cyanNeon/30">📘 GUIDE & CGU</span>
-  <a href="index.html" class="bg-goldAccent text-black font-black px-5 py-2 rounded-xl text-xs">← Retour au site</a>
+  <span class="pill bg-cyanNeon/15 text-cyanNeon border border-cyanNeon/30">📘 GUIDE & INFOS</span>
+  <a href="index.html" class="bg-goldAccent text-black font-black px-4 md:px-5 py-2.5 rounded-xl text-xs hover:scale-105 transition">← Retour au site</a>
 </header>
 
-<main class="max-w-4xl mx-auto pt-28 pb-16 px-4 space-y-12">
-  <section class="card p-8 rounded-3xl border-goldAccent/40">
-    <h2 class="text-3xl font-black text-white mb-4">Le Fonctionnement YANrecords 🇩🇿</h2>
-    <p class="text-gray-300 text-sm leading-relaxed mb-6">Plateforme officielle de vente d'instrumentales et de plugins VST avec génération automatique de contrats de licence et protection des droits en Algérie.</p>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-300">
-      <div class="p-4 bg-obsidian rounded-xl border border-borderDark">
-        <b class="text-goldAccent block mb-1">🎤 Pour les Artistes :</b>
-        Achat sécurisé en Dinars (CCP/BaridiMob), contrat PDF téléchargeable à valeur juridique, téléchargement haute qualité et clés VST uniques.
+<section class="pt-28 px-4 md:px-7 max-w-7xl mx-auto">
+  <div class="banner rounded-[2rem] p-8 md:p-14 border border-borderDark relative overflow-hidden fade">
+    <div class="absolute -top-24 -right-24 w-80 h-80 bg-goldAccent/10 rounded-full blur-3xl"></div>
+    <div class="relative z-10 max-w-3xl">
+      <span class="pill bg-goldAccent/20 text-goldAccent border border-goldAccent/40 mb-5">TOUT COMPRENDRE · 🇩🇿</span>
+      <h2 class="text-4xl md:text-6xl font-black leading-[1.05] mb-5">LE GUIDE<br><span class="tcyan">YANRECORDS</span></h2>
+      <p class="text-gray-300 text-lg mb-7">Tu ne sais pas ce qu'est un <b class="text-white">stem</b>, une <b class="text-white">licence exclusive</b>, une <b class="text-white">clé VST</b> ou à quoi sert le <b class="text-white">contrat PDF</b> ? Tout est expliqué ici, simplement.</p>
+      <div class="relative max-w-md">
+        <input id="q" type="text" placeholder="Chercher : stems, exclusive, contrat, clé VST..." class="w-full bg-obsidian/80 border border-borderDark rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white outline-none focus:border-goldAccent transition">
+        <svg class="w-5 h-5 absolute left-3.5 top-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       </div>
-      <div class="p-4 bg-obsidian rounded-xl border border-borderDark">
-        <b class="text-cyanNeon block mb-1">🎹 Pour les Beatmakers :</b>
-        Commission ultra-réduite (5% sur les beats, 8% sur les VST), traçabilité absolue des œuvres (empreinte SHA-256) et notifications aux abonnés.
-      </div>
+      <p id="qres" class="text-xs text-gray-500 mt-2 h-4"></p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FAQ -->
-  <section class="space-y-4">
-    <h3 class="text-2xl font-black text-white">Questions Fréquentes</h3>
-    
-    <details open>
-      <summary>Comment fonctionne le contrat de licence PDF ?</summary>
-      <div class="ans">À chaque commande validée par le producteur ou l'administrateur, un contrat officiel unique au format PDF (ex: <code>YAN-2025-00042</code>) est généré. Il fige les droits d'exploitation, les limites de streaming, le partage de publishing (50/50) et l'empreinte cryptographique du fichier original.</div>
-    </details>
+<div class="max-w-7xl mx-auto px-4 md:px-7 py-10 flex gap-8">
 
-    <details>
-      <summary>Pourquoi le nom légal est-il demandé pour les licences exclusives ?</summary>
-      <div class="ans">Une licence exclusive transfère définitivement l'exclusivité d'exploitation. En droit de la propriété intellectuelle, un contrat rédigé sous pseudonyme n'a pas la même force qu'avec l'état civil complet des deux parties. Pour les licences MP3, WAV et Stems, le pseudonyme suffit.</div>
-    </details>
+  <aside class="hidden lg:block w-60 flex-shrink-0">
+    <nav class="sticky top-28 card rounded-2xl p-3 space-y-1">
+      <p class="px-3 py-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">Sommaire</p>
+      <a href="#start" class="navlink">🚀 Comment ça marche</a>
+      <a href="#licences" class="navlink">📜 Les licences beats</a>
+      <a href="#vst" class="navlink">🔑 Les plugins VST</a>
+      <a href="#contrat" class="navlink">📄 Contrat & preuves</a>
+      <a href="#glossaire" class="navlink">📖 Glossaire audio</a>
+      <a href="#paiement" class="navlink">💳 Paiement & commissions</a>
+      <a href="#vendre" class="navlink">🎹 Vendre ses prods</a>
+      <a href="#social" class="navlink">🔔 Abonnements & messages</a>
+      <a href="#droits" class="navlink">⚖️ Droits & protection</a>
+      <a href="#faq" class="navlink">❓ Questions fréquentes</a>
+      <a href="#cgu" class="navlink">📋 CGU complètes</a>
+    </nav>
+  </aside>
 
-    <details>
-      <summary>C'est quoi l'empreinte SHA-256 du fichier ?</summary>
-      <div class="ans">C'est une signature mathématique calculée directement dans votre navigateur au moment de l'upload. Elle garantit qu'aucune note ni modification n'a été apportée au fichier depuis sa publication. Cette signature est inscrite dans votre contrat PDF.</div>
-    </details>
-  </section>
+  <div class="lg:hidden fixed top-[72px] inset-x-0 z-40 glass px-3 py-2.5 flex gap-2 overflow-x-auto">
+    <a href="#start" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">🚀 Démarrer</a>
+    <a href="#licences" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">📜 Licences</a>
+    <a href="#vst" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">🔑 VST</a>
+    <a href="#contrat" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">📄 Contrat</a>
+    <a href="#glossaire" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">📖 Glossaire</a>
+    <a href="#paiement" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">💳 Paiement</a>
+    <a href="#vendre" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">🎹 Vendre</a>
+    <a href="#social" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">🔔 Social</a>
+    <a href="#droits" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">⚖️ Droits</a>
+    <a href="#faq" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">❓ FAQ</a>
+    <a href="#cgu" class="pill bg-cardDark border border-borderDark text-gray-300 whitespace-nowrap">📋 CGU</a>
+  </div>
 
-  <!-- CGU OFFICIELLES -->
-  <section class="card p-8 rounded-3xl border-borderDark space-y-6 text-sm text-gray-300 leading-relaxed" id="cgu">
-    <h3 class="text-2xl font-black text-goldAccent">Conditions Générales d'Utilisation (CGU)</h3>
-    <p><b>1. Objet :</b> YANrecords est une place de marché numérique permettant l'acquisition et la concession de licences d'œuvres musicales et d'outils logiciels audio.</p>
-    <p><b>2. Propriété Intellectuelle :</b> Les producteurs certifient sur l'honneur être les auteurs originaux des créations soumises. Tout usage d'échantillons non libres de droits engage la responsabilité exclusive du vendeur.</p>
-    <p><b>3. Protection & Révocation :</b> Les clés VST sont limitées à 3 activations machine par titulaire. Toute tentative de diffusion publique ou de partage de clé entraîne sa désactivation immédiate par les serveurs d'authentification.</p>
-    <p><b>4. Droit applicable :</b> Les transactions et contrats établis sont régis par le droit commercial et la réglementation relative au droit d'auteur en vigueur en République Algérienne Démocratique et Populaire.</p>
-  </section>
-</main>
+  <main class="flex-1 min-w-0 space-y-14 lg:pt-0 pt-12">
+
+    <!-- 1. COMMENT ÇA MARCHE -->
+    <section id="start" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">🚀 Comment ça marche</h3>
+      <p class="text-gray-400 text-sm mb-6">YANrecords met en relation des <b class="text-goldAccent">producteurs</b> et des <b class="text-cyanNeon">artistes</b>. Chaque vente génère un <b class="text-white">contrat PDF officiel</b>.</p>
+
+      <div class="grid md:grid-cols-2 gap-5 mb-6">
+        <div class="card rounded-2xl p-6 border-cyanNeon/30 lift">
+          <span class="pill bg-cyanNeon/15 text-cyanNeon mb-4">🎤 JE SUIS ARTISTE</span>
+          <ol class="space-y-3 text-sm text-gray-300">
+            <li><b class="text-white">1.</b> J'écoute les beats gratuitement.</li>
+            <li><b class="text-white">2.</b> Je choisis ma licence et je lis ce qu'elle autorise.</li>
+            <li><b class="text-white">3.</b> Je coche « j'accepte », je paie et j'envoie ma capture.</li>
+            <li><b class="text-white">4.</b> L'admin vérifie sous 24h.</li>
+            <li><b class="text-white">5.</b> Je récupère mes fichiers <b>et mon contrat PDF</b>.</li>
+          </ol>
+        </div>
+        <div class="card rounded-2xl p-6 border-goldAccent/30 lift">
+          <span class="pill bg-goldAccent/15 text-goldAccent mb-4">🎹 JE SUIS PRODUCTEUR</span>
+          <ol class="space-y-3 text-sm text-gray-300">
+            <li><b class="text-white">1.</b> Je renseigne mon CCP dans <code>Paramètres</code>.</li>
+            <li><b class="text-white">2.</b> Je publie, je fixe mes prix et mes limites.</li>
+            <li><b class="text-white">3.</b> Mes abonnés sont notifiés 🔔.</li>
+            <li><b class="text-white">4.</b> Je touche 95% (beats) ou 92% (VST).</li>
+            <li><b class="text-white">5.</b> Je retrouve mes ventes et contrats dans le Dashboard.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <details><summary>Est-ce que je peux écouter avant d'acheter ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui, gratuit et illimité. Clique sur la pochette d'un beat. Le lecteur reste en bas pendant que tu navigues. Les versions d'écoute contiennent souvent un <b>tag vocal</b> du producteur pour éviter le vol.</div></details>
+
+        <details><summary>Faut-il un compte pour acheter ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui. Le compte relie ton achat à ton identité, stocke tes fichiers, tes clés VST et tes <b>contrats PDF</b>. Tu peux t'inscrire par email ou avec Google.</div></details>
+
+        <details><summary>Puis-je parler directement à un producteur ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui. Une <b>messagerie interne</b> est intégrée au site. Va sur le profil du producteur et clique sur l'icône 💬, ou utilise l'onglet <code>Messages</code>. Tes échanges sont conservés et peuvent servir de preuve écrite en cas de désaccord.</div></details>
+
+        <details><summary>Pourquoi je dois confirmer mon email ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Pour éviter les faux comptes et garantir qu'on peut te recontacter si un problème survient. Pense à vérifier ton dossier <b>Spam</b>.</div></details>
+      </div>
+    </section>
+
+    <!-- 2. LICENCES -->
+    <section id="licences" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">📜 Les licences beats</h3>
+      <p class="text-gray-400 text-sm mb-6">Tu n'achètes pas le beat : tu achètes le <b class="text-white">droit de l'utiliser</b>, dans certaines limites. C'est ça, une licence.</p>
+
+      <div class="grid md:grid-cols-2 gap-4 mb-7">
+        <div class="card rounded-2xl p-5 border-borderDark lift">
+          <div class="flex items-center justify-between mb-3"><h4 class="font-black text-white text-lg">MP3 Lease</h4><span class="pill bg-white/10 text-gray-300">ENTRÉE</span></div>
+          <p class="text-sm text-gray-400 mb-3">Fichier <b class="text-white">MP3 320 kbps</b>. Parfait pour une démo, un freestyle, un son YouTube ou SoundCloud.</p>
+          <p class="text-xs text-gray-500">⚠️ Qualité compressée. Le beat reste en vente. Tag à conserver.</p>
+        </div>
+        <div class="card rounded-2xl p-5 border-cyanNeon/30 lift">
+          <div class="flex items-center justify-between mb-3"><h4 class="font-black text-white text-lg">WAV Standard</h4><span class="pill bg-cyanNeon/15 text-cyanNeon">RECOMMANDÉ</span></div>
+          <p class="text-sm text-gray-400 mb-3"><b class="text-white">WAV non compressé</b> + MP3. Qualité studio, indispensable si ton ingé son mixe ta voix dessus.</p>
+          <p class="text-xs text-gray-500">✅ Distribution Spotify, Apple Music, Deezer.</p>
+        </div>
+        <div class="card rounded-2xl p-5 border-goldAccent/30 lift">
+          <div class="flex items-center justify-between mb-3"><h4 class="font-black text-white text-lg">Trackout / Stems</h4><span class="pill bg-goldAccent/15 text-goldAccent">PRO</span></div>
+          <p class="text-sm text-gray-400 mb-3"><b class="text-white">Chaque instrument dans un fichier séparé</b> : la 808 à part, la caisse claire à part, le piano à part…</p>
+          <p class="text-xs text-gray-500">🎚️ Ton ingé peut tout retoucher. Le beat reste en vente.</p>
+        </div>
+        <div class="card rounded-2xl p-5 border-pinkNeon/40 lift">
+          <div class="flex items-center justify-between mb-3"><h4 class="font-black text-white text-lg">🔥 Exclusive</h4><span class="pill bg-pinkNeon/15 text-pinkNeon">UNIQUE</span></div>
+          <p class="text-sm text-gray-400 mb-3">Tout (MP3 + WAV + Stems) et surtout : le beat est <b class="text-pinkNeon">retiré définitivement du catalogue</b>.</p>
+          <p class="text-xs text-gray-500">💎 Usage illimité, tag retiré. <b class="text-pinkNeon">Nom légal obligatoire</b> pour le contrat.</p>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-5 border-goldAccent/30 mb-5">
+        <h4 class="font-black text-goldAccent mb-2">⚙️ Limites personnalisables par le producteur</h4>
+        <p class="text-sm text-gray-300">Le tableau ci-dessous est le <b class="text-white">cadre standard</b> de la plateforme. Chaque producteur peut toutefois fixer ses <b class="text-white">propres chiffres</b> au moment de publier (streams, copies, clips, durée…).</p>
+        <p class="text-xs text-gray-500 mt-2">👉 Les limites réellement appliquées s'affichent <b class="text-white">avant de payer</b>, dans la fenêtre d'achat, sous « 📋 Ce que cette licence autorise ». Ce sont celles-là qui seront écrites dans ton contrat PDF.</p>
+      </div>
+
+      <div class="card rounded-2xl p-5 overflow-x-auto mb-5">
+        <h4 class="font-black text-white mb-1">Tableau comparatif standard</h4>
+        <p class="text-[11px] text-gray-500 mb-4">Valeurs par défaut. Vérifie toujours la fenêtre d'achat du beat concerné.</p>
+        <table>
+          <thead><tr><th>Critère</th><th>MP3</th><th>WAV</th><th>Stems</th><th>Exclusive</th></tr></thead>
+          <tbody>
+            <tr><td class="text-white font-bold">Fichiers livrés</td><td>MP3</td><td>WAV + MP3</td><td>Pistes séparées</td><td>Tout</td></tr>
+            <tr><td class="text-white font-bold">Streams autorisés</td><td>50 000</td><td>150 000</td><td>500 000</td><td class="yes">Illimité</td></tr>
+            <tr><td class="text-white font-bold">Copies vendues</td><td>2 000</td><td>5 000</td><td>10 000</td><td class="yes">Illimité</td></tr>
+            <tr><td class="text-white font-bold">Clips vidéo</td><td>1</td><td>2</td><td class="yes">Illimité</td><td class="yes">Illimité</td></tr>
+            <tr><td class="text-white font-bold">Passage radio</td><td class="no">Non</td><td>2 stations</td><td class="yes">Oui</td><td class="yes">Oui</td></tr>
+            <tr><td class="text-white font-bold">Concerts payants</td><td class="no">Non</td><td class="yes">Oui</td><td class="yes">Oui</td><td class="yes">Oui</td></tr>
+            <tr><td class="text-white font-bold">Tag producteur</td><td>Obligatoire</td><td>Obligatoire</td><td>Optionnel</td><td class="yes">Retiré</td></tr>
+            <tr><td class="text-white font-bold">Crédit « Prod. by »</td><td>Obligatoire</td><td>Obligatoire</td><td>Obligatoire</td><td>Obligatoire</td></tr>
+            <tr><td class="text-white font-bold">Beat reste en vente</td><td>Oui</td><td>Oui</td><td>Oui</td><td class="no">Non, retiré</td></tr>
+            <tr><td class="text-white font-bold">Nom légal requis</td><td class="no">Non</td><td class="no">Non</td><td class="no">Non</td><td class="yes">Oui</td></tr>
+            <tr><td class="text-white font-bold">Durée</td><td>2 ans</td><td>5 ans</td><td>10 ans</td><td class="yes">Illimitée</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="space-y-3">
+        <details><summary>Différence entre lease et exclusive ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>Lease</b> = location. Le producteur peut louer le même beat à 10 autres personnes. Ton morceau et celui d'un autre rappeur peuvent avoir le même instru.<br><br><b>Exclusive</b> = achat définitif. Le beat disparaît du site, personne d'autre ne l'aura. Plus cher, mais ton son est unique.</div></details>
+
+        <details><summary>Pourquoi mon nom légal est demandé en exclusive ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Une exclusive est un <b>transfert de droits important</b>. Un contrat signé « DJ Yanis » n'a aucune valeur devant un tribunal : il faut une identité réelle.<br><br>Pour les licences <b>MP3, WAV et Stems</b>, le nom légal n'est <b>pas demandé</b> : le pseudo suffit.<br><br>Ton nom légal n'est <b>jamais affiché publiquement</b>. Il apparaît uniquement sur le contrat PDF, visible par toi, le producteur et l'administrateur.</div></details>
+
+        <details><summary>Je dépasse les limites de ma licence, que se passe-t-il ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Si ton morceau marche mieux que prévu, tu dois <b>passer à la licence supérieure</b>. Contacte le producteur par la messagerie : en général tu paies seulement la différence. Sans régularisation, le contrat PDF sert de preuve contre toi (retrait YouTube, Spotify…).</div></details>
+
+        <details><summary>Dois-je créditer le producteur ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui, dans tous les cas, y compris en exclusive. Format standard : <code>Mon Titre (Prod. by NomDuProducteur)</code>. À mettre dans le titre, la description YouTube et les métadonnées de distribution. C'est écrit noir sur blanc dans ton contrat.</div></details>
+
+        <details><summary>C'est quoi le « publishing » ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Ce sont les <b>droits d'auteur</b> générés par le morceau (radio, streaming, concerts). Un morceau a deux auteurs : celui de la musique (producteur) et celui des paroles (toi). Partage standard : <b>50% / 50%</b>, mentionné dans le contrat. En Algérie, c'est l'<b>ONDA</b> qui gère ces droits.</div></details>
+
+        <details><summary>Et si le beat contient un sample ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Un <b>sample</b> est un extrait d'un morceau existant. S'il n'est pas autorisé, ton morceau peut être bloqué ou démonétisé. Le producteur doit le signaler dans la description. Il s'engage par les CGU à ne publier que des créations originales ou des samples libres de droits.</div></details>
+      </div>
+    </section>
+
+    <!-- 3. VST -->
+    <section id="vst" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">🔑 Les plugins VST</h3>
+      <p class="text-gray-400 text-sm mb-6">Un VST s'installe dans ton logiciel de musique. Chaque acheteur reçoit une clé unique.</p>
+
+      <div class="grid md:grid-cols-3 gap-4 mb-6">
+        <div class="card rounded-2xl p-5 text-center lift border-cyanNeon/25">
+          <div class="text-3xl mb-2">🎛️</div><h4 class="font-black text-white mb-1">C'est quoi un VST ?</h4>
+          <p class="text-xs text-gray-400">Un module qui s'ajoute à FL Studio, Ableton… pour créer ou transformer des sons : synthé, reverb, compresseur, banque de sons.</p>
+        </div>
+        <div class="card rounded-2xl p-5 text-center lift border-goldAccent/25">
+          <div class="text-3xl mb-2">🔐</div><h4 class="font-black text-white mb-1">C'est quoi la clé ?</h4>
+          <p class="text-xs text-gray-400">Un code unique type <code>YAN-A7K2-MN9P-4QWC</code> qui prouve ton achat. Sans elle, le plugin reste muet.</p>
+        </div>
+        <div class="card rounded-2xl p-5 text-center lift border-pinkNeon/25">
+          <div class="text-3xl mb-2">💻</div><h4 class="font-black text-white mb-1">Pourquoi 3 machines ?</h4>
+          <p class="text-xs text-gray-400">Pour couvrir ton PC de studio, ton portable et une machine de secours, sans permettre de partager la clé.</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <details><summary>Comment j'active mon plugin, étape par étape ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>1.</b> Va dans <code>Mes clés VST</code> et clique sur <b>Télécharger</b>.<br><b>2.</b> Décompresse le ZIP et lance l'installation.<br><b>3.</b> Ouvre ton logiciel et charge le plugin.<br><b>4.</b> Une fenêtre demande ta clé : copie-la depuis le site (bouton <b>Copier</b>).<br><b>5.</b> Le plugin vérifie la clé en ligne et se débloque.<br><br>Tu peux tester ta clé à tout moment depuis <code>Vérifier une clé</code>.</div></details>
+
+        <details><summary>Ma clé fonctionne sur combien d'ordinateurs ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>3 machines maximum.</b> Réactiver sur le <b>même</b> PC ne consomme rien. Activer sur un <b>nouveau</b> PC consomme 1 place. Ton compteur <code>1/3</code>, <code>2/3</code>… est visible dans <code>Mes clés VST</code>.</div></details>
+
+        <details><summary>J'ai changé d'ordinateur et épuisé mes 3 places<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Contacte l'administrateur par la messagerie en précisant ta clé : les activations peuvent être remises à zéro gratuitement.</div></details>
+
+        <details><summary>Ma clé peut-elle être désactivée ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui, dans un seul cas : si elle est <b>partagée ou revendue</b>. Une clé diffusée publiquement est révoquée sans remboursement et le plugin cesse de fonctionner partout.</div></details>
+
+        <details><summary>Le plugin fonctionne-t-il sans internet ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui. Une connexion n'est nécessaire que pour la <b>première activation</b>. Ensuite le plugin garde la licence en mémoire et fonctionne hors ligne plusieurs jours avant de revérifier.</div></details>
+
+        <details><summary>VST2, VST3, AU : quelle différence ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>VST2</b> : ancien format, répandu sur Windows.<br><b>VST3</b> : format moderne, plus stable.<br><b>AU</b> : réservé à macOS et Logic Pro.<br><br>Le producteur doit préciser les formats fournis dans la description.</div></details>
+      </div>
+    </section>
+
+    <!-- 4. CONTRAT -->
+    <section id="contrat" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">📄 Contrat & preuves</h3>
+      <p class="text-gray-400 text-sm mb-6">Chaque vente validée génère un <b class="text-white">contrat PDF officiel numéroté</b>, téléchargeable par les deux parties.</p>
+
+      <div class="card rounded-2xl p-6 border-goldAccent/40 mb-5">
+        <h4 class="font-black text-goldAccent mb-4">Ce que contient ton contrat</h4>
+        <div class="grid md:grid-cols-2 gap-3">
+          <div class="step"><div class="num bg-goldAccent/20 text-goldAccent">1</div><div><p class="text-sm font-bold text-white">Les parties</p><p class="text-xs text-gray-400">Noms d'artiste, et noms légaux pour les exclusives.</p></div></div>
+          <div class="step"><div class="num bg-goldAccent/20 text-goldAccent">2</div><div><p class="text-sm font-bold text-white">L'œuvre</p><p class="text-xs text-gray-400">Titre, genre, BPM, gamme, date de publication, empreinte SHA-256.</p></div></div>
+          <div class="step"><div class="num bg-goldAccent/20 text-goldAccent">3</div><div><p class="text-sm font-bold text-white">La licence</p><p class="text-xs text-gray-400">Tous les chiffres autorisés : streams, copies, clips, radio, durée.</p></div></div>
+          <div class="step"><div class="num bg-goldAccent/20 text-goldAccent">4</div><div><p class="text-sm font-bold text-white">Les montants</p><p class="text-xs text-gray-400">Prix payé, part producteur, commission, moyen de paiement.</p></div></div>
+          <div class="step"><div class="num bg-goldAccent/20 text-goldAccent">5</div><div><p class="text-sm font-bold text-white">Les engagements</p><p class="text-xs text-gray-400">Garantie d'originalité, crédit obligatoire, interdiction de revente, droit algérien.</p></div></div>
+          <div class="step"><div class="num bg-greenPro/20 text-greenPro">6</div><div><p class="text-sm font-bold text-white">L'acceptation</p><p class="text-xs text-gray-400">Date et heure exactes où tu as coché « j'accepte », plus la date de livraison.</p></div></div>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <details open><summary>Où je télécharge mon contrat ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>Acheteur :</b> onglet <code>Mes commandes</code> → bouton doré <b>Contrat PDF</b>. Également visible dans <code>Mes clés VST</code>.<br><br><b>Producteur :</b> <code>Dashboard</code> → onglet <b>MES VENTES</b> → bouton <b>PDF</b>.<br><br>Le contrat est disponible dès que l'administrateur a validé le paiement.</div></details>
+
+        <details><summary>C'est quoi le numéro YAN-2025-00042 ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">C'est la <b>référence unique</b> de ta licence, attribuée par la base de données. Elle ne peut jamais être réutilisée ni falsifiée. En cas de litige, c'est ce numéro qui permet de retrouver l'intégralité du dossier : paiement, acceptation, fichier d'origine.</div></details>
+
+        <details><summary>C'est quoi l'empreinte SHA-256 ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">C'est une <b>signature numérique</b> du fichier audio, calculée au moment de la publication. Une suite de 64 caractères qui change totalement si une seule note du fichier est modifiée.<br><br><b>À quoi ça sert :</b> prouver que le fichier livré est exactement celui qui a été publié, et que personne ne l'a altéré depuis. C'est aussi une preuve d'antériorité si quelqu'un prétend plus tard être l'auteur du beat.</div></details>
+
+        <details><summary>L'acceptation en ligne a-t-elle de la valeur ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui, un accord conclu en ligne engage les parties. Sa solidité dépend de la qualité des preuves réunies : ici tu as l'identité du compte, l'email vérifié, l'horodatage exact de l'acceptation, la preuve de virement et l'empreinte du fichier.<br><br>Pour les <b>exclusives à montant élevé</b>, il reste conseillé de signer en plus un exemplaire papier.</div></details>
+
+        <details><summary>Le producteur reçoit-il le même document ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui, le <b>contrat est strictement identique</b> pour les deux parties. L'administrateur y a également accès en cas d'arbitrage. Personne d'autre ne peut le consulter.</div></details>
+
+        <details><summary>Je conseille de garder quoi exactement ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">• Le <b>PDF du contrat</b> (sauvegarde-le hors du site).<br>• Ta <b>capture de virement</b>.<br>• Les <b>fichiers achetés</b>.<br>• Les <b>échanges de messagerie</b> avec le producteur.<br>• Côté producteur : les <b>fichiers de projet</b> (.flp, .als…) qui prouvent que tu es l'auteur.</div></details>
+      </div>
+    </section>
+
+    <!-- 5. GLOSSAIRE -->
+    <section id="glossaire" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">📖 Glossaire audio</h3>
+      <p class="text-gray-400 text-sm mb-6">Tous les mots techniques du site, expliqués simplement.</p>
+      <div class="grid md:grid-cols-2 gap-3">
+        <div class="card rounded-xl p-4"><h4 class="font-black text-goldAccent text-sm mb-1">BPM</h4><p class="text-xs text-gray-400">« Battements par minute ». La vitesse du beat. Drill ≈ 140, trap ≈ 130, ballade ≈ 80.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-goldAccent text-sm mb-1">Gamme (Key)</h4><p class="text-xs text-gray-400">La tonalité, par exemple <code>Am</code> (la mineur). Utile pour accorder ta voix.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-cyanNeon text-sm mb-1">Stems / Trackout</h4><p class="text-xs text-gray-400">Chaque instrument dans un fichier séparé. Au lieu d'un seul fichier, tu reçois 10 à 30 pistes.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-cyanNeon text-sm mb-1">Mix</h4><p class="text-xs text-gray-400">L'équilibrage entre tous les éléments : volume de la voix face à la basse, place de chaque son.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-cyanNeon text-sm mb-1">Master</h4><p class="text-xs text-gray-400">Dernière étape : rendre le morceau assez fort et équilibré pour passer partout.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-pinkNeon text-sm mb-1">Tag producteur</h4><p class="text-xs text-gray-400">La voix ou le son signature dans le beat. Protège du vol avant l'achat.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-pinkNeon text-sm mb-1">Type beat</h4><p class="text-xs text-gray-400">Beat inspiré du style d'un artiste. « Jul type beat » = ambiance Jul, sans lien officiel.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-pinkNeon text-sm mb-1">808</h4><p class="text-xs text-gray-400">La grosse basse profonde qui glisse, emblématique de la trap et du drill.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-white text-sm mb-1">Loop</h4><p class="text-xs text-gray-400">Une boucle : courte séquence qui se répète pour construire le beat.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-white text-sm mb-1">DAW</h4><p class="text-xs text-gray-400">Le logiciel de production : FL Studio, Ableton, Logic Pro, Cubase, Reaper…</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-white text-sm mb-1">WAV vs MP3</h4><p class="text-xs text-gray-400">Le <b>WAV</b> garde 100% de la qualité. Le <b>MP3</b> compresse. Pour mixer ta voix, prends du WAV.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-white text-sm mb-1">Preset</h4><p class="text-xs text-gray-400">Réglage tout prêt dans un plugin. Tu cliques, le son est déjà configuré.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-greenPro text-sm mb-1">Lease</h4><p class="text-xs text-gray-400">Location non exclusive. Le beat reste disponible pour d'autres acheteurs.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-greenPro text-sm mb-1">Exclusive</h4><p class="text-xs text-gray-400">Achat définitif. Le beat est retiré du catalogue, tu es le seul à l'utiliser.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-greenPro text-sm mb-1">Publishing</h4><p class="text-xs text-gray-400">Les droits d'auteur du morceau, partagés entre compositeur et parolier.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-greenPro text-sm mb-1">ONDA</h4><p class="text-xs text-gray-400">L'Office National des Droits d'Auteur, organisme algérien de protection des œuvres.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-cyanNeon text-sm mb-1">SHA-256</h4><p class="text-xs text-gray-400">Empreinte numérique du fichier. 64 caractères qui changent si le fichier est modifié.</p></div>
+        <div class="card rounded-xl p-4"><h4 class="font-black text-cyanNeon text-sm mb-1">Nom légal</h4><p class="text-xs text-gray-400">Ton vrai nom d'état civil, par opposition au pseudo. Requis seulement pour les exclusives.</p></div>
+      </div>
+    </section>
+
+    <!-- 6. PAIEMENT -->
+    <section id="paiement" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">💳 Paiement & commissions</h3>
+      <p class="text-gray-400 text-sm mb-6">Paiement 100% local, adapté à l'Algérie.</p>
+
+      <div class="card rounded-2xl p-6 mb-5 border-goldAccent/30">
+        <h4 class="font-black text-white mb-4">Le parcours en 6 étapes</h4>
+        <div class="grid md:grid-cols-6 gap-3 text-center">
+          <div><div class="w-10 h-10 rounded-xl bg-goldAccent/20 text-goldAccent font-black flex items-center justify-center mx-auto mb-2">1</div><p class="text-xs text-gray-400">Tu choisis ta licence</p></div>
+          <div><div class="w-10 h-10 rounded-xl bg-goldAccent/20 text-goldAccent font-black flex items-center justify-center mx-auto mb-2">2</div><p class="text-xs text-gray-400">Tu lis et acceptes les limites</p></div>
+          <div><div class="w-10 h-10 rounded-xl bg-goldAccent/20 text-goldAccent font-black flex items-center justify-center mx-auto mb-2">3</div><p class="text-xs text-gray-400">Le CCP du vendeur s'affiche</p></div>
+          <div><div class="w-10 h-10 rounded-xl bg-goldAccent/20 text-goldAccent font-black flex items-center justify-center mx-auto mb-2">4</div><p class="text-xs text-gray-400">Tu fais le virement</p></div>
+          <div><div class="w-10 h-10 rounded-xl bg-goldAccent/20 text-goldAccent font-black flex items-center justify-center mx-auto mb-2">5</div><p class="text-xs text-gray-400">Tu envoies la capture</p></div>
+          <div><div class="w-10 h-10 rounded-xl bg-greenPro/20 text-greenPro font-black flex items-center justify-center mx-auto mb-2">6</div><p class="text-xs text-gray-400">Fichiers + contrat sous 24h</p></div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mb-5">
+        <div class="card rounded-2xl p-5 border-greenPro/30">
+          <h4 class="font-black text-white mb-2">Commission sur les beats</h4>
+          <p class="text-4xl font-black text-greenPro mb-2">5%</p>
+          <p class="text-xs text-gray-400">Sur un beat à 10 000 DZD : le producteur reçoit <b class="text-white">9 500 DZD</b>, la plateforme garde 500 DZD.</p>
+        </div>
+        <div class="card rounded-2xl p-5 border-cyanNeon/30">
+          <h4 class="font-black text-white mb-2">Commission sur les VST</h4>
+          <p class="text-4xl font-black text-cyanNeon mb-2">8%</p>
+          <p class="text-xs text-gray-400">Sur un VST à 10 000 DZD : le producteur reçoit <b class="text-white">9 200 DZD</b>, la plateforme garde 800 DZD.</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <details><summary>Pourquoi envoyer une capture d'écran ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Il n'y a pas encore de paiement automatique par carte. La capture est la <b>preuve de ton virement</b>. L'administrateur la compare aux mouvements réels du compte avant de libérer la commande. Elle est archivée comme élément du dossier.</div></details>
+
+        <details><summary>Combien de temps avant de recevoir ma commande ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">En général quelques heures, <b>24h maximum</b> en jours ouvrés. Tu suis l'état en direct dans <code>Mes commandes</code> : <b>⏳ En vérification</b>, puis <b>✅ Livrée</b> ou <b>❌ Refusée</b> avec le motif.</div></details>
+
+        <details><summary>Ma commande a été refusée, pourquoi ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Causes fréquentes : capture illisible, montant différent du prix affiché, virement jamais arrivé, ou beat vendu en exclusif entre-temps. Le motif est affiché sous ta commande. Si de l'argent a bien été débité, contacte immédiatement l'administrateur par la messagerie.</div></details>
+
+        <details><summary>Puis-je payer par carte ou PayPal ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Pas encore. Actuellement seuls <b>BaridiMob, CCP et Edahabia</b> par virement manuel sont acceptés. Le paiement automatique est prévu dans une prochaine version.</div></details>
+      </div>
+    </section>
+
+    <!-- 7. VENDRE -->
+    <section id="vendre" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">🎹 Vendre ses prods</h3>
+      <p class="text-gray-400 text-sm mb-6">Tout ce qu'il faut savoir pour publier et encaisser.</p>
+      <div class="space-y-3">
+        <details open><summary>Comment publier mon premier beat ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>1.</b> Renseigne ton <b>CCP / BaridiMob</b> dans <code>Paramètres</code>, sinon personne ne peut te payer.<br><b>2.</b> Clique sur <b>Poster</b>.<br><b>3.</b> Remplis titre, genre, BPM, gamme.<br><b>4.</b> Fixe tes 4 prix.<br><b>5.</b> Si tu veux, coche <b>Personnaliser les limites</b> pour définir tes propres chiffres.<br><b>6.</b> Ajoute pochette (5 Mo max) et fichier audio (50 Mo max).<br><b>7.</b> Publie. L'empreinte SHA-256 est calculée et tes abonnés sont notifiés.</div></details>
+
+        <details><summary>À quoi servent les limites personnalisées ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Elles te permettent d'adapter chaque licence à ta stratégie. Par exemple autoriser plus de streams en MP3, ou raccourcir la durée du WAV.<br><br>Les chiffres que tu saisis sont <b>figés au moment de la vente</b> et recopiés dans le contrat PDF de l'acheteur. Même si tu les modifies plus tard, les contrats déjà émis restent inchangés.</div></details>
+
+        <details><summary>Dois-je renseigner mon nom légal ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Uniquement si tu veux vendre des <b>licences exclusives</b>. Sans nom légal, la validation d'une exclusive est <b>bloquée automatiquement</b> par le système. Un bandeau jaune te le rappelle dans ton Dashboard.<br><br>Pour les MP3, WAV et Stems, ce n'est pas nécessaire. Ton nom légal n'est jamais affiché publiquement.</div></details>
+
+        <details><summary>Quels prix pratiquer ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Fourchettes couramment observées sur le marché algérien, à adapter selon ta notoriété :<br><br>• <b>MP3 Lease</b> : 1 500 – 3 000 DZD<br>• <b>WAV</b> : 3 000 – 6 000 DZD<br>• <b>Stems</b> : 6 000 – 12 000 DZD<br>• <b>Exclusive</b> : 20 000 – 60 000 DZD<br><br>Commence raisonnable, augmente avec tes références.</div></details>
+
+        <details><summary>Comment récupérer mon argent ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Chaque vente validée crédite ton <b>solde</b> dans le Dashboard. Depuis cette page, demande un retrait : <b>minimum 1 000 DZD</b>. Virement sur ton CCP sous 7 jours ouvrés. Une seule demande en attente à la fois.</div></details>
+
+        <details><summary>Où je vois mes ventes et mes contrats ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><code>Dashboard</code> → onglet <b>MES VENTES</b>. Tu y vois pour chaque vente : le titre, la licence, l'acheteur, le montant net, la date et le <b>numéro de contrat</b>, avec un bouton <b>PDF</b>.</div></details>
+
+        <details><summary>Combien de publications par jour ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>10 publications par tranche de 24h.</b> Cette limite évite le spam et protège l'espace de stockage.</div></details>
+
+        <details><summary>Puis-je supprimer un beat déjà vendu ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Non. Un produit ayant généré une vente ne peut plus être supprimé : les acheteurs doivent conserver l'accès à leur licence, leur clé et leur contrat.</div></details>
+
+        <details><summary>Conseils pour vendre plus<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">• Une <b>pochette soignée</b> double le nombre de clics.<br>• Mets un <b>tag vocal</b> sur la version d'écoute.<br>• Remplis ta <b>bio</b> et ton <b>Instagram</b>.<br>• Publie <b>régulièrement</b>, tes abonnés sont notifiés.<br>• Nomme tes beats avec le style : <code>Drill Alger Type Beat – Nuit</code>.<br>• Réponds vite aux <b>messages</b> : la réactivité fait vendre.</div></details>
+      </div>
+    </section>
+
+    <!-- 8. SOCIAL -->
+    <section id="social" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">🔔 Abonnements & messages</h3>
+      <p class="text-gray-400 text-sm mb-6">Suis tes producteurs préférés et discute directement avec eux.</p>
+      <div class="space-y-3">
+        <details><summary>À quoi sert l'abonnement ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">C'est gratuit. Tu reçois une notification instantanée dès qu'un producteur publie un nouveau beat ou VST. Tu augmentes aussi son compteur d'abonnés, ce qui l'aide à être visible.</div></details>
+
+        <details><summary>Comment m'abonner ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Clique sur le nom d'un producteur (Beatstore, VST ou lecteur) pour ouvrir son profil, puis sur <b>S'abonner</b>. Tu peux aussi parcourir la page <b>Artistes</b>.</div></details>
+
+        <details><summary>À quoi sert la cloche ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Elle permet de rester abonné <b>sans recevoir de notifications</b>. Cloche allumée 🔔 = tu es alerté. Cloche barrée 🔕 = tu suis en silence.</div></details>
+
+        <details open><summary>Comment fonctionne la messagerie ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Va sur le profil d'un producteur et clique sur l'icône 💬, ou ouvre l'onglet <code>Messages</code>.<br><br>• Les messages arrivent <b>en temps réel</b>.<br>• Une <b>pastille rose</b> signale les non lus.<br>• Tes conversations sont <b>privées</b> : seuls l'expéditeur et le destinataire y accèdent.<br>• Tout est <b>conservé et horodaté</b>, ce qui sert de preuve écrite en cas de désaccord sur un accord négocié.</div></details>
+
+        <details><summary>À quoi ça sert concrètement ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">• Négocier un prix ou une licence sur mesure.<br>• Demander un beat personnalisé.<br>• Régler un problème de fichier ou de clé.<br>• Demander une réinitialisation d'activations VST.<br>• Se mettre d'accord sur le partage du publishing <b>avant</b> l'achat.</div></details>
+
+        <details><summary>Que contient mon profil public ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>Visible par tous :</b> nom d'artiste, photo, bio, Instagram, créations, écoutes, abonnés.<br><br><b>Jamais visible :</b> email, solde, <b>nom légal</b>, CCP (affiché uniquement à un acheteur au moment de payer).</div></details>
+      </div>
+    </section>
+
+    <!-- 9. DROITS -->
+    <section id="droits" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">⚖️ Droits & protection</h3>
+      <p class="text-gray-400 text-sm mb-6">Ce qui protège ta musique et tes achats sur la plateforme.</p>
+
+      <div class="card rounded-2xl p-5 border-greenPro/30 mb-4">
+        <h4 class="font-black text-greenPro mb-3">✅ Ce qui est en place</h4>
+        <ul class="text-sm text-gray-300 space-y-2">
+          <li>• <b class="text-white">Contrat PDF numéroté</b> généré à chaque vente validée, pour les deux parties.</li>
+          <li>• <b class="text-white">Acceptation horodatée</b> : date et heure exactes où l'acheteur a validé les conditions.</li>
+          <li>• <b class="text-white">Nom légal</b> des deux parties sur les contrats exclusifs, bloqué par le système s'il manque.</li>
+          <li>• <b class="text-white">Empreinte SHA-256</b> de chaque fichier, calculée à la publication et imprimée sur le contrat.</li>
+          <li>• <b class="text-white">Date certaine de publication</b> enregistrée à l'upload.</li>
+          <li>• <b class="text-white">Preuve de paiement</b> archivée (capture du virement).</li>
+          <li>• <b class="text-white">Limites de licence figées</b> dans la commande, impossibles à modifier après coup.</li>
+          <li>• <b class="text-white">Messagerie horodatée</b> conservant la trace des négociations.</li>
+          <li>• <b class="text-white">Clé VST unique</b>, limitée à 3 machines et révocable.</li>
+          <li>• <b class="text-white">Fichiers VST privés</b>, téléchargeables uniquement par les acheteurs.</li>
+          <li>• <b class="text-white">Verrouillage exclusif</b> : un beat vendu en exclusive disparaît du catalogue.</li>
+        </ul>
+      </div>
+
+      <div class="card rounded-2xl p-5 border-yellow-500/40 mb-4">
+        <h4 class="font-black text-yellow-400 mb-3">⚠️ Ce qui reste à faire de ton côté</h4>
+        <ul class="text-sm text-gray-300 space-y-2">
+          <li>• <b class="text-white">Sauvegarde tes contrats PDF</b> ailleurs que sur le site.</li>
+          <li>• <b class="text-white">Conserve tes fichiers de projet</b> (.flp, .als…) : seule la personne qui les possède peut prouver qu'elle a composé le beat.</li>
+          <li>• <b class="text-white">Envisage un dépôt ONDA</b> pour tes œuvres les plus importantes.</li>
+          <li>• <b class="text-white">Fais relire ton modèle de contrat</b> par un avocat avant tes premières grosses exclusives.</li>
+        </ul>
+      </div>
+
+      <div class="space-y-3">
+        <details><summary>Quelqu'un a volé mon beat, que faire ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans"><b>1.</b> Rassemble tes preuves : fichier projet, date de publication YANrecords, empreinte SHA-256, contrats émis.<br><b>2.</b> Contacte la personne par écrit pour demander le retrait.<br><b>3.</b> Si refus, utilise les formulaires de réclamation YouTube, Spotify ou Instagram.<br><b>4.</b> Pour les sommes importantes, consulte un avocat et envisage un dépôt <b>ONDA</b>.</div></details>
+
+        <details><summary>Un acheteur dépasse sa licence, que faire ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Tu as maintenant un <b>contrat PDF daté</b> qui fixe précisément les limites et qu'il a accepté par horodatage.<br><br><b>1.</b> Contacte-le par la messagerie en citant le numéro de contrat.<br><b>2.</b> Propose la licence supérieure contre la différence de prix.<br><b>3.</b> S'il refuse, le contrat prévoit la résiliation de plein droit et tu peux faire valoir tes droits auprès des plateformes de diffusion.</div></details>
+
+        <details><summary>Comment protéger mes créations en Algérie ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">L'organisme compétent est l'<b>ONDA</b> (Office National des Droits d'Auteur et Droits Voisins). Un dépôt donne une <b>date certaine</b> opposable devant un tribunal. Renseigne-toi directement auprès d'eux pour la procédure et les tarifs en vigueur.</div></details>
+
+        <details><summary>Avertissement important<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Les contrats générés suivent les <b>usages de l'industrie musicale</b>. Ils ne constituent pas un conseil juridique. Pour une protection pleinement opposable, faites valider le modèle par un <b>avocat spécialisé en propriété intellectuelle</b> exerçant en Algérie.</div></details>
+      </div>
+    </section>
+
+    <!-- 10. FAQ -->
+    <section id="faq" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">❓ Questions fréquentes</h3>
+      <div class="space-y-3 mt-6">
+        <details><summary>Le site est-il gratuit ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui. Créer un compte, écouter, publier, s'abonner et envoyer des messages est gratuit. Une commission n'est prélevée qu'en cas de vente : 5% beats, 8% VST.</div></details>
+
+        <details><summary>Puis-je revendre un beat acheté ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Non, jamais. Tu achètes le droit de l'<b>utiliser dans ton morceau</b>, pas de le redistribuer, revendre ou partager, même en exclusive. C'est écrit dans ton contrat.</div></details>
+
+        <details><summary>Puis-je être remboursé ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Les produits numériques ne sont pas remboursables une fois livrés. Exception : fichier corrompu, manquant ou non conforme. Signale-le sous 48h.</div></details>
+
+        <details><summary>J'ai perdu ma clé VST<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Impossible de la perdre : elle reste affichée dans <code>Mes clés VST</code>, <code>Mes commandes</code> et sur ton <b>contrat PDF</b>.</div></details>
+
+        <details><summary>Je ne retrouve pas mon contrat<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Il n'est disponible qu'<b>après validation</b> par l'administrateur. Si ta commande affiche encore ⏳, patiente. Une fois ✅ Livrée, le bouton <b>Contrat PDF</b> apparaît dans <code>Mes commandes</code>. Tu peux le retélécharger autant de fois que tu veux.</div></details>
+
+        <details><summary>Puis-je utiliser un beat pour une pub ou un film ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Ce type d'usage (synchronisation) n'est pas couvert par les licences standard. Contacte le producteur par la <b>messagerie</b> pour négocier un accord spécifique.</div></details>
+
+        <details><summary>Plusieurs artistes peuvent avoir le même beat ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui, en lease (MP3, WAV, Stems). C'est le principe de la location. Pour être le seul, prends l'<b>Exclusive</b>.</div></details>
+
+        <details><summary>Comment contacter un producteur ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Par la <b>messagerie interne</b> du site : profil du producteur → icône 💬, ou onglet <code>Messages</code>. Tu peux aussi passer par son Instagram s'il l'a renseigné, mais la messagerie interne est préférable car elle garde une trace écrite.</div></details>
+
+        <details><summary>Le site fonctionne-t-il sur téléphone ?<svg class="arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="ans">Oui, entièrement. Barre de navigation en bas, lecteur adapté, messagerie optimisée et téléchargement du contrat PDF fonctionnel.</div></details>
+      </div>
+    </section>
+
+    <!-- 11. CGU -->
+    <section id="cgu" class="fade">
+      <h3 class="text-3xl font-black text-white mb-2">📋 Conditions Générales d'Utilisation</h3>
+      <p class="text-gray-400 text-sm mb-2">Version 3.0 · Dernière mise à jour : <span id="dt"></span></p>
+      <div class="card rounded-xl p-4 border-yellow-500/40 mb-6">
+        <p class="text-xs text-yellow-300">⚠️ Document rédigé selon les usages de l'industrie musicale. Il ne remplace pas l'avis d'un avocat. Avant toute exploitation commerciale à grande échelle, faites-le valider par un juriste spécialisé en droit algérien.</p>
+      </div>
+
+      <div class="card rounded-2xl p-6 md:p-8 space-y-6 text-sm text-gray-300 leading-relaxed">
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 1 — OBJET ET CHAMP D'APPLICATION</h4>
+        <p>1.1. YANrecords (« la Plateforme ») est un service en ligne de mise en relation permettant à des producteurs de proposer à la vente des instrumentales (« beats ») et des extensions logicielles audio (« plugins VST »), et à des utilisateurs d'en acquérir des licences d'utilisation.</p>
+        <p>1.2. Les présentes CGU régissent l'ensemble des relations entre la Plateforme et ses utilisateurs. Toute utilisation vaut acceptation pleine et entière.</p>
+        <p>1.3. La Plateforme s'adresse principalement au marché algérien. Les prix sont exprimés en dinars algériens (DZD).</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 2 — DÉFINITIONS</h4>
+        <p><b>Membre</b> : toute personne disposant d'un compte actif.<br>
+        <b>Producteur / Vendeur</b> : Membre publiant du contenu à la vente.<br>
+        <b>Acheteur</b> : Membre acquérant une licence.<br>
+        <b>Beat</b> : instrumentale musicale originale.<br>
+        <b>VST</b> : extension logicielle pour logiciel de production musicale.<br>
+        <b>Licence</b> : droit d'utilisation concédé par le Vendeur, dans les limites de l'article 8.<br>
+        <b>Clé VST</b> : code d'activation unique, personnel et incessible.<br>
+        <b>Commande</b> : demande d'achat accompagnée d'une preuve de paiement, en attente de validation.<br>
+        <b>Contrat de Licence</b> : document PDF numéroté généré automatiquement après validation.<br>
+        <b>Nom légal</b> : identité civile complète du Membre, distincte du nom d'artiste.<br>
+        <b>Empreinte</b> : code SHA-256 identifiant de manière unique un fichier.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 3 — INSCRIPTION ET COMPTE</h4>
+        <p>3.1. L'inscription requiert une adresse email valide ou un compte Google, ainsi qu'un nom d'artiste.</p>
+        <p>3.2. Le Membre garantit l'exactitude des informations fournies et s'engage à les maintenir à jour.</p>
+        <p>3.3. Les identifiants sont strictement personnels. Le Membre est seul responsable de l'activité de son compte.</p>
+        <p>3.4. Un seul compte par personne. Les comptes multiples visant à contourner les limites entraînent une suspension.</p>
+        <p>3.5. L'inscription est réservée aux personnes majeures ou aux mineurs disposant d'une autorisation parentale.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 4 — IDENTITÉ ET NOM LÉGAL</h4>
+        <p>4.1. Le <b>nom d'artiste</b> est public. Il suffit pour acheter ou vendre des licences MP3, WAV et Trackout/Stems.</p>
+        <p>4.2. Le <b>nom légal</b> est obligatoire, pour le Vendeur comme pour l'Acheteur, dès lors qu'une licence <b>Exclusive</b> est concernée. Le système bloque automatiquement la validation en son absence.</p>
+        <p>4.3. Le nom légal n'est jamais affiché publiquement. Il figure uniquement sur le Contrat de Licence, accessible aux deux parties et à l'administration.</p>
+        <p>4.4. Tout nom légal manifestement fantaisiste ou falsifié entraîne l'annulation de la transaction et la suspension du compte.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 5 — RÔLE DE LA PLATEFORME</h4>
+        <p>5.1. YANrecords agit exclusivement en qualité d'<b>intermédiaire technique</b>. Elle n'est ni l'auteur, ni l'éditeur, ni le propriétaire des contenus publiés.</p>
+        <p>5.2. Le contrat de licence est conclu <b>directement entre le Vendeur et l'Acheteur</b>. La Plateforme n'y est pas partie.</p>
+        <p>5.3. La Plateforme assure la vérification des preuves de paiement, la génération du Contrat de Licence et la livraison technique des contenus.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 6 — PROPRIÉTÉ INTELLECTUELLE ET GARANTIES</h4>
+        <p>6.1. Le Vendeur déclare et garantit être l'<b>auteur original</b> et le titulaire exclusif de l'ensemble des droits sur tout contenu publié.</p>
+        <p>6.2. Le Vendeur garantit que son contenu ne porte atteinte à aucun droit de tiers : droit d'auteur, droits voisins, marque, droit à l'image.</p>
+        <p>6.3. Le Vendeur conserve la propriété de son œuvre et concède uniquement une licence d'utilisation.</p>
+        <p>6.4. Le Vendeur garantit la Plateforme contre toute réclamation de tiers et en supporte seul les conséquences financières et juridiques.</p>
+        <p>6.5. Toute publication d'une œuvre dont le Membre n'est pas l'auteur entraîne la suppression du contenu, la suspension définitive du compte et la rétention des sommes concernées.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 7 — SAMPLES ET CONTENUS DE TIERS</h4>
+        <p>7.1. Le Vendeur utilisant un sample doit détenir une autorisation valide ou utiliser un contenu libre de droits.</p>
+        <p>7.2. La présence d'un sample doit être signalée dans la description du produit.</p>
+        <p>7.3. Toute conséquence d'un sample non autorisé (blocage, démonétisation, réclamation) incombe exclusivement au Vendeur.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 8 — LICENCES BEATS</h4>
+        <p>8.1. Quatre niveaux sont proposés : MP3 Lease, WAV Standard, Trackout/Stems et Exclusive.</p>
+        <p>8.2. Les limites par défaut (streams, copies, clips, radio, concerts, tag, durée) figurent dans le tableau comparatif publié sur la présente page et font partie intégrante des CGU.</p>
+        <p>8.3. <b>Limites personnalisées</b> : le Vendeur peut définir ses propres valeurs au moment de la publication. Ces valeurs prévalent alors sur les limites par défaut et sont affichées à l'Acheteur avant paiement.</p>
+        <p>8.4. Les limites applicables sont <b>figées au moment de la commande</b> et reproduites dans le Contrat de Licence. Une modification ultérieure par le Vendeur est sans effet sur les licences déjà concédées.</p>
+        <p>8.5. Les licences MP3, WAV et Stems sont <b>non exclusives</b> : le même beat peut être concédé à plusieurs Acheteurs simultanément.</p>
+        <p>8.6. La licence <b>Exclusive</b> entraîne le retrait définitif du beat du catalogue. Aucune licence ultérieure ne pourra être concédée.</p>
+        <p>8.7. Le crédit « Prod. by [Nom du Producteur] » est <b>obligatoire pour toutes les licences</b>, y compris exclusive, dans le titre, la description et les métadonnées de distribution.</p>
+        <p>8.8. Le tag sonore du producteur doit être conservé lorsque la licence le prévoit.</p>
+        <p>8.9. <b>Dépassement</b> : en cas de dépassement des limites, l'Acheteur doit acquérir sans délai la licence supérieure. À défaut, la licence est résiliée de plein droit et le Vendeur peut exiger réparation.</p>
+        <p>8.10. <b>Publishing</b> : sauf accord écrit différent, les droits d'auteur du morceau résultant sont partagés à hauteur de 50% pour le Producteur (composition) et 50% pour l'Acheteur (paroles et interprétation).</p>
+        <p>8.11. Sont interdits sans accord écrit spécifique : la revente, la redistribution, le partage, la mise à disposition en banque de sons, et l'usage publicitaire ou cinématographique.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 9 — LICENCES VST ET CLÉS D'ACTIVATION</h4>
+        <p>9.1. Chaque achat de plugin génère une clé unique, personnelle et incessible.</p>
+        <p>9.2. La clé autorise l'activation sur <b>trois machines au maximum</b>. Une réactivation sur une machine déjà enregistrée ne consomme pas d'activation supplémentaire.</p>
+        <p>9.3. L'activation nécessite une connexion internet. Le plugin peut ensuite fonctionner hors ligne durant une période limitée.</p>
+        <p>9.4. Le partage, la publication, la revente ou la diffusion d'une clé entraîne sa <b>révocation immédiate sans remboursement</b>.</p>
+        <p>9.5. Sont interdits : la décompilation, l'ingénierie inverse, le contournement de la protection et la redistribution du plugin.</p>
+        <p>9.6. En cas de changement de matériel, une réinitialisation des activations peut être demandée gratuitement à l'administration.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 10 — CONTRAT DE LICENCE, ACCEPTATION ET PREUVES</h4>
+        <p>10.1. Avant tout paiement, l'Acheteur doit <b>prendre connaissance des limites</b> de la licence choisie et <b>cocher expressément</b> la case d'acceptation. Cette acceptation est <b>horodatée</b> et enregistrée.</p>
+        <p>10.2. Après validation du paiement, un <b>Contrat de Licence au format PDF</b> est généré automatiquement. Il porte une référence unique de la forme <code>YAN-AAAA-NNNNN</code>, non réutilisable.</p>
+        <p>10.3. Le Contrat mentionne : l'identité des parties, l'œuvre et ses caractéristiques, l'empreinte SHA-256 du fichier, le type de licence et l'intégralité de ses limites, les montants et la commission, les engagements des parties, les dates d'acceptation et de livraison.</p>
+        <p>10.4. Le Contrat est accessible et téléchargeable, de façon identique, par l'Acheteur, le Vendeur et l'administration.</p>
+        <p>10.5. <b>Empreinte numérique</b> : une signature SHA-256 est calculée lors de la publication de chaque fichier. Elle permet d'établir que le fichier livré est bien celui qui a été publié et qu'il n'a pas été altéré.</p>
+        <p>10.6. Les éléments suivants constituent le faisceau de preuves de la transaction : horodatage de publication, empreinte du fichier, preuve de paiement, horodatage d'acceptation, référence du Contrat, et le cas échéant les échanges de messagerie.</p>
+        <p>10.7. Il appartient à chaque partie de <b>conserver une copie</b> de son Contrat en dehors de la Plateforme.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 11 — PRIX, COMMISSIONS ET PAIEMENT</h4>
+        <p>11.1. Les prix sont librement fixés par le Vendeur et affichés toutes taxes comprises en DZD.</p>
+        <p>11.2. La Plateforme perçoit une commission de <b>5% sur les beats</b> et <b>8% sur les VST</b>, prélevée sur la part du Vendeur. L'Acheteur ne paie que le prix affiché.</p>
+        <p>11.3. Les paiements s'effectuent par virement CCP, BaridiMob ou Edahabia vers le compte du Vendeur.</p>
+        <p>11.4. L'Acheteur doit transmettre une <b>preuve de paiement lisible</b> lors de sa commande.</p>
+        <p>11.5. Toute preuve falsifiée entraîne l'annulation de la commande, la suspension définitive du compte et d'éventuelles poursuites.</p>
+        <p>11.6. La Plateforme peut modifier ses taux de commission moyennant un préavis de 30 jours.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 12 — VALIDATION ET LIVRAISON</h4>
+        <p>12.1. Toute commande est soumise à une vérification manuelle du paiement.</p>
+        <p>12.2. Le délai de traitement est de <b>24 heures ouvrées maximum</b>.</p>
+        <p>12.3. La commande peut être refusée en cas de preuve illisible, de montant incorrect, de paiement non reçu, d'informations d'identité manquantes ou de produit entre-temps indisponible. Le motif est communiqué à l'Acheteur.</p>
+        <p>12.4. Les fichiers, clés et contrats restent accessibles dans l'espace personnel de l'Acheteur tant que son compte demeure actif.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 13 — RÉTRACTATION ET REMBOURSEMENT</h4>
+        <p>13.1. Les contenus numériques livrés immédiatement ne peuvent faire l'objet d'une rétractation après téléchargement.</p>
+        <p>13.2. Un remboursement est possible uniquement en cas de fichier corrompu, manquant ou manifestement non conforme à l'annonce.</p>
+        <p>13.3. Toute réclamation doit être formulée dans les <b>48 heures</b> suivant la livraison, accompagnée de justificatifs.</p>
+        <p>13.4. Le remboursement d'une licence exclusive entraîne la résiliation du Contrat correspondant et la remise en vente du beat.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 14 — RETRAITS DES GAINS</h4>
+        <p>14.1. Les sommes issues des ventes validées sont créditées sur le solde du Vendeur.</p>
+        <p>14.2. Le retrait minimum est fixé à <b>1 000 DZD</b>.</p>
+        <p>14.3. Un compte CCP ou BaridiMob valide doit être renseigné au préalable.</p>
+        <p>14.4. Le versement intervient sous <b>7 jours ouvrés</b> après la demande.</p>
+        <p>14.5. Une seule demande de retrait peut être en cours à la fois.</p>
+        <p>14.6. La Plateforme peut suspendre un retrait en cas de litige ou de suspicion de fraude.</p>
+        <p>14.7. Le Vendeur est seul responsable de ses obligations fiscales et déclaratives.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 15 — MESSAGERIE INTERNE</h4>
+        <p>15.1. La Plateforme met à disposition une messagerie privée entre Membres.</p>
+        <p>15.2. Les conversations sont accessibles uniquement à l'expéditeur et au destinataire. L'administration peut y accéder en cas de litige signalé ou d'obligation légale.</p>
+        <p>15.3. Les messages sont conservés et horodatés. Ils peuvent constituer un <b>élément de preuve</b> en cas de désaccord sur un accord négocié.</p>
+        <p>15.4. Sont interdits : le harcèlement, les propos haineux ou menaçants, le démarchage abusif, et toute tentative de contourner la Plateforme pour échapper à la commission.</p>
+        <p>15.5. Tout abus entraîne la suspension de l'accès à la messagerie, voire du compte.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 16 — CONTENUS INTERDITS</h4>
+        <p>Sont strictement prohibés : les œuvres plagiées ou contrefaites ; les samples non autorisés ; les contenus haineux, racistes, diffamatoires ou incitant à la violence ; les contenus pornographiques ; les contenus contraires à l'ordre public algérien ; les fichiers contenant des programmes malveillants ; les annonces trompeuses sur la nature du produit.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 17 — LIMITES D'UTILISATION</h4>
+        <p>17.1. Maximum <b>10 publications par 24 heures</b> et par compte.</p>
+        <p>17.2. Fichiers audio et plugins : <b>50 Mo maximum</b>. Images : <b>5 Mo maximum</b>.</p>
+        <p>17.3. Sont interdits : l'automatisation des écoutes, le gonflage artificiel des statistiques ou des abonnés, et toute tentative d'atteinte à la sécurité du service.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 18 — SUSPENSION ET RÉSILIATION</h4>
+        <p>18.1. La Plateforme peut suspendre ou supprimer tout compte en cas de manquement aux présentes CGU.</p>
+        <p>18.2. Un Membre peut demander la suppression de son compte à tout moment.</p>
+        <p>18.3. Les licences régulièrement acquises <b>restent valides</b> même après la suppression du compte du Vendeur. Les Contrats déjà émis conservent leur valeur.</p>
+        <p>18.4. Les produits ayant généré une vente ne peuvent être supprimés par leur auteur.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 19 — RESPONSABILITÉ</h4>
+        <p>19.1. La Plateforme met en œuvre les moyens raisonnables pour assurer la disponibilité du service, sans garantie d'absence totale d'interruption.</p>
+        <p>19.2. Elle ne saurait être tenue responsable de la qualité artistique des contenus, des litiges entre Membres, de l'usage fait des fichiers, ni d'une perte de données imputable à l'utilisateur.</p>
+        <p>19.3. Il appartient à chaque Membre de conserver une copie de sécurité de ses fichiers, clés et contrats.</p>
+        <p>19.4. La responsabilité éventuelle de la Plateforme est limitée au montant de la commission perçue sur la transaction litigieuse.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 20 — DONNÉES PERSONNELLES</h4>
+        <p>20.1. Données collectées : email, nom d'artiste, nom légal le cas échéant, photo, biographie, réseaux sociaux, coordonnées bancaires (Vendeurs), historique des commandes et contrats, messages.</p>
+        <p>20.2. Finalités : fonctionnement du service, traitement des commandes, génération des contrats, versement des gains, support et preuve.</p>
+        <p>20.3. <b>Informations publiques</b> : nom d'artiste, photo, biographie, Instagram, créations, statistiques publiques.</p>
+        <p>20.4. <b>Informations confidentielles</b> : email, nom légal, solde, coordonnées bancaires, messages. Le CCP n'est révélé qu'à un Acheteur engagé dans l'achat.</p>
+        <p>20.5. Les données ne sont ni vendues, ni cédées, ni louées à des tiers.</p>
+        <p>20.6. Chaque Membre peut demander l'accès, la rectification ou la suppression de ses données.</p>
+        <p>20.7. Les données liées aux transactions et aux contrats sont conservées à des fins de preuve et d'obligations comptables.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 21 — LITIGES ENTRE MEMBRES</h4>
+        <p>21.1. Les Membres doivent d'abord rechercher une solution amiable, de préférence via la messagerie interne afin de conserver une trace.</p>
+        <p>21.2. La Plateforme peut intervenir à titre de simple médiateur, sans obligation de résultat, en s'appuyant sur le Contrat de Licence et les preuves archivées.</p>
+        <p>21.3. En cas de litige persistant, les sommes concernées peuvent être gelées jusqu'à résolution.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 22 — MODIFICATION DES CGU</h4>
+        <p>22.1. Les présentes CGU peuvent être modifiées à tout moment.</p>
+        <p>22.2. Les Membres sont informés des modifications substantielles.</p>
+        <p>22.3. La poursuite de l'utilisation vaut acceptation de la nouvelle version.</p>
+        <p>22.4. Les licences déjà acquises restent régies par la version en vigueur au jour de l'achat, telle que reproduite dans leur Contrat.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 23 — DROIT APPLICABLE ET JURIDICTION</h4>
+        <p>23.1. Les présentes CGU et les Contrats de Licence sont soumis au <b>droit algérien</b>.</p>
+        <p>23.2. À défaut de résolution amiable, tout litige relève de la compétence des juridictions algériennes.</p>
+        <p>23.3. La nullité éventuelle d'une clause n'affecte pas la validité des autres dispositions.</p></div>
+
+        <div><h4 class="font-black text-goldAccent mb-2">ARTICLE 24 — CONTACT</h4>
+        <p>Pour toute question relative aux présentes conditions, au fonctionnement du service ou à l'exercice de vos droits, contactez l'administration via la messagerie interne ou les coordonnées publiées sur le site.</p></div>
+
+      </div>
+    </section>
+
+    <div class="text-center py-10">
+      <a href="index.html" class="inline-block bg-goldAccent text-black font-black px-10 py-4 rounded-2xl hover:scale-105 transition" style="box-shadow:0 0 28px rgba(226,176,83,.35)">← Retour sur YANrecords</a>
+      <p class="text-xs text-gray-600 mt-5">YANrecords 🇩🇿 · La marketplace musicale algérienne</p>
+    </div>
+  </main>
+</div>
+
+<div id="top">↑</div>
+
+<script>
+document.getElementById('dt').textContent = new Date().toLocaleDateString('fr-FR');
+
+var q = document.getElementById('q');
+var res = document.getElementById('qres');
+q.addEventListener('input', function(){
+  var s = q.value.trim().toLowerCase();
+  var items = document.querySelectorAll('details');
+  var n = 0;
+  items.forEach(function(d){
+    if(!s){ d.classList.remove('hidden-row'); d.open = false; return; }
+    var txt = d.textContent.toLowerCase();
+    if(txt.indexOf(s) >= 0){ d.classList.remove('hidden-row'); d.open = true; n++; }
+    else { d.classList.add('hidden-row'); d.open = false; }
+  });
+  res.textContent = s ? (n + ' résultat' + (n > 1 ? 's' : '') + ' trouvé' + (n > 1 ? 's' : '')) : '';
+});
+
+var links = document.querySelectorAll('.navlink');
+var secs = document.querySelectorAll('main section');
+window.addEventListener('scroll', function(){
+  var y = window.scrollY + 140, cur = '';
+  secs.forEach(function(s){ if(s.offsetTop <= y) cur = s.id; });
+  links.forEach(function(l){ l.classList.toggle('on', l.getAttribute('href') === '#' + cur); });
+  document.getElementById('top').classList.toggle('show', window.scrollY > 500);
+});
+
+document.getElementById('top').addEventListener('click', function(){
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
 </body>
 </html>
