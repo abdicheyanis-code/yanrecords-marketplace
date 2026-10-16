@@ -375,6 +375,7 @@ function Toasts(props){
 function AuthPage(props){
   const [mode,setMode]=React.useState('login');
   const [email,setEmail]=React.useState(''),[pass,setPass]=React.useState(''),[name,setName]=React.useState('');
+  const [role,setRole]=React.useState('visitor');
   const [err,setErr]=React.useState(''),[busy,setBusy]=React.useState(false),[cgu,setCgu]=React.useState(false);
   async function submit(e){
     e.preventDefault();setErr('');
@@ -382,7 +383,7 @@ function AuthPage(props){
     setBusy(true);
     try{
       if(mode==='login'){const r=await sb.auth.signInWithPassword({email:email,password:pass});if(r.error)throw r.error;props.toast('Connecté !');}
-      else{const r=await sb.auth.signUp({email:email,password:pass,options:{data:{full_name:name||email.split('@')[0]}}});
+      else{const r=await sb.auth.signUp({email:email,password:pass,options:{data:{full_name:name||email.split('@')[0],role:role}}});
         if(r.error)throw r.error;
         if(r.data.user&&!r.data.session)props.toast('Vérifie ton email pour activer ton compte');else props.toast('Compte créé !');}
     }catch(ex){setErr(ex.message);}
@@ -412,6 +413,12 @@ function AuthPage(props){
           {mode==='register'?<div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste</label><input type="text" required maxLength="50" value={name} onChange={function(e){setName(e.target.value);}} placeholder="DJ Yanis" className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/></div>:null}
           <div><label className="text-xs font-bold text-gray-400 block mb-1">Email</label><input type="email" required value={email} onChange={function(e){setEmail(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/></div>
           <div><label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label><input type="password" required minLength="6" value={pass} onChange={function(e){setPass(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/></div>
+          {mode==='register'?<div className="space-y-2"><p className="text-xs font-bold text-gray-300">Je suis :</p>
+            <div className="grid grid-cols-3 gap-2">
+              <button type="button" onClick={function(){setRole('visitor');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='visitor'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">👤</span>Visiteur<span className="block text-[9px] font-normal text-gray-500 mt-0.5">J'achète des beats</span></button>
+              <button type="button" onClick={function(){setRole('artist');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='artist'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎤</span>Artiste<span className="block text-[9px] font-normal text-gray-500 mt-0.5">Je cherche des instrus</span></button>
+              <button type="button" onClick={function(){setRole('producer');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='producer'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎹</span>Producteur<span className="block text-[9px] font-normal text-gray-500 mt-0.5">Je vends mes prods</span></button>
+            </div></div>:null}
           {mode==='register'?<div className="flex items-start gap-3"><input type="checkbox" checked={cgu} onChange={function(e){setCgu(e.target.checked);}} className="mt-1 accent-goldAccent"/><label className="text-xs text-gray-400">J'accepte les <a href="#" onClick={function(e){e.preventDefault();window.openGuide&&window.openGuide('cgu');}} className="text-goldAccent font-bold hover:underline">CGU</a>.</label></div>:null}
           {err?<div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{err}</div>:null}
           <button type="submit" disabled={busy} className={'w-full font-black py-3.5 rounded-xl mt-4 disabled:opacity-50 '+(mode==='login'?'bg-cyanNeon text-black gc':'bg-goldAccent text-black gg')}>{busy?'...':(mode==='login'?'CONNEXION':"S'INSCRIRE")}</button>
@@ -751,7 +758,7 @@ function HomeView(props){
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         {top.map(function(a){return <button key={a.id} onClick={function(){props.openProducer(a.id);}} className="card rounded-2xl p-4 text-center lift">
           <div className="ringg w-16 h-16 mx-auto mb-3"><img src={a.avatar_url||AV} className="w-full h-full rounded-full object-cover border-2 border-obsidian" alt=""/></div>
-          <p className="text-sm font-black text-white truncate">{a.name}</p><p className="text-[10px] text-gray-500">{a.count} créations</p></button>;})}
+          <p className="text-sm font-black text-white truncate">{a.name}</p><span className={'inline-block text-[9px] font-bold '+(a.role==='producer'?'text-goldAccent':a.role==='artist'?'text-pinkNeon':'text-gray-400')}>{a.role==='producer'?'🎹 Prod':a.role==='artist'?'🎤 Artiste':'👤'}</span><p className="text-[10px] text-gray-500">{a.count} créations</p></button>;})}
       </div></div>:null}
     <div className="card p-8 md:p-12 rounded-3xl border-cyanNeon/50 lift">
       <div className="flex items-center gap-3 mb-4"><div className="w-12 h-12 rounded-xl bg-cyanNeon/20 flex items-center justify-center"><Icon n="mic" c="w-6 h-6 text-cyanNeon"/></div><span className="text-xs font-bold text-cyanNeon uppercase tracking-widest">Pour les Artistes</span></div>
@@ -781,6 +788,7 @@ function ArtistsView(props){
       return <button key={a.id} onClick={function(){props.openProducer(a.id);}} className="card rounded-2xl p-6 text-center lift hover:border-pinkNeon/50">
         <div className="ringg w-20 h-20 mx-auto mb-4"><img src={a.avatar_url||AV} className="w-full h-full rounded-full object-cover border-2 border-obsidian" alt=""/></div>
         <p className="text-base font-black text-white truncate">{a.name}</p>
+        <span className={'inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full '+(a.role==='producer'?'bg-goldAccent/20 text-goldAccent':a.role==='artist'?'bg-pinkNeon/20 text-pinkNeon':'bg-gray-500/20 text-gray-400')}>{a.role==='producer'?'🎹 Producteur':a.role==='artist'?'🎤 Artiste':'👤 Visiteur'}</span>
         <p className="text-[11px] text-gray-500 mt-1">{a.count} créations · {fmt(a.plays)} ▶</p>
         <span className="inline-block mt-3 text-[11px] font-bold text-pinkNeon">Voir le profil →</span></button>;})}
     </div>}
@@ -821,6 +829,7 @@ function ProducerPage(props){
         <div className="flex-1 text-center md:text-left">
           <p className="text-[11px] font-black text-goldAccent uppercase tracking-[0.2em] mb-1">Producteur · 🇩🇿</p>
           <h1 className="text-4xl md:text-5xl font-black text-white leading-none">{data.name}</h1>
+          {data.role?<span className={'inline-block mt-2 text-[11px] font-black px-3 py-1 rounded-full '+(data.role==='producer'?'bg-goldAccent/20 text-goldAccent':data.role==='artist'?'bg-pinkNeon/20 text-pinkNeon':'bg-gray-500/20 text-gray-400')}>{data.role==='producer'?'🎹 Producteur':data.role==='artist'?'🎤 Artiste':'👤 Visiteur'}</span>:null}
           {data.bio?<p className="text-sm text-gray-300 mt-3 max-w-xl">{data.bio}</p>:<p className="text-sm text-gray-600 mt-3 italic">Pas encore de bio.</p>}
           {data.instagram?<a href={'https://instagram.com/'+String(data.instagram).replace('@','')} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-pinkNeon hover:underline"><Icon n="insta" c="w-4 h-4"/>@{String(data.instagram).replace('@','')}</a>:null}
         </div>
@@ -1121,7 +1130,7 @@ function DashboardView(props){
   return <div className="space-y-6 fade">
     <div className="flex flex-col md:flex-row justify-between gap-4 bg-cardDark border border-borderDark p-6 rounded-2xl">
       <div className="flex items-center gap-4"><img src={p.avatar_url||AV} className="w-16 h-16 rounded-full object-cover border-2 border-goldAccent" alt=""/>
-        <div><h2 className="text-2xl font-black text-white">{p.name}</h2><p className="text-xs text-gray-400">{props.email} <span className="text-[10px] text-gray-600">(privé)</span></p>
+        <div><h2 className="text-2xl font-black text-white">{p.name} <span className={'text-[11px] font-black px-2 py-0.5 rounded-full '+(p.role==='producer'?'bg-goldAccent/20 text-goldAccent':p.role==='artist'?'bg-pinkNeon/20 text-pinkNeon':'bg-gray-500/20 text-gray-400')}>{p.role==='producer'?'🎹 Producteur':p.role==='artist'?'🎤 Artiste':'👤 Visiteur'}</span></h2><p className="text-xs text-gray-400">{props.email} <span className="text-[10px] text-gray-600">(privé)</span></p>
         {!p.legal_name?<p className="text-[11px] text-yellow-400 mt-1">⚠️ Nom légal manquant → ventes exclusives bloquées</p>:null}</div></div>
       <div className="flex gap-2 self-start flex-wrap">
         <button onClick={function(){props.openProducer(p.id);}} className="border border-pinkNeon text-pinkNeon font-black px-5 py-3 rounded-xl text-sm hover:bg-pinkNeon/10 transition">Mon profil public</button>
@@ -1166,6 +1175,7 @@ function DashboardView(props){
 }
 
 function UploadView(props){
+  if(!props.profile||props.profile.role!=='producer')return <div className="max-w-2xl mx-auto card p-8 rounded-2xl border-goldAccent/40 fade text-center"><h2 className="text-2xl font-black text-white mb-3">Publication réservée aux producteurs</h2><p className="text-gray-400 mb-6">Tu dois être producteur pour publier des beats ou VST. Change ton rôle dans Paramètres.</p><button onClick={function(){props.setView('settings');}} className="bg-goldAccent text-black font-black px-6 py-3 rounded-xl">Aller dans Paramètres</button></div>;
   const [title,setTitle]=React.useState(''),[type,setType]=React.useState('beat'),[genre,setGenre]=React.useState('Drill');
   const [bpm,setBpm]=React.useState(140),[mkey,setMkey]=React.useState('Am');
   const [p1,setP1]=React.useState(2000),[p2,setP2]=React.useState(4000),[p3,setP3]=React.useState(8000),[p4,setP4]=React.useState(25000);
@@ -1250,9 +1260,10 @@ function SettingsView(props){
   const p=props.profile;
   const [name,setName]=React.useState(p.name||''),[legal,setLegal]=React.useState(p.legal_name||'');
   const [rip,setRip]=React.useState(p.rip||''),[bio,setBio]=React.useState(p.bio||''),[insta,setInsta]=React.useState(p.instagram||'');
+  const [role,setRole]=React.useState(p.role||'visitor');
   const [avatar,setAvatar]=React.useState(null),[preview,setPreview]=React.useState(p.avatar_url||AV),[busy,setBusy]=React.useState(false);
   async function submit(e){e.preventDefault();setBusy(true);
-    await props.save({name:name,legal_name:legal,rip:rip,bio:bio,instagram:insta,avatar:avatar});setAvatar(null);setBusy(false);}
+    await props.save({name:name,legal_name:legal,rip:rip,bio:bio,instagram:insta,avatar:avatar,role:role});setAvatar(null);setBusy(false);}
   return <div className="max-w-2xl mx-auto card p-8 rounded-3xl fade">
     <h2 className="text-3xl font-black text-white mb-6 border-b border-borderDark pb-6">Paramètres</h2>
     <form onSubmit={submit} className="space-y-5">
@@ -1260,6 +1271,15 @@ function SettingsView(props){
         <div className="ringg w-24 h-24"><img src={preview} className="w-full h-full rounded-full object-cover border-2 border-obsidian" alt=""/></div>
         <div className="flex-1 w-full"><label className="text-xs font-bold text-gray-400 block mb-2">Photo (max 5MB)</label>
         <input type="file" accept="image/*" onChange={function(e){const f=e.target.files[0];if(f){setAvatar(f);setPreview(URL.createObjectURL(f));}}} className="w-full text-sm text-gray-400 file:bg-cyanNeon file:text-black file:border-0 file:rounded-xl file:px-4 file:py-2 file:mr-4 file:font-bold"/></div>
+      </div>
+      <div className="p-5 rounded-2xl bg-cyanNeon/5 border border-cyanNeon/30">
+        <label className="text-xs font-bold text-cyanNeon block mb-2 uppercase">Mon rôle</label>
+        <div className="grid grid-cols-3 gap-2">
+          <button type="button" onClick={function(){setRole('visitor');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='visitor'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">👤</span>Visiteur</button>
+          <button type="button" onClick={function(){setRole('artist');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='artist'?'border-pinkNeon bg-pinkNeon/10 text-pinkNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎤</span>Artiste</button>
+          <button type="button" onClick={function(){setRole('producer');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='producer'?'border-goldAccent bg-goldAccent/10 text-goldAccent':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎹</span>Producteur</button>
+        </div>
+        <p className="text-[11px] text-gray-500 mt-2">Modifiable à tout moment. Seuls les producteurs peuvent publier des beats/VST.</p>
       </div>
       <div><label className="text-xs font-bold text-gray-400 block mb-1">Nom d'Artiste (public)</label><input type="text" required maxLength="50" value={name} onChange={function(e){setName(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none"/></div>
       <div className="p-5 rounded-2xl bg-pinkNeon/5 border border-pinkNeon/30">
@@ -1519,7 +1539,7 @@ function App(){
     if(r.error){setProfileErr(r.error.message);return;}
     if(tries<2){setTimeout(function(){loadProfile(uid,tries+1);},1500);return;}
     const u=(await sb.auth.getUser()).data.user;
-    const ins=await sb.from('profiles').insert({id:uid,name:(u.user_metadata&&u.user_metadata.full_name)||u.email.split('@')[0],email:u.email}).select().single();
+    const ins=await sb.from('profiles').insert({id:uid,name:(u.user_metadata&&u.user_metadata.full_name)||u.email.split('@')[0],email:u.email,role:(u.user_metadata&&u.user_metadata.role)||'visitor'}).select().single();
     if(ins.data)setProfile(ins.data);else setProfileErr(ins.error?ins.error.message:'Profil introuvable');
   }
   async function loadFavs(uid){const r=await sb.from('favorites').select('track_id').eq('user_id',uid);if(r.data)setFavs(r.data.map(function(x){return x.track_id;}));}
@@ -1532,7 +1552,7 @@ function App(){
               :await sb.from('favorites').insert({user_id:session.user.id,track_id:id});
     if(r.error){toast(r.error.message,'error');loadFavs(session.user.id);}
     else toast(on?'Retiré des favoris':'Ajouté aux favoris ♥');}
-  async function loadProducers(){const r=await sb.rpc('list_producers');if(r.data)setAllProfiles(r.data);}
+  async function loadProducers(){const r=await sb.from('profiles').select('id,name,avatar_url,role');if(r.data)setAllProfiles(r.data);}
   async function loadNotifications(uid){const r=await sb.from('notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(30);if(r.data)setNotifications(r.data);}
   async function loadFollowers(uid){const r=await sb.rpc('get_producer',{p_id:uid});if(r.data)setMyFollowers(r.data.followers||0);}
   async function loadMsgUnread(){const r=await sb.rpc('my_conversations');
@@ -1637,7 +1657,7 @@ function App(){
         if(up.error)throw up.error;
         url=sb.storage.from('avatars').getPublicUrl(n).data.publicUrl;}
       const r=await sb.from('profiles').update({name:d.name,legal_name:(d.legal_name||'').trim()||null,
-        rip:d.rip,bio:d.bio,instagram:d.instagram,avatar_url:url}).eq('id',profile.id).select().single();
+        rip:d.rip,bio:d.bio,instagram:d.instagram,avatar_url:url,role:d.role||profile.role||'visitor'}).eq('id',profile.id).select().single();
       if(r.error)throw r.error;
       setProfile(r.data);toast('Profil sauvegardé !');setView('dashboard');
     }catch(ex){toast(ex.message,'error');}}
@@ -1718,13 +1738,13 @@ function App(){
     +withdrawals.filter(function(w){return w.status==='pending';}).length;
   const unread=notifications.filter(function(n){return !n.is_read;}).length;
   const pmap={};
-  allProfiles.forEach(function(p){pmap[p.id]={id:p.id,name:p.name||'Producteur',avatar_url:p.avatar_url||null,count:0,plays:0};});
+  allProfiles.forEach(function(p){pmap[p.id]={id:p.id,name:p.name||'Producteur',avatar_url:p.avatar_url||null,count:0,plays:0,role:p.role||'visitor'};});
   tracks.forEach(function(t){
     if(!t.producer_id)return;
-    if(!pmap[t.producer_id])pmap[t.producer_id]={id:t.producer_id,name:t.producer_name||'Producteur',avatar_url:null,count:0,plays:0};
+    if(!pmap[t.producer_id])pmap[t.producer_id]={id:t.producer_id,name:t.producer_name||'Producteur',avatar_url:null,count:0,plays:0,role:'producer'};
     pmap[t.producer_id].count++;pmap[t.producer_id].plays+=(t.plays||0);});
   if(pmap[profile.id])pmap[profile.id].avatar_url=profile.avatar_url;
-  const producers=Object.keys(pmap).map(function(k){return pmap[k];}).sort(function(a,b){return b.count-a.count;});
+  const producers=Object.keys(pmap).map(function(k){return pmap[k];}).filter(function(p){return p.role==='producer'||(!p.role&&p.count>0);}).sort(function(a,b){return b.count-a.count;});
 
   return <div className="relative">
     <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
@@ -1766,5 +1786,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b08b372c69ec9e',t:'MTc5MjA4NTM0Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4b39c97b81f2834',t:'MTc5MjExNzUxMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
