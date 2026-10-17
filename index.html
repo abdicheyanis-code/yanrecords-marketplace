@@ -239,7 +239,7 @@ const AR={'Accueil':'الرئيسية','VSTs':'إضافات VST','Beats':'بيت
 'Mes commandes':'طلباتي','Messages':'الرسائل','Mes clés VST':'مفاتيح VST','Mes favoris':'مفضلتي','Paramètres':'الإعدادات','Déconnexion':'تسجيل الخروج',
 'Dashboard':'لوحة التحكم','Guide & Infos':'الدليل والمعلومات','Vérifier une clé':'التحقق من مفتاح','BEATSTORE':'متجر البيتات','PLUGINS VST':'إضافات VST',
 'LES PRODUCTEURS':'المنتجون','MES COMMANDES':'طلباتي','MES FAVORIS':'مفضلتي','Derniers beats':'أحدث البيتات','Les plus écoutés':'الأكثر استماعا',
-'Beat du jour':'بيت اليوم','Comment ça marche':'كيف يعمل الموقع','Voir tout →':'عرض الكل ←','Explorer le beatstore':'تصفح المتجر','Publier mes prods':'انشر إنتاجاتك',
+'Beat du jour':'بيت اليوم','Le beatmaker':'المنتج','Voir son profil':'شاهد ملفه','Partager':'مشاركة','Copier le lien':'نسخ الرابط','Comment ça marche':'كيف يعمل الموقع','Voir tout →':'عرض الكل ←','Explorer le beatstore':'تصفح المتجر','Publier mes prods':'انشر إنتاجاتك',
 'Producteurs':'منتجون','Beats en ligne':'بيت متوفر','Écoutes':'استماع','La marketplace musicale algérienne':'السوق الموسيقي الجزائري','Le son de':'صوت',"l'Algérie":'الجزائر','Marché musical algérien':'السوق الموسيقي الجزائري',
 'Beats, plugins VST et contrat PDF officiel à chaque vente.':'بيتات وإضافات VST وعقد PDF رسمي مع كل عملية بيع.',
 '1. Écoute':'١. استمع','Trouve le beat qui te correspond.':'اعثر على البيت الذي يناسبك.','2. Choisis ta licence':'٢. اختر رخصتك',
@@ -477,6 +477,32 @@ function RateBtn(props){
 function Stars(props){
   return <span className="text-goldAccent tracking-wider">{[1,2,3,4,5].map(function(i){return <span key={i} className={i<=props.n?'':'text-gray-700'}>★</span>;})}</span>;
 }
+function ShareBtn(props){
+  const [open,setOpen]=React.useState(false),[copied,setCopied]=React.useState(false);
+  const b=props.t;
+  const url=window.location.origin+window.location.pathname;
+  const msg='🎧 '+b.title+' — par '+(b.producer_name||'un producteur 213WAVE')+'\n💰 '+fmt(b.price_mp3)+' DZD sur 213WAVE 🇩🇿\n'+url;
+  function close(){setOpen(false);}
+  function doShare(e){e.stopPropagation();
+    if(navigator.share){navigator.share({title:b.title,text:msg}).catch(function(){});}
+    else setOpen(!open);
+  }
+  function go(u){window.open(u,'_blank','noopener,noreferrer');close();}
+  function copyLink(){try{navigator.clipboard.writeText(url);}catch(e){}setCopied(true);setTimeout(function(){setCopied(false);close();},1200);}
+  const big=!!props.big;
+  return <div className="relative flex-shrink-0">
+    {open?<div className="fixed inset-0 z-40" onClick={function(e){e.stopPropagation();close();}}></div>:null}
+    <button onClick={doShare} title="Partager" className={big?'h-11 px-5 rounded-xl border border-cyanNeon text-cyanNeon font-black text-xs flex items-center gap-2 hover:bg-cyanNeon/10 transition hover:scale-105':'w-9 h-9 rounded-xl border border-borderDark text-gray-400 hover:text-cyanNeon hover:border-cyanNeon flex items-center justify-center transition hover:scale-110'}>
+      <Icon n="share" c="w-4 h-4"/>{big?tr('Partager'):''}
+    </button>
+    {open?<div className="absolute bottom-12 right-0 z-50 card rounded-2xl border border-borderDark p-2.5 flex items-center gap-2 shadow-2xl">
+      <button onClick={function(e){e.stopPropagation();go('https://wa.me/?text='+encodeURIComponent(msg));}} title="WhatsApp" className="w-10 h-10 rounded-xl bg-green-500 text-white font-black text-xs hover:scale-110 transition">WA</button>
+      <button onClick={function(e){e.stopPropagation();go('https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(msg));}} title="Telegram" className="w-10 h-10 rounded-xl bg-sky-500 text-white font-black text-xs hover:scale-110 transition">TG</button>
+      <button onClick={function(e){e.stopPropagation();go('https://twitter.com/intent/tweet?text='+encodeURIComponent(msg));}} title="X" className="w-10 h-10 rounded-xl bg-white text-black font-black text-xs hover:scale-110 transition">X</button>
+      <button onClick={function(e){e.stopPropagation();copyLink();}} title="Copier le lien" className={'w-10 h-10 rounded-xl border flex items-center justify-center transition hover:scale-110 '+(copied?'border-greenPro text-greenPro bg-greenPro/10':'border-borderDark text-gray-300 hover:text-cyanNeon hover:border-cyanNeon')}><Icon n={copied?'check':'copy'} c="w-4 h-4"/></button>
+    </div>:null}
+  </div>;
+}
 function ReviewsModal(props){
   const t=props.track;
   const [list,setList]=React.useState(null),[rating,setRating]=React.useState(5),[comment,setComment]=React.useState(''),[busy,setBusy]=React.useState(false);
@@ -555,7 +581,7 @@ function TrackCard(props){
       <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.bpm} BPM</span>
       <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.key}</span></div>
     <div className="flex items-center gap-2 flex-wrap">
-      <FavBtn id={b.id} favs={props.favs} toggle={props.toggleFav}/><RateBtn track={b} ratings={props.ratings} open={props.openReviews}/>
+      <FavBtn id={b.id} favs={props.favs} toggle={props.toggleFav}/><RateBtn track={b} ratings={props.ratings} open={props.openReviews}/><ShareBtn t={b}/>
       {!b.is_sold?<button onClick={function(){props.buy(b);}} className="flex-1 bg-goldAccent text-black font-black px-3 py-2 rounded-xl text-xs whitespace-nowrap hover:scale-105 transition">{fmt(b.price_mp3)} DZD</button>:null}
     </div></div>;
 }
@@ -718,6 +744,7 @@ function HomeView(props){
   const latest=beats.slice(0,4);
   const topP=beats.slice().sort(function(a,b){return (b.plays||0)-(a.plays||0);}).slice(0,4);
   const daily=beats.length?beats[Math.floor(Date.now()/86400000)%beats.length]:null;
+  const dailyProd=daily?(props.producers.filter(function(p){return p.id===daily.producer_id;})[0]||{id:daily.producer_id,name:daily.producer_name||'Producteur',avatar_url:null,role:'producer',count:0}):null;
   const totalPlays=props.tracks.reduce(function(sum,x){return sum+(x.plays||0);},0);
   const cp={current:props.current,playing:props.playing,play:props.play,buy:props.buy,favs:props.favs,toggleFav:props.toggleFav,ratings:props.ratings,openReviews:props.openReviews,openProducer:props.openProducer};
   function row(title,arr){return <div>
@@ -759,10 +786,33 @@ function HomeView(props){
           <div className="bg-black/40 border border-borderDark rounded-2xl p-4 text-center"><p className="text-2xl font-black text-cyanNeon"><CountUp to={beats.length}/></p><p className="text-[10px] text-gray-400 uppercase font-bold">{tr('Beats en ligne')}</p></div>
           <div className="bg-black/40 border border-borderDark rounded-2xl p-4 text-center"><p className="text-2xl font-black text-pinkNeon"><CountUp to={totalPlays}/></p><p className="text-[10px] text-gray-400 uppercase font-bold">{tr('Écoutes')}</p></div>
         </div></div></div>
-    {daily?<div className="card rounded-3xl p-5 md:p-6 border-goldAccent/40 flex flex-col sm:flex-row items-center gap-6">
-      <div className="w-full sm:w-56 flex-shrink-0"><TrackCard t={daily} {...cp}/></div>
-      <div className="text-center sm:text-left"><p className="text-xs font-black text-goldAccent uppercase tracking-widest mb-2">⭐ {tr('Beat du jour')}</p>
-        <h3 className="text-3xl font-black text-white">{daily.title}</h3><p className="text-gray-400 mt-1">{daily.producer_name}</p></div></div>:null}
+    {daily&&dailyProd?<div className="card rounded-3xl p-5 md:p-6 border-goldAccent/40">
+      <div className="flex flex-col lg:flex-row items-center gap-6">
+        <div className="w-full sm:w-56 flex-shrink-0"><TrackCard t={daily} {...cp}/></div>
+        <div className="flex-1 text-center lg:text-left">
+          <p className="text-xs font-black text-goldAccent uppercase tracking-widest mb-2">⭐ {tr('Beat du jour')}</p>
+          <h3 className="text-3xl font-black text-white">{daily.title}</h3>
+          <div className="flex gap-1.5 flex-wrap mt-2 justify-center lg:justify-start">
+            <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{daily.genre}</span>
+            <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{daily.bpm} BPM</span>
+            <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{daily.key}</span>
+          </div>
+          <div className="flex items-center gap-2 mt-5 justify-center lg:justify-start">
+            {!daily.is_sold?<button onClick={function(){props.buy(daily);}} className="bg-goldAccent text-black font-black px-6 py-3 rounded-xl text-sm hover:scale-105 transition">💰 {fmt(daily.price_mp3)} DZD</button>:null}
+            <ShareBtn t={daily} big/>
+          </div>
+        </div>
+        <div className="w-full lg:w-72 flex-shrink-0 rounded-2xl border border-goldAccent/30 bg-black/30 p-5">
+          <p className="text-[10px] font-black text-goldAccent uppercase tracking-[0.2em] mb-3 text-center">🎤 {tr('Le beatmaker')}</p>
+          <button onClick={function(){props.openProducer(dailyProd.id);}} className="block w-full hover:scale-105 transition">
+            <div className="ringg w-20 h-20 mx-auto mb-3"><img src={dailyProd.avatar_url||AV} className="w-full h-full rounded-full object-cover border-2 border-obsidian" alt=""/></div>
+            <p className="font-black text-white truncate max-w-full">{dailyProd.name}</p>
+          </button>
+          <div className="text-center mt-1"><span className={'inline-block text-[10px] font-black px-2.5 py-1 rounded-full '+(dailyProd.role==='producer'?'bg-goldAccent/20 text-goldAccent':dailyProd.role==='artist'?'bg-pinkNeon/20 text-pinkNeon':'bg-gray-500/20 text-gray-400')}>{dailyProd.role==='producer'?'🎹 Producteur':dailyProd.role==='artist'?'🎤 Artiste':'👤 Visiteur'}</span></div>
+          <p className="text-[11px] text-gray-500 mt-2 text-center">{dailyProd.count||0} créations</p>
+          <button onClick={function(){props.openProducer(dailyProd.id);}} className="w-full mt-4 bg-goldAccent text-black font-black px-4 py-2.5 rounded-xl text-xs hover:scale-105 transition">{tr('Voir son profil')} →</button>
+        </div>
+      </div></div>:null}
     {row('Derniers beats',latest)}
     {row('Les plus écoutés',topP)}
     <div><h3 className="dsp text-3xl text-white mb-4">{tr('Comment ça marche')}</h3>
@@ -947,7 +997,7 @@ function BeatsView(props){
         </div>
         <div className="hidden md:block col-span-3 text-sm text-gray-400">{b.bpm} BPM · {b.key} · {b.plays||0} ▶</div>
         <div className="col-span-full md:col-span-3 flex justify-end items-center gap-2">
-          <FavBtn id={b.id} favs={props.favs} toggle={props.toggleFav}/><RateBtn track={b} ratings={props.ratings} open={props.openReviews}/>
+          <FavBtn id={b.id} favs={props.favs} toggle={props.toggleFav}/><RateBtn track={b} ratings={props.ratings} open={props.openReviews}/><ShareBtn t={b}/>
           {b.is_sold?<span className="text-xs font-bold text-red-500 border border-red-800/50 px-4 py-2 rounded-xl">VENDU</span>
           :<button onClick={function(){props.buy(b);}} className="border border-goldAccent text-goldAccent font-bold px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">Acheter ({fmt(b.price_mp3)} DZD)</button>}
         </div></div>;})}
@@ -1812,5 +1862,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4c1477b8a10301c',t:'MTc5MjI2MDgyNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4c187ca5af9b225',t:'MTc5MjI2MzQ2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
