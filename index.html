@@ -586,6 +586,46 @@ function TrackCard(props){
     </div></div>;
 }
 
+function PriceModal(props){
+  const t=props.track,isVst=t.type==='vst';
+  const [p1,setP1]=React.useState(String(t.price_mp3||0));
+  const [p2,setP2]=React.useState(String(t.price_wav||0));
+  const [p3,setP3]=React.useState(String(t.price_stems||0));
+  const [p4,setP4]=React.useState(String(t.price_exclusive||0));
+  const [busy,setBusy]=React.useState(false);
+  async function save(){
+    setBusy(true);
+    const prices={price_mp3:parseInt(p1,10)||0};
+    if(!isVst){prices.price_wav=parseInt(p2,10)||0;prices.price_stems=parseInt(p3,10)||0;prices.price_exclusive=parseInt(p4,10)||0;}
+    const ok=await props.save(t.id,prices);
+    setBusy(false);
+    if(ok)props.close();
+  }
+  return <div className="fixed inset-0 z-[150] bg-black/75 flex items-center justify-center p-4" onClick={props.close}>
+    <div className="card rounded-2xl p-6 w-full max-w-md border border-goldAccent/40 pop" onClick={function(e){e.stopPropagation();}}>
+      <h3 className="text-lg font-black text-white mb-1">💰 Modifier les prix</h3>
+      <p className="text-xs text-gray-400 mb-4 truncate">{t.title} · {(t.type||'').toUpperCase()}</p>
+      {isVst?
+      <div className="p-4 rounded-xl bg-obsidian/60 border border-borderDark">
+        <p className="text-xs font-bold text-goldAccent uppercase mb-3">Prix du VST (DZD) · commission 8%</p>
+        <input type="number" min="0" value={p1} onChange={function(e){setP1(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2.5 text-white"/>
+      </div>
+      :<div className="p-4 rounded-xl bg-obsidian/60 border border-borderDark">
+        <p className="text-xs font-bold text-goldAccent uppercase mb-3">Prix (DZD) · commission 5%</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="text-[11px] text-gray-400">MP3</label><input type="number" min="0" value={p1} onChange={function(e){setP1(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+          <div><label className="text-[11px] text-gray-400">WAV</label><input type="number" min="0" value={p2} onChange={function(e){setP2(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+          <div><label className="text-[11px] text-gray-400">Stems</label><input type="number" min="0" value={p3} onChange={function(e){setP3(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+          <div><label className="text-[11px] text-gray-400">Exclusif</label><input type="number" min="0" value={p4} onChange={function(e){setP4(e.target.value);}} className="w-full bg-cardDark border border-borderDark rounded-lg p-2 text-white"/></div>
+        </div>
+      </div>}
+      <div className="flex gap-2 mt-5">
+        <button onClick={save} disabled={busy} className="flex-1 bg-goldAccent text-black font-black py-3 rounded-xl text-sm hover:scale-105 transition disabled:opacity-50">{busy?'...':'💾 Enregistrer'}</button>
+        <button onClick={props.close} className="px-6 py-3 rounded-xl text-sm font-bold border border-borderDark text-gray-300 hover:text-white transition">Annuler</button>
+      </div>
+    </div></div>;
+}
+
 function NavBar(props){
   const [open,setOpen]=React.useState(false),[bell,setBell]=React.useState(false);
   const p=props.profile;
@@ -1198,6 +1238,7 @@ function VerifyView(props){
 function DashboardView(props){
   const [amount,setAmount]=React.useState('');
   const [tab,setTab]=React.useState('pubs');
+  const [editPrice,setEditPrice]=React.useState(null);
   const [sales,setSales]=React.useState([]);
   const p=props.profile;
   const mine=props.tracks.filter(function(t){return t.producer_id===p.id;});
@@ -1235,6 +1276,7 @@ function DashboardView(props){
           <div className="min-w-0"><h4 className="font-bold text-white text-sm truncate">{t.title}</h4>
           <p className="text-xs text-gray-400">{(t.type||'').toUpperCase()} · {t.plays||0} écoutes {t.file_hash?'· 🔒 empreinte OK':''}</p></div></div>
         <div className="flex items-center gap-3"><span className="text-xs font-bold text-goldAccent">{fmt(t.price_mp3)} DZD</span>
+        <button onClick={function(){setEditPrice(t);}} title="Modifier le prix" className="p-2 bg-goldAccent/20 text-goldAccent rounded-lg hover:bg-goldAccent hover:text-black transition"><Icon n="money" c="w-4 h-4"/></button>
         <button onClick={function(){props.remove(t.id);}} className="p-2 bg-red-950/60 text-red-400 rounded-lg hover:bg-red-600 hover:text-white transition"><Icon n="trash" c="w-4 h-4"/></button></div></div>;})}
     </div>):(sales.length===0?<p className="text-gray-400 text-sm text-center py-6">Aucune vente pour le moment.</p>:
     <div className="space-y-3">{sales.map(function(s){
@@ -1247,6 +1289,7 @@ function DashboardView(props){
           <button onClick={function(){props.pdf(s.contract_no);}} className="bg-goldAccent text-black font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1"><Icon n="pdf" c="w-4 h-4"/>PDF</button>
         </div></div>;})}
     </div>)}
+    {editPrice?<PriceModal track={editPrice} save={props.savePrices} close={function(){setEditPrice(null);}}/>:null}
   </div>;
 }
 
@@ -1796,6 +1839,11 @@ function App(){
     if(r.error){toast(r.error.code==='23503'?'Impossible : ce produit a des ventes.':r.error.message,'error');return;}
     toast('Supprimé.');loadTracks();}
 
+  async function saveTrackPrices(id,prices){
+    const r=await sb.from('tracks').update(prices).eq('id',id);
+    if(r.error){toast(r.error.message,'error');return false;}
+    toast('Prix mis à jour 💰');loadTracks();return true;}
+
   function openBuy(item){if(!session){toast('Connecte-toi','error');return;}setBuyItem(item);}
   function share(){copy(window.location.href);}
 
@@ -1846,7 +1894,7 @@ function App(){
       {view==='keys'?<KeysView purchases={purchases} copy={copy} download={downloadVst} pdf={pdf}/>:null}
       {view==='messages'?<MessagesView me={session.user.id} initPeer={chatPeer} initName={chatName} toast={toast} openProducer={openProducer} refreshUnread={loadMsgUnread}/>:null}
       {view==='verify'?<VerifyView myKeys={myKeys}/>:null}
-      {view==='dashboard'?<DashboardView profile={profile} email={session.user.email} tracks={tracks} setView={setView} withdraw={requestWithdrawal} remove={removeTrack} followers={myFollowers} openProducer={openProducer} pdf={pdf}/>:null}
+      {view==='dashboard'?<DashboardView profile={profile} email={session.user.email} tracks={tracks} setView={setView} withdraw={requestWithdrawal} remove={removeTrack} savePrices={saveTrackPrices} followers={myFollowers} openProducer={openProducer} pdf={pdf}/>:null}
       {view==='upload'?<UploadView profile={profile} upload={uploadTrack}/>:null}
       {view==='settings'?<SettingsView profile={profile} save={saveProfile}/>:null}
       {(view==='admin'&&profile.is_admin)?<AdminView orders={adminOrders} withdrawals={withdrawals} validate={validateOrder} refuse={refuseOrder} payWd={payWithdrawal} pdf={pdf}/>:null}
@@ -1862,5 +1910,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4c187ca5af9b225',t:'MTc5MjI2MzQ2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4d8fac98b5cdc2f',t:'MTc5MjUwOTM0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
