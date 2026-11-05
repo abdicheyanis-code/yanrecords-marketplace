@@ -437,6 +437,7 @@ function AuthPage(props){
         </div>
       </div>
       <div className="card p-8 rounded-[2rem] border-cyanNeon/20">
+        {props.onClose?<button onClick={props.onClose} className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-white transition mb-2"><Icon n="back" c="w-4 h-4"/>{tr('Retour au site')}</button>:null}
         <div className="flex bg-obsidian rounded-xl p-1 mb-8 border border-borderDark">
           <button onClick={function(){setMode('login');setErr('');}} className={'flex-1 py-2.5 text-sm font-bold rounded-lg transition '+(mode==='login'?'bg-cyanNeon text-black':'text-gray-400')}>Se connecter</button>
           <button onClick={function(){setMode('register');setErr('');}} className={'flex-1 py-2.5 text-sm font-bold rounded-lg transition '+(mode==='register'?'bg-goldAccent text-black':'text-gray-400')}>Créer un compte</button>
@@ -647,10 +648,11 @@ function NavBar(props){
       </div>
       <div className="flex items-center gap-2 relative z-50">
         <button onClick={function(){setLang(LANG==='ar'?'fr':'ar');}} className="h-10 px-3 rounded-xl bg-cardDark border border-borderDark text-xs font-black text-goldAccent hover:border-goldAccent transition">{LANG==='ar'?'FR':'عربية'}</button>
-        <button onClick={function(){go('messages');}} className="relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-cyanNeon transition text-gray-300">
+        {!p?<button onClick={function(){props.login&&props.login();}} className="h-10 px-5 rounded-xl bg-goldAccent text-black text-xs font-black hover:scale-105 transition gg">{tr('Connexion')}</button>:null}
+        {p?<button onClick={function(){go('messages');}} className="relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-cyanNeon transition text-gray-300">
           <Icon n="chat" c="w-5 h-5"/>{props.msgUnread>0?<span className="dot"></span>:null}
-        </button>
-        <div className="relative">
+        </button>:null}
+        {p?<React.Fragment><div className="relative">
           <button onClick={openBell} className={'relative w-10 h-10 rounded-xl bg-cardDark border border-borderDark flex items-center justify-center hover:border-pinkNeon transition '+(props.unread>0?'text-pinkNeon':'text-gray-300')}>
             <Icon n="bell" c={'w-5 h-5 '+(props.unread>0?'shake':'')}/>{props.unread>0?<span className="dot"></span>:null}
           </button>
@@ -664,7 +666,7 @@ function NavBar(props){
               </button>;})}
           </div>:null}
         </div>
-        <button onClick={function(){go('upload');}} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs gc hover:scale-105 transition"><Icon n="up" c="w-4 h-4"/>{tr('Poster')}</button>
+        {p?<button onClick={function(){go('upload');}} className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-cyanNeon to-blue-600 text-black font-bold px-4 py-2 rounded-xl text-xs gc hover:scale-105 transition"><Icon n="up" c="w-4 h-4"/>{tr('Poster')}</button>:null}
         <div className="relative">
           <button onClick={function(){setOpen(!open);setBell(false);}} className="flex items-center gap-2 bg-cardDark border border-borderDark px-2 py-1.5 rounded-xl hover:border-cyanNeon transition relative">
             <img src={(p&&p.avatar_url)?p.avatar_url:AV} className="w-7 h-7 rounded-full object-cover" alt=""/>
@@ -687,18 +689,19 @@ function NavBar(props){
             <div className="h-px bg-borderDark my-1"></div>
             <button onClick={props.logout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-400 hover:bg-red-500/10 transition"><Icon n="out" c="w-4 h-4"/>{tr('Déconnexion')}</button>
           </div>:null}
-        </div>
+        </div></React.Fragment>:null}
       </div>
     </nav>
   </React.Fragment>;
 }
 
 function MobileNav(props){
-  const items=[{v:'home',n:'home',l:'Accueil'},{v:'beats',n:'note',l:'Beats'},{v:'vsts',n:'cpu',l:'VSTs'},{v:'messages',n:'chat',l:'Chat'},{v:'upload',n:'up',l:'Poster'}];
+  const items=props.guest?[{v:'home',n:'home',l:'Accueil'},{v:'beats',n:'note',l:'Beats'},{v:'vsts',n:'cpu',l:'VSTs'},{v:'artists',n:'star',l:'Artistes'},{v:'login',n:'lock',l:'Connexion'}]
+    :[{v:'home',n:'home',l:'Accueil'},{v:'beats',n:'note',l:'Beats'},{v:'vsts',n:'cpu',l:'VSTs'},{v:'messages',n:'chat',l:'Chat'},{v:'upload',n:'up',l:'Poster'}];
   if(props.isAdmin)items.push({v:'admin',n:'list',l:'Admin'});
   return <nav className={'md:hidden fixed inset-x-0 z-40 glass border-t border-borderDark px-2 py-2 flex justify-around '+(props.hasPlayer?'bottom-[96px]':'bottom-0')}>
     {items.map(function(it){
-      return <button key={it.v} onClick={function(){props.setView(it.v);}} className={'relative flex flex-col items-center gap-1 transition '+(props.view===it.v?'text-cyanNeon scale-110':'text-gray-400')}>
+      return <button key={it.v} onClick={function(){if(it.v==='login'){props.login&&props.login();}else props.setView(it.v);}} className={'relative flex flex-col items-center gap-1 transition '+(props.view===it.v?'text-cyanNeon scale-110':'text-gray-400')}>
         <Icon n={it.n} c="w-5 h-5"/><span className="text-[9px] font-bold">{tr(it.l)}</span>
         {(it.v==='messages'&&props.msgUnread>0)?<span className="dot"></span>:null}</button>;})}
   </nav>;
@@ -923,6 +926,7 @@ function ProducerPage(props){
   const beats=mine.filter(function(t){return t.type==='beat';});
   const vsts=mine.filter(function(t){return t.type==='vst';});
   async function follow(){
+    if(!props.me){props.needAuth&&props.needAuth('Connecte-toi pour t\'abonner');return;}
     setBusy(true);
     const r=await sb.rpc('toggle_follow',{p_id:props.id});
     if(r.error)props.toast(r.error.message,'error');
@@ -931,6 +935,7 @@ function ProducerPage(props){
     setBusy(false);
   }
   async function bell(){
+    if(!props.me){props.needAuth&&props.needAuth('Connecte-toi pour activer les notifications');return;}
     const r=await sb.rpc('toggle_bell',{p_id:props.id});
     if(r.error){props.toast(r.error.message,'error');return;}
     setData(Object.assign({},data,{notify:r.data.notify}));
@@ -1603,6 +1608,12 @@ function App(){
   if(!audio.current)audio.current=new Audio();
 
   function setView(v){setViewRaw(v);window.scrollTo({top:0,behavior:'smooth'});}
+  const [showAuth,setShowAuth]=React.useState(false);
+  function needAuth(msg){toast(msg||'Connecte-toi pour continuer','error');setShowAuth(true);}
+  function setViewGuest(v){
+    if(v==='home'||v==='beats'||v==='vsts'||v==='artists'||v==='producer'||v==='verify')setView(v);
+    else needAuth('Connecte-toi pour accéder à cette page');
+  }
   function toast(msg,type){const id=Date.now()+Math.random();
     setToasts(function(p){return p.concat([{id:id,msg:msg,type:type||'success'}]);});
     setTimeout(function(){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});},4000);}
@@ -1637,7 +1648,7 @@ function App(){
     return function(){io.disconnect();};
   },[view]);
   React.useEffect(function(){if(profile&&profile.is_admin){loadAdminOrders();loadWithdrawals();}},[profile&&profile.is_admin]);
-  React.useEffect(function(){if(session)loadProducers();},[session&&session.user.id]);
+  React.useEffect(function(){loadProducers();},[session&&session.user.id]);
   React.useEffect(function(){loadRatings();if(session)loadFavs(session.user.id);else setFavs([]);},[session&&session.user.id]);
 
   React.useEffect(function(){
@@ -1665,14 +1676,14 @@ function App(){
   async function loadFavs(uid){const r=await sb.from('favorites').select('track_id').eq('user_id',uid);if(r.data)setFavs(r.data.map(function(x){return x.track_id;}));}
   async function loadRatings(){const r=await sb.rpc('track_ratings');if(r.data){const m={};r.data.forEach(function(x){m[x.track_id]={avg:x.avg_rating,nb:Number(x.nb)};});setRatings(m);}}
   async function toggleFav(id){
-    if(!session){toast('Connecte-toi','error');return;}
+    if(!session){needAuth('Connecte-toi pour ajouter aux favoris');return;}
     const on=favs.indexOf(id)>=0;
     setFavs(on?favs.filter(function(x){return x!==id;}):favs.concat([id]));
     const r=on?await sb.from('favorites').delete().eq('user_id',session.user.id).eq('track_id',id)
               :await sb.from('favorites').insert({user_id:session.user.id,track_id:id});
     if(r.error){toast(r.error.message,'error');loadFavs(session.user.id);}
     else toast(on?'Retiré des favoris':'Ajouté aux favoris ♥');}
-  async function loadProducers(){const r=await sb.from('profiles').select('id,name,avatar_url,role');if(r.data)setAllProfiles(r.data);}
+  async function loadProducers(){const r=await sb.from('public_profiles').select('id,name,avatar_url,role');if(r.data)setAllProfiles(r.data);}
   async function loadNotifications(uid){const r=await sb.from('notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(30);if(r.data)setNotifications(r.data);}
   async function loadFollowers(uid){const r=await sb.rpc('get_producer',{p_id:uid});if(r.data)setMyFollowers(r.data.followers||0);}
   async function loadMsgUnread(){const r=await sb.rpc('my_conversations');
@@ -1697,7 +1708,7 @@ function App(){
     const bm={},tm={};
     const b=r.data.map(function(o){return o.buyer_id;});const t2=r.data.map(function(o){return o.track_id;});
     if(b.length){
-      const p=await sb.from('profiles').select('id,name').in('id',b);
+      const p=await sb.from('public_profiles').select('id,name').in('id',b);
       if(p.data&&p.data.length){p.data.forEach(function(x){bm[x.id]=x.name;});}
       else{const p2=await sb.rpc('list_producers');(p2.data||[]).forEach(function(x){bm[x.id]=x.name;});}
     }
@@ -1845,19 +1856,10 @@ function App(){
     if(r.error){toast(r.error.message,'error');return false;}
     toast('Prix mis à jour 💰');loadTracks();return true;}
 
-  function openBuy(item){if(!session){toast('Connecte-toi','error');return;}setBuyItem(item);}
+  function openBuy(item){if(!session){needAuth('Connecte-toi pour acheter');return;}setBuyItem(item);}
   function share(){copy(window.location.href);}
 
   if(loading)return <div className="min-h-screen flex items-center justify-center relative overflow-hidden"><MatrixRain/><div className="relative z-10 w-16 h-16 rounded-2xl bg-black/60 border border-green-500/50 font-black text-3xl gg flex items-center justify-center animate-pulse backdrop-blur"><span style={{color:'#00a651'}}>٢</span><span style={{color:'#ffffff'}}>١</span><span style={{color:'#d52b1e'}}>٣</span></div></div>;
-  if(!session)return <React.Fragment>
-    <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
-    <AuthPage toast={toast}/><GuideOverlay/></React.Fragment>;
-  if(!profile)return <div className="min-h-screen flex items-center justify-center p-4"><div className="card p-8 rounded-2xl text-center max-w-md">
-    {profileErr?<React.Fragment><h2 className="text-xl font-black text-white mb-2">Profil inaccessible</h2>
-    <p className="text-xs text-red-400 mb-4">{profileErr}</p>
-    <button onClick={logout} className="bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Se déconnecter</button></React.Fragment>
-    :<div className="loader mx-auto"></div>}</div></div>;
-
   const myKeys=purchases.filter(function(p){return p.license_type==='vst'&&p.vst_key;});
   const pendingCount=adminOrders.filter(function(o){return o.status==='pending';}).length
     +withdrawals.filter(function(w){return w.status==='pending';}).length;
@@ -1868,8 +1870,38 @@ function App(){
     if(!t.producer_id)return;
     if(!pmap[t.producer_id])pmap[t.producer_id]={id:t.producer_id,name:t.producer_name||'Producteur',avatar_url:null,count:0,plays:0,role:'producer'};
     pmap[t.producer_id].count++;pmap[t.producer_id].plays+=(t.plays||0);});
-  if(pmap[profile.id])pmap[profile.id].avatar_url=profile.avatar_url;
+  if(profile&&pmap[profile.id])pmap[profile.id].avatar_url=profile.avatar_url;
   const producers=Object.keys(pmap).map(function(k){return pmap[k];}).filter(function(p){return p.role==='producer'||(!p.role&&p.count>0);}).sort(function(a,b){return b.count-a.count;});
+
+  if(!session)return <div className="relative">
+    <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
+    <div className="aurora"></div>
+    <div className="spotlight" style={{left:spot.x-200,top:spot.y-200}}></div>
+    <div className="cursor-dot" style={{left:spot.x,top:spot.y}}></div>
+    <div className="cursor-ring" style={{left:spot.x,top:spot.y}}></div>
+    <NavBar view={view} setView={setViewGuest} profile={null} login={function(){setShowAuth(true);}}/>
+    <MobileNav view={view} setView={setViewGuest} hasPlayer={!!current} msgUnread={0} guest login={function(){setShowAuth(true);}}/>
+    <div key={view} className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto fade">
+      {view!=='home'?<button onClick={function(){setView('home');}} className="mb-6 flex items-center gap-2 text-gray-400 text-sm font-bold hover:text-white transition"><Icon n="back" c="w-4 h-4"/>{tr('Retour')}</button>:null}
+      {view==='home'?<HomeView setView={setViewGuest} producers={producers} openProducer={openProducer} tracks={tracks} ready={tracksReady} play={play} playing={playing} current={current} buy={openBuy} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
+      {view==='beats'?<BeatsView ready={tracksReady} tracks={tracks} producers={producers} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
+      {view==='vsts'?<VstsView tracks={tracks} myKeys={[]} buy={openBuy} setView={setViewGuest} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
+      {view==='artists'?<ArtistsView producers={producers} openProducer={openProducer}/>:null}
+      {(view==='producer'&&producerId)?<ProducerPage id={producerId} me={null} tracks={tracks} play={play} playing={playing} current={current} buy={openBuy} toast={toast} setView={setViewGuest} share={share} openChat={function(){needAuth('Connecte-toi pour contacter ce producteur');}} needAuth={needAuth}/>:null}
+      {view==='verify'?<VerifyView myKeys={[]}/>:null}
+    </div>
+    {reviewTrack?<ReviewsModal track={reviewTrack} me={null} profile={null} bought={false} close={function(){setReviewTrack(null);}} toast={toast} refresh={loadRatings}/>:null}
+    <GuideOverlay/>
+    {current?<Player track={current} playing={playing} play={play} progress={progress} duration={duration} time={time}
+      seek={seek} volume={volume} muted={muted} setVolume={changeVolume} toggleMute={toggleMute} buy={openBuy} openProducer={openProducer}/>:null}
+    {showAuth?<div className="fixed inset-0 z-[200] overflow-y-auto"><AuthPage toast={toast} onClose={function(){setShowAuth(false);}}/></div>:null}
+  </div>;
+
+  if(!profile)return <div className="min-h-screen flex items-center justify-center p-4"><div className="card p-8 rounded-2xl text-center max-w-md">
+    {profileErr?<React.Fragment><h2 className="text-xl font-black text-white mb-2">Profil inaccessible</h2>
+    <p className="text-xs text-red-400 mb-4">{profileErr}</p>
+    <button onClick={logout} className="bg-cyanNeon text-black px-6 py-3 rounded-xl font-bold">Se déconnecter</button></React.Fragment>
+    :<div className="loader mx-auto"></div>}</div></div>;
 
   return <div className="relative">
     <Toasts items={toasts} remove={function(id){setToasts(function(p){return p.filter(function(t){return t.id!==id;});});}}/>
@@ -1911,5 +1943,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a55da3a80a8e2e36',t:'MTc5MzkwMDM4MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a55da3a80a8e2e36',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
