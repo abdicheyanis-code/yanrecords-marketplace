@@ -484,7 +484,8 @@ function ShareBtn(props){
   const msg='🎧 '+b.title+' — par '+(b.producer_name||'un producteur 213WAVE')+'\n💰 '+fmt(b.price_mp3)+' DZD sur 213WAVE 🇩🇿\n'+url;
   function close(){setOpen(false);}
   function doShare(e){e.stopPropagation();
-    if(navigator.share){navigator.share({title:b.title,text:msg}).catch(function(){});}
+    const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    if(navigator.share&&isMobile){navigator.share({title:b.title,text:msg}).catch(function(){});}
     else setOpen(!open);
   }
   function go(u){window.open(u,'_blank','noopener,noreferrer');close();}
@@ -1910,5 +1911,5 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Boundary><App/></Boundary>);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4d8fac98b5cdc2f',t:'MTc5MjUwOTM0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
