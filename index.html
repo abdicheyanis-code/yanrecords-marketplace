@@ -1135,7 +1135,7 @@ function MyOrdersView(props){
         <div className="flex flex-col gap-2 items-end">
           {badge}
           {o.contract_no?<button onClick={function(){props.pdf(o.contract_no);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 hover:scale-105 transition"><Icon n="pdf" c="w-4 h-4"/>Contrat PDF</button>:null}
-          {o.track&&o.track.audio_url&&o.product_type==='beat'?<button onClick={function(){downloadAudio(o.track,o.license_type);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Télécharger le beat</button>:null}
+          {o.status==='validated'&&o.track&&o.track.audio_url&&o.product_type==='beat'?<button onClick={function(){downloadAudio(o.track,o.license_type);}} className="bg-cyanNeon text-black font-bold px-4 py-2 rounded-xl text-xs">Télécharger le beat</button>:null}
         </div></div>;})}
     </div>}
   </section>;
