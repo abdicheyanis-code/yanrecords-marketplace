@@ -438,7 +438,7 @@ function Toasts(props){
 
 function AuthPage(props){
   const [mode,setMode]=React.useState('login');
-  const [email,setEmail]=React.useState(''),[pass,setPass]=React.useState(''),[name,setName]=React.useState('');
+  const [email,setEmail]=React.useState(function(){try{return localStorage.getItem('yan_mail')||'';}catch(e){return '';}}),[pass,setPass]=React.useState(''),[name,setName]=React.useState('');
   const [role,setRole]=React.useState('visitor');
   const [err,setErr]=React.useState(''),[busy,setBusy]=React.useState(false),[cgu,setCgu]=React.useState(false);
   async function submit(e){
@@ -446,7 +446,7 @@ function AuthPage(props){
     if(mode==='register'&&!cgu){setErr('Vous devez accepter les CGU.');return;}
     setBusy(true);
     try{
-      if(mode==='login'){const r=await sb.auth.signInWithPassword({email:email,password:pass});if(r.error)throw r.error;props.toast('Connecté !');}
+      if(mode==='login'){const r=await sb.auth.signInWithPassword({email:email,password:pass});if(r.error)throw r.error;try{localStorage.setItem('yan_mail',email);}catch(e){}window.__yanOut=false;props.toast('Connecté !');}
       else{const r=await sb.auth.signUp({email:email,password:pass,options:{data:{full_name:name||email.split('@')[0],role:role}}});
         if(r.error)throw r.error;
         if(r.data.user&&!r.data.session)props.toast('Vérifie ton email pour activer ton compte');else props.toast('Compte créé !');}
@@ -1774,17 +1774,20 @@ function App(){
       const s=r.data.session;setSession(s);
       if(s){loadProfile(s.user.id);loadPurchases(s.user.id);loadMyOrders(s.user.id);loadNotifications(s.user.id);loadFollowers(s.user.id);loadMsgUnread();}
       loadTracks();setLoading(false);});
+    let hadSess=false;
     const sub=sb.auth.onAuthStateChange(function(e,s){
       setSession(s);
       if(e==='PASSWORD_RECOVERY')setPwReset(true);
-      if(s){loadProfile(s.user.id);loadPurchases(s.user.id);loadMyOrders(s.user.id);loadNotifications(s.user.id);loadFollowers(s.user.id);loadMsgUnread();}
-      else{setProfile(null);setPurchases([]);setMyOrders([]);setAdminOrders([]);setNotifications([]);}});
+      if(s){hadSess=true;loadProfile(s.user.id);loadPurchases(s.user.id);loadMyOrders(s.user.id);loadNotifications(s.user.id);loadFollowers(s.user.id);loadMsgUnread();}
+      else{if(hadSess&&e==='SIGNED_OUT'&&!window.__yanOut)toast('Session expirée sur mobile — reconnecte-toi, ton e-mail est pré-rempli 😉');hadSess=false;setProfile(null);setPurchases([]);setMyOrders([]);setAdminOrders([]);setNotifications([]);}});
+    function onVis(){if(!document.hidden){sb.auth.getSession().then(function(r){const s2=r.data&&r.data.session;if(s2){hadSess=true;setSession(s2);loadProfile(s2.user.id);loadPurchases(s2.user.id);loadMyOrders(s2.user.id);loadNotifications(s2.user.id);loadFollowers(s2.user.id);loadMsgUnread();}});}}
+    document.addEventListener('visibilitychange',onVis);
     const a=audio.current;
     function onEnd(){setPlaying(false);setProgress(0);}
     function onTime(){setTime(a.currentTime);setProgress((a.currentTime/a.duration)*100||0);}
     function onMeta(){setDuration(a.duration);}
     a.addEventListener('ended',onEnd);a.addEventListener('timeupdate',onTime);a.addEventListener('loadedmetadata',onMeta);
-    return function(){sub.data.subscription.unsubscribe();a.removeEventListener('ended',onEnd);a.removeEventListener('timeupdate',onTime);a.removeEventListener('loadedmetadata',onMeta);};
+    return function(){sub.data.subscription.unsubscribe();document.removeEventListener('visibilitychange',onVis);a.removeEventListener('ended',onEnd);a.removeEventListener('timeupdate',onTime);a.removeEventListener('loadedmetadata',onMeta);};
   },[]);
 
   React.useEffect(function(){function onMove(e){setSpot({x:e.clientX,y:e.clientY});}window.addEventListener('mousemove',onMove);return function(){window.removeEventListener('mousemove',onMove);};},[]);
@@ -1866,7 +1869,7 @@ function App(){
     setAdminOrders(r.data.map(function(o){o.proof_view=sm[o.proof_url]||o.proof_url;o.buyer_name=bm[o.buyer_id]||'Client';o.track_title=tm[o.track_id]||'—';return o;}));}
   async function loadWithdrawals(){const r=await sb.from('withdrawals').select('*').order('created_at',{ascending:false});if(r.data)setWithdrawals(r.data);}
 
-  async function logout(){audio.current.pause();setPlaying(false);await sb.auth.signOut();setView('home');toast('Déconnecté.');}
+  async function logout(){audio.current.pause();setPlaying(false);window.__yanOut=true;await sb.auth.signOut();setView('home');toast('Déconnecté.');}
 
   async function play(t){
     if(!t.audio_url){toast("Pas d'audio",'error');return;}
