@@ -1515,6 +1515,32 @@ function AdminView(props){
   </section>;
 }
 
+function PwResetModal(props){
+  const [p1,setP1]=React.useState(''),[p2,setP2]=React.useState(''),[busy,setBusy]=React.useState(false);
+  async function save(){
+    if(!p1||p1.length<6){props.toast('Mot de passe : 6 caractères minimum','error');return;}
+    if(p1!==p2){props.toast('Les deux mots de passe ne correspondent pas','error');return;}
+    setBusy(true);
+    const r=await sb.auth.updateUser({password:p1});
+    setBusy(false);
+    if(r.error){props.toast(r.error.message,'error');return;}
+    try{history.replaceState(null,'',location.pathname);}catch(e){}
+    props.toast('Mot de passe changé ✅');
+    props.close();
+  }
+  return <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4">
+    <div className="card rounded-2xl max-w-md w-full p-6 pop">
+      <h3 className="text-xl font-black text-white mb-2">🔑 Nouveau mot de passe</h3>
+      <p className="text-xs text-gray-400 mb-4">Tu as demandé à réinitialiser ton mot de passe. Choisis ton nouveau mot de passe ci-dessous.</p>
+      <label className="text-xs font-bold text-gray-400 block mb-1">Nouveau mot de passe</label>
+      <input type="password" value={p1} onChange={function(e){setP1(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none mb-3 focus:border-cyanNeon"/>
+      <label className="text-xs font-bold text-gray-400 block mb-1">Confirme le mot de passe</label>
+      <input type="password" value={p2} onChange={function(e){setP2(e.target.value);}} onKeyDown={function(e){if(e.key==='Enter')save();}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/>
+      <button onClick={save} disabled={busy} className="w-full bg-goldAccent text-black font-black py-3.5 rounded-xl mt-4 gg disabled:opacity-40">{busy?'...':'ENREGISTRER'}</button>
+      <button onClick={props.close} className="w-full mt-2 border border-borderDark text-gray-300 font-bold py-2.5 rounded-xl hover:bg-white/5 transition">Plus tard</button>
+    </div></div>;
+}
+
 function BuyModal(props){
   const item=props.item;
   const [license,setLicense]=React.useState(item.type==='vst'?'vst':'mp3');
@@ -1713,6 +1739,7 @@ function App(){
   const [allProfiles,setAllProfiles]=React.useState([]);
   const [session,setSession]=React.useState(null),[profile,setProfile]=React.useState(null);
   const [tracks,setTracks]=React.useState([]),[purchases,setPurchases]=React.useState([]);
+  const [pwReset,setPwReset]=React.useState(false);
   const [myOrders,setMyOrders]=React.useState([]),[adminOrders,setAdminOrders]=React.useState([]);
   const [withdrawals,setWithdrawals]=React.useState([]),[notifications,setNotifications]=React.useState([]);
   const [myFollowers,setMyFollowers]=React.useState(0),[msgUnread,setMsgUnread]=React.useState(0);
@@ -1749,6 +1776,7 @@ function App(){
       loadTracks();setLoading(false);});
     const sub=sb.auth.onAuthStateChange(function(e,s){
       setSession(s);
+      if(e==='PASSWORD_RECOVERY')setPwReset(true);
       if(s){loadProfile(s.user.id);loadPurchases(s.user.id);loadMyOrders(s.user.id);loadNotifications(s.user.id);loadFollowers(s.user.id);loadMsgUnread();}
       else{setProfile(null);setPurchases([]);setMyOrders([]);setAdminOrders([]);setNotifications([]);}});
     const a=audio.current;
@@ -2045,6 +2073,7 @@ function App(){
       {view==='me'?<ProducerPage id={profile.id} me={profile.id} tracks={tracks} play={play} playing={playing} current={current} buy={openBuy} toast={toast} setView={setView} share={share} openChat={openChat}/>:null}
       {(view==='producer'&&producerId)?<ProducerPage id={producerId} me={profile.id} tracks={tracks} play={play} playing={playing} current={current} buy={openBuy} toast={toast} setView={setView} share={share} openChat={openChat}/>:null}
       {view==='myorders'?<MyOrdersView orders={myOrders} copy={copy} pdf={pdf}/>:null}
+      {pwReset?<PwResetModal close={function(){setPwReset(false);}} toast={toast}/>:null}
       {view==='keys'?<KeysView purchases={purchases} copy={copy} download={downloadVst} pdf={pdf}/>:null}
       {view==='messages'?<MessagesView me={session.user.id} initPeer={chatPeer} initName={chatName} toast={toast} openProducer={openProducer} refreshUnread={loadMsgUnread}/>:null}
       {view==='verify'?<VerifyView myKeys={myKeys}/>:null}
