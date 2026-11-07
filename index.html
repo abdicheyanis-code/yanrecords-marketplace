@@ -1875,7 +1875,7 @@ function App(){
     if(!confirm('Confirmer que le paiement est bien reçu ?'))return;
     const r=await sb.rpc('validate_order',{p_order_id:id,p_admin_id:session.user.id});
     if(r.error){toast(r.error.message,'error');return;}
-    if(r.data&&r.data.ok){toast('Livrée ! Contrat '+r.data.contract);loadAdminOrders();loadTracks();}
+    if(r.data&&r.data.ok){toast('Livrée ! Contrat '+String(r.data.contract||'').replace('YAN-','213-'));loadAdminOrders();loadTracks();}
     else toast((r.data&&r.data.msg)||'Erreur','error');}
   async function refuseOrder(id){
     const reason=prompt('Raison du refus :');if(reason===null)return;
