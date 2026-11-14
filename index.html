@@ -480,9 +480,9 @@ function AuthPage(props){
           <div><label className="text-xs font-bold text-gray-400 block mb-1">Mot de passe (6+)</label><input type="password" required minLength="6" value={pass} onChange={function(e){setPass(e.target.value);}} className="w-full bg-obsidian border border-borderDark rounded-xl p-3 text-sm text-white outline-none focus:border-cyanNeon"/></div>
           {mode==='register'?<div className="space-y-2"><p className="text-xs font-bold text-gray-300">Je suis :</p>
             <div className="grid grid-cols-3 gap-2">
-              <button type="button" onClick={function(){setRole('visitor');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='visitor'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">👤</span>Visiteur<span className="block text-[9px] font-normal text-gray-500 mt-0.5">J'achète des beats</span></button>
-              <button type="button" onClick={function(){setRole('artist');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='artist'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎤</span>Artiste<span className="block text-[9px] font-normal text-gray-500 mt-0.5">Je cherche des instrus</span></button>
-              <button type="button" onClick={function(){setRole('producer');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='producer'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎹</span>Producteur<span className="block text-[9px] font-normal text-gray-500 mt-0.5">Je vends mes prods</span></button>
+              <button type="button" onClick={function(){setRole('visitor');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='visitor'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">👤</span>Visiteur·euse<span className="block text-[9px] font-normal text-gray-500 mt-0.5">J'écoute et j'achète</span></button>
+              <button type="button" onClick={function(){setRole('artist');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='artist'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎤</span>Rappeur·euse / Artiste<span className="block text-[9px] font-normal text-gray-500 mt-0.5">Je cherche des instrus</span></button>
+              <button type="button" onClick={function(){setRole('producer');}} className={'p-3 rounded-xl border text-xs font-bold transition '+(role==='producer'?'border-cyanNeon bg-cyanNeon/10 text-cyanNeon':'border-borderDark text-gray-400 hover:text-white')}><span className="block text-base mb-1">🎹</span>Producteur·rice / Beatmaker<span className="block text-[9px] font-normal text-gray-500 mt-0.5">Je crée et je vends mes beats</span></button>
             </div></div>:null}
           {mode==='register'?<div className="flex items-start gap-3"><input type="checkbox" checked={cgu} onChange={function(e){setCgu(e.target.checked);}} className="mt-1 accent-goldAccent"/><label className="text-xs text-gray-400">J'accepte les <a href="#" onClick={function(e){e.preventDefault();window.openGuide&&window.openGuide('cgu');}} className="text-goldAccent font-bold hover:underline">CGU</a>.</label></div>:null}
           {err?<div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs p-3 rounded-xl">{err}</div>:null}
@@ -518,11 +518,11 @@ function ShareBtn(props){
   function close(){setOpen(false);}
   function doShare(e){e.stopPropagation();
     const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    if(navigator.share&&isMobile){navigator.share({title:b.title,text:msg}).catch(function(){});}
+    if(navigator.share&&isMobile){navigator.share({title:b.title,text:msg}).catch(function(){});try{sb.rpc('increment_shares',{p_track_id:b.id});}catch(e){}}
     else setOpen(!open);
   }
-  function go(u){window.open(u,'_blank','noopener,noreferrer');close();}
-  function copyLink(){try{navigator.clipboard.writeText(url);}catch(e){}setCopied(true);setTimeout(function(){setCopied(false);close();},1200);}
+  function go(u){window.open(u,'_blank','noopener,noreferrer');try{sb.rpc('increment_shares',{p_track_id:b.id});}catch(e){}close();}
+  function copyLink(){try{navigator.clipboard.writeText(url);}catch(e){}try{sb.rpc('increment_shares',{p_track_id:b.id});}catch(e){}setCopied(true);setTimeout(function(){setCopied(false);close();},1200);}
   const big=!!props.big;
   return <div className="relative flex-shrink-0">
     {open?<div className="fixed inset-0 z-40" onClick={function(e){e.stopPropagation();close();}}></div>:null}
@@ -614,6 +614,7 @@ function TrackCard(props){
       <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.genre}</span>
       <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.bpm} BPM</span>
       <span className="text-[10px] font-bold bg-white/5 border border-borderDark rounded-md px-2 py-0.5 text-gray-300">{b.key}</span></div>
+    <p className="text-[10px] text-gray-500 mb-1">▶ {b.plays||0} · ❤️ {((props.likes||{})[b.id])||0} · 🔁 {b.shares||0}</p>
     <div className="flex items-center gap-2 flex-wrap">
       <FavBtn id={b.id} favs={props.favs} toggle={props.toggleFav}/><RateBtn track={b} ratings={props.ratings} open={props.openReviews}/><ShareBtn t={b}/>
       {!b.is_sold?<button onClick={function(){props.buy(b);}} className="flex-1 bg-goldAccent text-black font-black px-3 py-2 rounded-xl text-xs whitespace-nowrap hover:scale-105 transition">{fmt(b.price_mp3)} DZD</button>:null}
@@ -822,7 +823,7 @@ function HomeView(props){
   const daily=beats.length?beats[Math.floor(Date.now()/86400000)%beats.length]:null;
   const dailyProd=daily?(props.producers.filter(function(p){return p.id===daily.producer_id;})[0]||{id:daily.producer_id,name:daily.producer_name||'Producteur',avatar_url:null,role:'producer',count:0}):null;
   const totalPlays=props.tracks.reduce(function(sum,x){return sum+(x.plays||0);},0);
-  const cp={current:props.current,playing:props.playing,play:props.play,buy:props.buy,favs:props.favs,toggleFav:props.toggleFav,ratings:props.ratings,openReviews:props.openReviews,openProducer:props.openProducer};
+  const cp={current:props.current,playing:props.playing,play:props.play,buy:props.buy,favs:props.favs,toggleFav:props.toggleFav,ratings:props.ratings,openReviews:props.openReviews,openProducer:props.openProducer,likes:props.likes};
   function row(title,arr){return <div>
     <div className="flex items-center justify-between mb-4"><h3 className="text-2xl font-black text-white">{tr(title)}</h3>
       <button onClick={function(){props.setView('beats');}} className="text-xs font-bold text-cyanNeon hover:underline">{tr('Voir tout →')}</button></div>
@@ -1020,6 +1021,7 @@ function ProducerPage(props){
         </div>
         <h4 className="font-black text-white truncate">{t.title}</h4>
         <p className="text-xs text-gray-400">{t.type==='vst'?'Plugin VST':t.genre+' · '+t.bpm+' BPM'}</p>
+        <p className="text-[10px] text-gray-500 mt-1">▶ {t.plays||0} · ❤️ {((props.likes||{})[t.id])||0} · 🔁 {t.shares||0}</p>
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-borderDark">
           <span className="font-black text-goldAccent">{fmt(t.price_mp3)} DZD</span>
           {!t.is_sold?<button onClick={function(){props.buy(t);}} className="bg-goldAccent text-black font-bold px-4 py-2 rounded-xl text-xs hover:scale-105 transition">{tr('Acheter')}</button>:null}
@@ -1073,7 +1075,7 @@ function BeatsView(props){
             <button onClick={function(){props.openProducer(b.producer_id);}} className="text-xs text-goldAccent font-bold hover:underline">{b.producer_name}</button>
             <span className="text-xs text-gray-500"> · {b.genre}</span></div>
         </div>
-        <div className="hidden md:block col-span-3 text-sm text-gray-400">{b.bpm} BPM · {b.key} · {b.plays||0} ▶</div>
+        <div className="hidden md:block col-span-3 text-sm text-gray-400">{b.bpm} BPM · {b.key} · {b.plays||0} ▶ · ❤️ {((props.likes||{})[b.id])||0} · 🔁 {b.shares||0}</div>
         <div className="col-span-full md:col-span-3 flex justify-end items-center gap-2">
           <FavBtn id={b.id} favs={props.favs} toggle={props.toggleFav}/><RateBtn track={b} ratings={props.ratings} open={props.openReviews}/><ShareBtn t={b}/>
           {b.is_sold?<span className="text-xs font-bold text-red-500 border border-red-800/50 px-4 py-2 rounded-xl">VENDU</span>
@@ -1741,6 +1743,7 @@ function App(){
   const [loading,setLoading]=React.useState(true);
   const [profileErr,setProfileErr]=React.useState(null);
   const [tracksReady,setTracksReady]=React.useState(false),[favs,setFavs]=React.useState([]),[ratings,setRatings]=React.useState({}),[reviewTrack,setReviewTrack]=React.useState(null);
+  const [likes,setLikes]=React.useState({});
   const [allProfiles,setAllProfiles]=React.useState([]);
   const [session,setSession]=React.useState(null),[profile,setProfile]=React.useState(null);
   const [tracks,setTracks]=React.useState([]),[purchases,setPurchases]=React.useState([]);
@@ -1804,7 +1807,7 @@ function App(){
   },[view]);
   React.useEffect(function(){if(profile&&profile.is_admin){loadAdminOrders();loadWithdrawals();}},[profile&&profile.is_admin]);
   React.useEffect(function(){loadProducers();},[session&&session.user.id]);
-  React.useEffect(function(){loadRatings();if(session)loadFavs(session.user.id);else setFavs([]);},[session&&session.user.id]);
+  React.useEffect(function(){loadRatings();loadLikes();if(session)loadFavs(session.user.id);else setFavs([]);},[session&&session.user.id]);
 
   React.useEffect(function(){
     if(!session)return;
@@ -1829,6 +1832,7 @@ function App(){
     if(ins.data)setProfile(ins.data);else setProfileErr(ins.error?ins.error.message:'Profil introuvable');
   }
   async function loadFavs(uid){const r=await sb.from('favorites').select('track_id').eq('user_id',uid);if(r.data)setFavs(r.data.map(function(x){return x.track_id;}));}
+  async function loadLikes(){const r=await sb.rpc('track_likes');if(r.data){const m={};r.data.forEach(function(x){m[x.track_id]=Number(x.nb);});setLikes(m);}}
   async function loadRatings(){const r=await sb.rpc('track_ratings');if(r.data){const m={};r.data.forEach(function(x){m[x.track_id]={avg:x.avg_rating,nb:Number(x.nb)};});setRatings(m);}}
   async function toggleFav(id){
     if(!session){needAuth('Connecte-toi pour ajouter aux favoris');return;}
@@ -2038,8 +2042,8 @@ function App(){
     <MobileNav view={view} setView={setViewGuest} hasPlayer={!!current} msgUnread={0} guest login={function(){setShowAuth(true);}}/>
     <div key={view} className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto fade">
       {view!=='home'?<button onClick={function(){setView('home');}} className="mb-6 flex items-center gap-2 text-gray-400 text-sm font-bold hover:text-white transition"><Icon n="back" c="w-4 h-4"/>{tr('Retour')}</button>:null}
-      {view==='home'?<HomeView setView={setViewGuest} producers={producers} openProducer={openProducer} tracks={tracks} ready={tracksReady} play={play} playing={playing} current={current} buy={openBuy} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
-      {view==='beats'?<BeatsView ready={tracksReady} tracks={tracks} producers={producers} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
+      {view==='home'?<HomeView setView={setViewGuest} producers={producers} openProducer={openProducer} tracks={tracks} ready={tracksReady} play={play} playing={playing} current={current} buy={openBuy} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack} likes={likes}/>:null}
+      {view==='beats'?<BeatsView ready={tracksReady} tracks={tracks} producers={producers} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack} likes={likes}/>:null}
       {view==='vsts'?<VstsView tracks={tracks} myKeys={[]} buy={openBuy} setView={setViewGuest} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
       {view==='smartmaster'?<SmartMasterView vst={tracks.filter(function(t){return t.type==='vst';})[0]} buy={openBuy} toast={toast} setView={setViewGuest}/>:null}
       {view==='artists'?<ArtistsView producers={producers} openProducer={openProducer}/>:null}
@@ -2072,8 +2076,8 @@ function App(){
     <div key={view} className="pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto fade">
       {view!=='home'?<button onClick={function(){setView('home');}} className="mb-6 flex items-center gap-2 text-gray-400 text-sm font-bold hover:text-white transition"><Icon n="back" c="w-4 h-4"/>{tr('Retour')}</button>:null}
 
-      {view==='home'?<HomeView setView={setView} producers={producers} openProducer={openProducer} tracks={tracks} ready={tracksReady} play={play} playing={playing} current={current} buy={openBuy} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
-      {view==='beats'?<BeatsView ready={tracksReady} tracks={tracks} producers={producers} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
+      {view==='home'?<HomeView setView={setView} producers={producers} openProducer={openProducer} tracks={tracks} ready={tracksReady} play={play} playing={playing} current={current} buy={openBuy} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack} likes={likes}/>:null}
+      {view==='beats'?<BeatsView ready={tracksReady} tracks={tracks} producers={producers} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack} likes={likes}/>:null}
       {view==='vsts'?<VstsView tracks={tracks} myKeys={myKeys} buy={openBuy} setView={setView} openProducer={openProducer} favs={favs} toggleFav={toggleFav} ratings={ratings} openReviews={setReviewTrack}/>:null}
       {view==='smartmaster'?<SmartMasterView vst={tracks.filter(function(t){return t.type==='vst';})[0]} buy={openBuy} toast={toast} setView={setView}/>:null}
       {view==='favs'?<FavsView tracks={tracks} favs={favs} toggleFav={toggleFav} play={play} playing={playing} current={current} buy={openBuy} openProducer={openProducer}/>:null}
