@@ -1515,6 +1515,11 @@ function AdminView(props){
   </section>;
 }
 
+// ===== PAIEMENT PLATEFORME (Solution A) =====
+// Quand ton CCP sera prêt, remets le numéro entre les guillemets de "rip" :
+// const PLATEFORME={rip:'0012345678 clé 99',name:'Abdiche Yanis — 213WAVE'};
+const PLATEFORME={rip:'',name:'Abdiche Yanis — 213WAVE'};
+
 function PwResetModal(props){
   const [p1,setP1]=React.useState(''),[p2,setP2]=React.useState(''),[busy,setBusy]=React.useState(false);
   async function save(){
@@ -1596,9 +1601,9 @@ function BuyModal(props){
 
       <div className="p-4 rounded-xl bg-obsidian/70 border border-borderDark mb-4">
         <h4 className="font-bold text-white text-sm mb-2">Paiement CCP / BaridiMob</h4>
-        {(seller&&seller.rip)?<React.Fragment><p className="font-mono text-base text-greenPro font-bold select-all">{seller.rip}</p><p className="text-xs text-gray-400 mt-1">Bénéficiaire : {seller.name}</p></React.Fragment>
-        :<p className="text-sm text-yellow-400">Le vendeur n'a pas encore configuré son CCP.</p>}
-        <p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {rate}% (prélevée au vendeur)</p></div>
+        {(PLATEFORME&&PLATEFORME.rip)?<React.Fragment><p className="font-mono text-base text-greenPro font-bold select-all">{PLATEFORME.rip}</p><p className="text-xs text-gray-400 mt-1">Bénéficiaire : {PLATEFORME.name}</p></React.Fragment>
+        :<React.Fragment><p className="text-sm text-yellow-400">🏦 Le numéro CCP / BaridiMob de la plateforme sera affiché ici très bientôt.</p><p className="text-[11px] text-gray-500 mt-1">Une question ? Contacte-nous via la messagerie du site.</p></React.Fragment>}
+        <p className="text-[11px] text-gray-500 mt-2">Commission plateforme : {rate}% (incluse) — le producteur reçoit {100-rate}% après vérification du paiement.</p></div>
 
       {needLegal?<div className="mb-4 p-4 rounded-xl bg-pinkNeon/5 border border-pinkNeon/30">
         <label className="text-xs font-bold text-pinkNeon block mb-1 uppercase">Nom légal complet (obligatoire)</label>
